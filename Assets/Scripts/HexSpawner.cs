@@ -193,8 +193,15 @@ public class HexSpawner : SerializedMonoBehaviour
                 h.GetComponent<Renderer>().material = seaMaterial;
                 h.GetComponent<MeshRenderer>().enabled = true;
                 //make land a little lower
-                double yNew = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
-                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNew, h.transform.localScale.z);
+                double yNewS = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
+                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNewS, h.transform.localScale.z);
+                break;
+            case CS.CAR_TYPE_HARBOUR:
+                h.GetComponent<Renderer>().material = seaMaterial;
+                h.GetComponent<MeshRenderer>().enabled = true;
+                //make land a little lower
+                double yNewH = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
+                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNewH, h.transform.localScale.z);
                 break;
             case CS.CAR_TYPE_DESERT:
                 h.GetComponent<Renderer>().material = desertMaterial;
@@ -218,6 +225,7 @@ public class HexSpawner : SerializedMonoBehaviour
                 Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has unknown material", h.name, h.hexState.col, h.hexState.row));
                 break;
         }
+
         //Now if the hex should have a land model ontop of it and a number render them
         if (isRenderedLandType(h.hexState.HexType))
         {
@@ -229,9 +237,17 @@ public class HexSpawner : SerializedMonoBehaviour
     private void LandModelPosition(HexLandModel newHexLandModel, Hex h)
     {
         newHexLandModel.name = String.Concat("landModel ", h.hexState.HexType);
-        newHexLandModel.transform.localPosition = new Vector3(0, 0, 0) + Vector3.Scale(h.GetComponent<MeshFilter>().sharedMesh.bounds.size, Vector3.up);
+        newHexLandModel.transform.localPosition = Quaternion.AngleAxis(h.hexState.Rotation, Vector3.up) * (new Vector3(0, 0, 0) + Vector3.Scale(h.GetComponent<MeshFilter>().sharedMesh.bounds.size, Vector3.up));
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMEMODEL);
+        //get list of all objects that are not of this type, they all need to be removed
         List<GameObject> ret = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType, false);
+        //get list of all subtypes of this object, all not mentioned subtypes need to be removed  
+        List<GameObject> sub = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType + "_" + CS.CAR_TYPE_SUB_KEYWORD, true);
+        var s = h.hexState.HexType + "_" + CS.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
+        //Debug.Log(s);
+        sub.RemoveAll((go) => go.name == s);
+        //merge lists and destroy
+        ret.AddRange(sub);
         Helpers.DestroyObjects(ret);
     }
 
@@ -331,11 +347,22 @@ public class HexSpawner : SerializedMonoBehaviour
         }
     }
 
-    bool isReplaceableLandType(String t)
+    bool isConfiguredEmpty(String t)
     {
         if (
             (t == "") || (t == null) ||
-            (t == CS.CAR_TYPE_WORD_NULL) || (t == CS.CAR_TYPE_NONE) || (t == CS.CAR_TYPE_SEA)
+            (t == CS.CAR_TYPE_WORD_NULL) || (t == CS.CAR_TYPE_NONE)
+            )
+        {
+            return true;
+        }
+        else { return false; }
+    }
+
+    bool isReplaceableLandType(String t)
+    {
+        if (
+            (isConfiguredEmpty(t)) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_HARBOUR)
             )
         {
             return false;
@@ -350,8 +377,7 @@ public class HexSpawner : SerializedMonoBehaviour
             Debug.Log(t);
         }
         if (
-            (t == "") || (t == null) ||
-            (t == CS.CAR_TYPE_WORD_NULL) || (t == CS.CAR_TYPE_NONE) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_DESERT)
+            (isConfiguredEmpty(t)) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_DESERT)
             )
         {
             return false;
@@ -361,10 +387,7 @@ public class HexSpawner : SerializedMonoBehaviour
 
     bool isRenderedLandType(String t)
     {
-        if (
-            (t == "") || (t == null) ||
-            (t == CS.CAR_TYPE_WORD_NULL) || (t == CS.CAR_TYPE_NONE)
-            )
+        if (isConfiguredEmpty(t))
         {
             return false;
         }

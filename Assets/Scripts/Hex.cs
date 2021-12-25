@@ -93,6 +93,8 @@ public class HexState
     public int col;
     public int row;
     public string HexType;
+    public string HexSubType;
+    public int Rotation = 0;
     public int? HexNum;
     public string GroupID;
     public bool Selected;

@@ -55,10 +55,22 @@ namespace Script
         public const string CAR_TYPE_MINE = "mine";
         public const string CAR_TYPE_GOLD = "gold";
         public const string CAR_TYPE_SEA = "sea";
+        public const string CAR_TYPE_HARBOUR = "harbour";
         public const string CAR_TYPE_DESERT = "desert";
         public const string CAR_TYPE_NONE = "none";
         public const string CAR_TYPE_WORD_NULL = "null";
         public const string CAR_TYPE_EMPTY = "";
+
+        //Sub Type Keywords
+        public const string CAR_TYPE_SUB_KEYWORD = "resources";
+
+        //Card SubTypes
+        public const string CAR_TYPE_SUB_FOREST = "wood";
+        public const string CAR_TYPE_SUB_PASTURE = "wool";
+        public const string CAR_TYPE_SUB_FIELD = "wheat";
+        public const string CAR_TYPE_SUB_HILL = "brick";
+        public const string CAR_TYPE_SUB_MOUNTAIN = "ore";
+        public const string CAR_TYPE_SUB_3_1 = "3_1";
 
         //Card Location
         public const string CAR_LOCATION_GAMEBOARD = "card is on the Gameboard";
