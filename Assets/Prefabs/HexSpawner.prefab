@@ -1,0 +1,659 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6641248295233056105
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6641248295233056106}
+  - component: {fileID: 6641248295233056107}
+  - component: {fileID: 6641248295233056109}
+  - component: {fileID: 6641248295233056108}
+  m_Layer: 3
+  m_Name: HexSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6641248295233056106
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641248295233056105}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6641248295233056107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641248295233056105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f9b42b0bb16b35469aedbb4415a4a49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: landTypes
+      Entry: 7
+      Data: 0|System.Collections.Generic.List`1[[landConfig, Assembly-CSharp]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 14
+    - Name: 
+      Entry: 7
+      Data: 1|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 5
+    - Name: landType
+      Entry: 1
+      Data: hill
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 2|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 6
+    - Name: landType
+      Entry: 1
+      Data: pasture
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 3|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 5
+    - Name: landType
+      Entry: 1
+      Data: mountain
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 4|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 6
+    - Name: landType
+      Entry: 1
+      Data: field
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 6
+    - Name: landType
+      Entry: 1
+      Data: forest
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 6|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 18
+    - Name: landType
+      Entry: 1
+      Data: sea
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 12
+    - Name: landType
+      Entry: 1
+      Data: null
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 8|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 2
+    - Name: landType
+      Entry: 1
+      Data: desert
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 2
+    - Name: landCnt
+      Entry: 3
+      Data: 1
+    - Name: landType
+      Entry: 1
+      Data: pasture
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 10|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 2
+    - Name: landCnt
+      Entry: 3
+      Data: 2
+    - Name: landType
+      Entry: 1
+      Data: mountain
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 11|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 2
+    - Name: landCnt
+      Entry: 3
+      Data: 1
+    - Name: landType
+      Entry: 1
+      Data: field
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 12|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 2
+    - Name: landCnt
+      Entry: 3
+      Data: 1
+    - Name: landType
+      Entry: 1
+      Data: forest
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 13|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 2
+    - Name: landCnt
+      Entry: 3
+      Data: 2
+    - Name: landType
+      Entry: 1
+      Data: hill
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|landConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 2
+    - Name: landCnt
+      Entry: 3
+      Data: 3
+    - Name: landType
+      Entry: 1
+      Data: gold
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: numTypes
+      Entry: 7
+      Data: 15|System.Collections.Generic.List`1[[numConfig, Assembly-CSharp]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 20
+    - Name: 
+      Entry: 7
+      Data: 16|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 19|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 20|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 22|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 23|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 24|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 3
+    - Name: numType
+      Entry: 3
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 25|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 26|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 28|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 29|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 30|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 31|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 32|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 33|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 34|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 35|numConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 2
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  forestMaterial: {fileID: 2100000, guid: 949b178715cc24e9d8bf5d9d5edba4a8, type: 2}
+  pastureMaterial: {fileID: 2100000, guid: 7ddd0e2c68fa8444598f5ed1c3a35839, type: 2}
+  fieldMaterial: {fileID: 2100000, guid: 519091cab1a4a4fffb843ff96a27c6a2, type: 2}
+  hillMaterial: {fileID: 2100000, guid: 612b7901286fb4f11a8d5110a11253ad, type: 2}
+  mountainMaterial: {fileID: 2100000, guid: f6a92a7ba707847488cb300faf1cb23f, type: 2}
+  desertMaterial: {fileID: 2100000, guid: 70fa2c06f09b5430d9f217344537f4c6, type: 2}
+  mineMaterial: {fileID: 2100000, guid: 552bde77c2a934ed4bd554aeec24b6e5, type: 2}
+  seaMaterial: {fileID: 2100000, guid: aa6f4e763921e455ea7cad3a4593850b, type: 2}
+  hexPrefab: {fileID: 6932450884815424045, guid: 0f53b7d9030d27f4e8b2a2cade7f4461, type: 3}
+  hexLandPrefab: {fileID: 5988809368511060260, guid: d69a158bc15c6480d8104aa0e9510264, type: 3}
+  hexTextPrefab: {fileID: 1514278714672149903, guid: 475aadd4dedb74c8caaa4f23640a4840, type: 3}
+--- !u!114 &6641248295233056109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641248295233056105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fe2b824d446dda4f9f3a403b4417683, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6641248295233056108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6641248295233056105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 1496645697bd6b14facf885d2ec53cfe, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6641248295233056109}
+        m_TargetAssemblyTypeName: SelectHexes, Assembly-CSharp
+        m_MethodName: LeftClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 1fb29c8c-2b33-4dc0-9321-ee626e304930
+    m_ActionName: Keyboard/Mouse/Left Click[/Mouse/leftButton]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Keyboard/Mouse
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
