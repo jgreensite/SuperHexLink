@@ -33,6 +33,7 @@ public class HexSpawner : SerializedMonoBehaviour
     public Material desertMaterial;
     public Material mineMaterial;
     public Material seaMaterial;
+    public Material goldMaterial;
 
     //Hex Prefab Types
     public Hex hexPrefab;
@@ -200,7 +201,7 @@ public class HexSpawner : SerializedMonoBehaviour
                 h.GetComponent<MeshRenderer>().enabled = true;
                 break;
             case CS.CAR_TYPE_GOLD:
-                h.GetComponent<Renderer>().material = desertMaterial;
+                h.GetComponent<Renderer>().material = goldMaterial;
                 h.GetComponent<MeshRenderer>().enabled = true;
                 break;
             case CS.CAR_TYPE_NONE:
