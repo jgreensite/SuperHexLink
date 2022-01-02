@@ -9,6 +9,8 @@ using AnyClone;
 using FDL.Library.Numeric;
 using Script;
 using TMPro;
+using SimpleHexExtensions;
+using HexExtensions;
 
 public class HexSpawner : SerializedMonoBehaviour
 {
@@ -237,7 +239,44 @@ public class HexSpawner : SerializedMonoBehaviour
     private void LandModelPosition(HexLandModel newHexLandModel, Hex h)
     {
         newHexLandModel.name = String.Concat("landModel ", h.hexState.HexType);
-        newHexLandModel.transform.localPosition = Quaternion.AngleAxis(h.hexState.Rotation, Vector3.up) * (new Vector3(0, 0, 0) + Vector3.Scale(h.GetComponent<MeshFilter>().sharedMesh.bounds.size, Vector3.up));
+        newHexLandModel.transform.localPosition = (new Vector3(0, 0, 0) + Vector3.Scale(h.GetComponent<MeshFilter>().sharedMesh.bounds.size, Vector3.up));
+
+        //Harbours can only point towards certain land types
+        if (h.hexState.HexType != CS.CAR_TYPE_HARBOUR)
+        {
+            newHexLandModel.transform.Rotate(Vector3.up, h.hexState.Rotation);
+        }
+        else
+        {
+            bool foundSuitable = false;
+            int r = h.hexState.Rotation/60;
+            var neigh = h.hexState.Neighbours();
+            int inc = 360 / neigh.Count;
+
+            //first check to see if the rotation given is valid
+            if (isOnBoardHex(neigh[r]))
+            {
+                newHexLandModel.transform.Rotate(Vector3.up, h.hexState.Rotation);
+                foundSuitable = true;
+            }
+            //if not set a new rotation based on first valid point
+            r = 0;    
+            while ((r < neigh.Count) && (foundSuitable == false))
+            {
+                var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neigh[r]);
+                if (isOnBoardHex(neigh[r]))
+                    {
+                        if (isReplaceableLandType(state.hexes[o.col][o.row].hexState.HexType))
+                        {
+                            newHexLandModel.transform.Rotate(Vector3.up, r * inc);
+                        foundSuitable = true;
+                        }
+                    }
+                r++;
+            }
+            if (foundSuitable == false) { Debug.Log(h.hexState.col + "_" + h.hexState.col + " Cannot find a suitable rotation"); }
+        }
+
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMEMODEL);
         //get list of all objects that are not of this type, they all need to be removed
         List<GameObject> ret = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType, false);
@@ -372,12 +411,8 @@ public class HexSpawner : SerializedMonoBehaviour
 
     bool isNumberedLandType(String t)
     {
-        if (t == CS.CAR_TYPE_DESERT)
-        {
-            Debug.Log(t);
-        }
         if (
-            (isConfiguredEmpty(t)) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_DESERT)
+            (isConfiguredEmpty(t)) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_DESERT) || (t == CS.CAR_TYPE_HARBOUR)
             )
         {
             return false;
@@ -495,7 +530,22 @@ public class HexSpawner : SerializedMonoBehaviour
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
     private float Get_Z_Offset(int col) => col % 2 == 0 ? state.hexGrid.Apothem * 1.0f : 0f;
 
-    public Hex GetNeighborAt(int col, int row, HexNeighborDirection direction)
+    //checks to see if the Hex is on thee board
+    public bool isOnBoardHex(HexExtensions.HexExtensions.Hex h)
+    {
+
+        var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
+        if ((o.col > -1) && (o.col < state.hexGrid.cols) && (o.row > -1) && (o.row < state.hexGrid.rows))
+        {
+            return (true);
+        }
+        else
+        {
+            return (false);
+        }
+    }
+
+    public Hex GetNeighborAt(int col, int row, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
     {
         (int row, int col) offsets = GetOffsetInDirection(row % 2 == 0, direction);
         return GetHexIfInBounds(row + offsets.row, col + offsets.col);
@@ -504,28 +554,26 @@ public class HexSpawner : SerializedMonoBehaviour
     private Hex GetHexIfInBounds(int row, int col) =>
         state.hexGrid.IsInBounds(row, col) ? state.hexes[row][col] : null;
 
-    private (int row, int col) GetOffsetInDirection(bool isEven, HexNeighborDirection direction)
+    private (int row, int col) GetOffsetInDirection(bool isEven, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
     {
         switch(direction)
         {
-            case HexNeighborDirection.Up:
+            case SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection.Up:
                 return (2, 0);
-            case HexNeighborDirection.UpRight:
+            case SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection.UpRight:
                 return isEven ? (1, 1) : (1, 0);
-            case HexNeighborDirection.DownRight:
+            case SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection.DownRight:
                 return isEven ? (-1, 1) : (-1, 0);
-            case HexNeighborDirection.Down:
+            case SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection.Down:
                 return (-2, 0);
-            case HexNeighborDirection.DownLeft:
+            case SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection.DownLeft:
                 return isEven ? (-1, 0) : (-1, -1);
-            case HexNeighborDirection.UpLeft:
+            case SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection.UpLeft:
                 return isEven ? (1, 0) : (1, -1);
         }
         return (0, 0);
     }
 }
-
-public enum HexNeighborDirection{Up, UpRight, DownRight, Down, DownLeft, UpLeft}
 
 [System.Serializable]
 public class HexSpawnerState
