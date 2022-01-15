@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="HostGameScreen" src="HostGameScreen.uxml" />
+    <ui:Button text="Spawn" display-tooltip-when-elided="true" />
+    <ui:Button text="Update" display-tooltip-when-elided="true" />
+    <ui:Label text="Generate" display-tooltip-when-elided="true" />
+    <ui:Button text="Refresh" display-tooltip-when-elided="true" />
+    <ui:Button text="Clear" display-tooltip-when-elided="true" />
+    <ui:Label text="Load/Save" display-tooltip-when-elided="true" />
+    <ui:Button text="Load" display-tooltip-when-elided="true" style="width: 596px;" />
+    <ui:TextField picking-mode="Ignore" label="filename" value="./data/maps/map.json" text="Filename" max-length="-1" is-delayed="true" style="align-items: stretch; flex-direction: row-reverse; width: 588px;" />
+    <ui:Instance template="HostGameScreen" name="HostGameScreen" />
+</ui:UXML>

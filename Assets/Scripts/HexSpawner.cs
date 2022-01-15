@@ -334,7 +334,7 @@ public class HexSpawner : SerializedMonoBehaviour
     {
         if ((filePath == null) || (filePath.Length == 0))
         {
-            filePath = "./data/maps/test2_hex.json"; //default value
+            filePath = "./data/maps/map.json"; //default value
         }
             byte[] bytes = SerializationUtility.SerializeValue(state, DataFormat.JSON);
             File.WriteAllBytes(filePath, bytes);
@@ -350,7 +350,7 @@ public class HexSpawner : SerializedMonoBehaviour
         HexSpawnerState loadedHexSpawner = new HexSpawnerState();
         if ((filePath == null) || (filePath.Length == 0))
         {
-            filePath = "./data/maps/test2_hex.json"; //default value
+            filePath = "./data/maps/map.json"; //default value
         }
         if (!File.Exists(filePath)) return; // No state to load
 

@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="TitleScreenUI.uss" />
+    <ui:VisualElement name="screen" class="screen" style="background-image: none; -unity-font: url(&apos;/Assets/UI/Fonts/HONEO___.TTF&apos;); -unity-font-definition: none; align-items: center;">
+        <ui:VisualElement name="header" class="header" style="-unity-font: url(&apos;/Assets/UI/Fonts/HONEO___.TTF&apos;);">
+            <ui:VisualElement name="game-logo" class="logo" />
+            <ui:Button text="Quit" display-tooltip-when-elided="true" name="quit-button" class="quit-button" />
+        </ui:VisualElement>
+        <ui:VisualElement name="main-content" class="main-content" style="width: 100%; margin-left: 0; margin-right: 0; padding-left: 20px; padding-right: 20px;">
+            <ui:Label text="SuperHexLink" display-tooltip-when-elided="true" name="Label" class="title" style="padding-left: 0; padding-right: 0; margin-top: 10px;" />
+            <ui:VisualElement name="join-local-title" class="section-title-container" style="-unity-font: url(&apos;/Assets/UI/Fonts/HONEO___.TTF&apos;); -unity-font-definition: none; color: rgba(0, 0, 0, 255); font-size: 22px; -unity-text-align: upper-center; padding-top: 10px;">
+                <ui:Label text="Join a Local Game" display-tooltip-when-elided="true" name="join-a-local-game" class="section-title" />
+            </ui:VisualElement>
+            <ui:VisualElement name="local-games-list-container" style="height: 200px; align-items: center; justify-content: center; width: 100%; border-left-width: 5px; border-right-width: 5px; border-top-width: 5px; border-bottom-width: 5px; border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-left-color: rgba(0, 0, 0, 255); border-right-color: rgba(0, 0, 0, 255); border-top-color: rgba(0, 0, 0, 255); border-bottom-color: rgba(0, 0, 0, 255);">
+                <ui:ListView focusable="true" name="local-games-list" item-height="100" style="max-width: 100px; max-height: 100px; width: 100%; height: 100%;" />
+            </ui:VisualElement>
+            <ui:Button text="Connect to a Local Game" display-tooltip-when-elided="true" name="manual-connect" class="blue-button" />
+            <ui:Label text="Or" display-tooltip-when-elided="true" name="or" style="padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; margin-top: 20px; font-size: 36px;" />
+            <ui:Button text="Host a Local Game" display-tooltip-when-elided="true" name="host-local-game" class="blue-button green-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
