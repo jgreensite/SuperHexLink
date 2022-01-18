@@ -9,7 +9,7 @@ public class TitleScreenManager : VisualElement
     VisualElement m_HostScreen;
     VisualElement m_JoinScreen;
     VisualElement m_ManualConnectScreen;
-
+    
     public new class UxmlFactory : UxmlFactory<TitleScreenManager, UxmlTraits> { }
 
     public TitleScreenManager()
@@ -24,9 +24,9 @@ public class TitleScreenManager : VisualElement
         m_JoinScreen = this.Q("JoinGameScreen");
         m_ManualConnectScreen = this.Q("ManualConnectScreen");
 
-        m_TitleScreen?.Q("host-local-button")?.RegisterCallback<ClickEvent>(ev => EnableHostScreen());
-        m_TitleScreen?.Q("join-local-button")?.RegisterCallback<ClickEvent>(ev => EnableJoinScreen());
-        m_TitleScreen?.Q("manual-connect-button")?.RegisterCallback<ClickEvent>(ev => EnableManualScreen());
+        m_TitleScreen?.Q("host-local-game")?.RegisterCallback<ClickEvent>(ev => EnableHostScreen());
+        m_TitleScreen?.Q("join-local-game")?.RegisterCallback<ClickEvent>(ev => EnableJoinScreen());
+        m_TitleScreen?.Q("manual-connect")?.RegisterCallback<ClickEvent>(ev => EnableManualScreen());
 
         m_HostScreen?.Q("back-button")?.RegisterCallback<ClickEvent>(ev => EnableTitleScreen());
         m_JoinScreen?.Q("back-button")?.RegisterCallback<ClickEvent>(ev => EnableTitleScreen());
