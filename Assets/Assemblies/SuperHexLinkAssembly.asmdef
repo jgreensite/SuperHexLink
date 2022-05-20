@@ -3,9 +3,9 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.UIElementsModule",
+        "UnityEditor.UIElementsInputSystemModule",
         "UnityEngine.UIElementsGameObjectsModule",
-        "UnityEngine",
-        "UnityEditor.UIElementsInputSystemModule"
+        "UnityEngine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
