@@ -106,7 +106,7 @@ public class LocalGamesFinder : MonoBehaviour
             m_ListView.itemsSource = discoveredServerInfoObjects;
             //We then must refresh the listView on this new data source
             //(don't worry it doesn't make the list jump, ListView is cool like that)
-            m_ListView.Refresh();
+            m_ListView.Rebuild();
 
             //We increment
             nextTime += (1 / perSecond);
