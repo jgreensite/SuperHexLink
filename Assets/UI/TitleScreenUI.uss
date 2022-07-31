@@ -75,14 +75,14 @@
     align-items: center;
     padding-left: 20px;
     padding-right: 20px;
-    -unity-font: url('/Assets/UI/Fonts/HONEO___.TTF');
+    -unity-font: url('project://database/Assets/UI/Fonts/HONEO___.TTF?fileID=12800000&guid=3c832893fd073478693fbae7b8561df6&type=3#HONEO___');
     color: rgb(0, 0, 0);
 }
 
 .title {
     font-size: 64px;
     margin-top: 100px;
-    -unity-font: url('/Assets/UI/Fonts/HONEO___.TTF');
+    -unity-font: url('project://database/Assets/UI/Fonts/HONEO___.TTF?fileID=12800000&guid=3c832893fd073478693fbae7b8561df6&type=3#HONEO___');
     color: rgb(0, 0, 0);
 }
 
@@ -239,9 +239,9 @@
     flex-direction: column-reverse;
     padding-left: 0;
     padding-right: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-left: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-left: 0;
     margin-right: 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -260,9 +260,10 @@
     border-right-color: rgb(255, 255, 255);
     border-top-color: rgb(255, 255, 255);
     border-bottom-color: rgb(255, 255, 255);
-    font-size: 24px;
+    font-size: 65%;
     color: rgb(255, 255, 255);
-    white-space: normal;
+    white-space: nowrap;
+    -unity-text-align: middle-center;
 }
 
 .quit-game-button:hover {
@@ -286,7 +287,7 @@
     max-width: 200px;
     height: 68px;
     margin-left: 10px;
-    background-image: url('/Assets/UI/superhexlink-logo.png');
+    background-image: url('project://database/Assets/UI/superhexlink-logo.png?fileID=2800000&guid=7bbf3e63ab18f4b4882933f9c3aae03b&type=3#superhexlink-logo');
     -unity-background-scale-mode: scale-to-fit;
 }
 

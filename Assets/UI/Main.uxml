@@ -1,12 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:Template name="HostGameScreen" src="HostGameScreen.uxml" />
+    <ui:Template name="HostGameScreen" src="project://database/Assets/UI/HostGameScreen.uxml?fileID=9197481963319205126&amp;guid=15664ca05ad6a488a9e50c6374c06d18&amp;type=3#HostGameScreen" />
     <ui:Button text="Spawn" display-tooltip-when-elided="true" />
     <ui:Button text="Update" display-tooltip-when-elided="true" />
     <ui:Label text="Generate" display-tooltip-when-elided="true" />
     <ui:Button text="Refresh" display-tooltip-when-elided="true" />
     <ui:Button text="Clear" display-tooltip-when-elided="true" />
     <ui:Label text="Load/Save" display-tooltip-when-elided="true" />
-    <ui:Button text="Load" display-tooltip-when-elided="true" style="width: 596px;" />
-    <ui:TextField picking-mode="Ignore" label="filename" value="./data/maps/map.json" text="Filename" max-length="-1" is-delayed="true" style="align-items: stretch; flex-direction: row-reverse; width: 588px;" />
-    <ui:Instance template="HostGameScreen" name="HostGameScreen" />
+    <ui:Button text="Load" display-tooltip-when-elided="true" style="width: auto;" />
+    <ui:TextField picking-mode="Ignore" label="filename" value="./data/maps/map.json" text="Filename" max-length="-1" is-delayed="true" style="align-items: stretch; flex-direction: row-reverse; width: auto;" />
+    <ui:Instance template="HostGameScreen" name="HostGameScreen" style="height: 280px;" />
 </ui:UXML>
