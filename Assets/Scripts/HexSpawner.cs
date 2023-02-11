@@ -25,7 +25,7 @@ public class HexSpawner : SerializedMonoBehaviour
         get { return this.state; }
         set { this.state = value; }
     }
-
+    
     //Hex Materials
     public Material forestMaterial;
     public Material pastureMaterial;
@@ -59,7 +59,7 @@ public class HexSpawner : SerializedMonoBehaviour
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numTypes = new List<numConfig>();
 
     [Button("Spawn Hexes")]
-    private void SpawnHexes()
+    public void SpawnHexes()
     {
         BuildHexes(false);
     }
@@ -143,7 +143,7 @@ public class HexSpawner : SerializedMonoBehaviour
 
     [Button("Update Hexes")]
     //used to update hexes based on what has been edited in the inspector
-    private void UpdateHexes()
+    public void UpdateHexes()
     {
         foreach (List<Hex> c in state.hexes)
         {
@@ -307,7 +307,7 @@ public class HexSpawner : SerializedMonoBehaviour
     }
 
     [Button("Refresh Map")]
-    private void RefeshHexes()
+    public void RefeshHexes()
     {
         BuildTypes();
         foreach (List<Hex> hc in state.hexes)
@@ -321,7 +321,7 @@ public class HexSpawner : SerializedMonoBehaviour
     }
 
     [Button("Clear Map")]
-    private void ClearHexes()
+    public void ClearHexes()
     {
         List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
         Helpers.DestroyObjects(ret);
@@ -330,7 +330,7 @@ public class HexSpawner : SerializedMonoBehaviour
 
     [Button("Save Map")]
     //todo - externalise defauilt value as a constant
-    private void SaveHexes(string filePath)
+    public void SaveHexes(string filePath)
     {
         if ((filePath == null) || (filePath.Length == 0))
         {
@@ -376,8 +376,8 @@ public class HexSpawner : SerializedMonoBehaviour
         //update the hexstate as a result
         UpdateHexes();
     }
-
-    private void RefreshLand(Hex h)
+    
+    public void RefreshLand(Hex h)
     {
         //do not randomize if supposed to skip
         if (isReplaceableLandType(h.hexState.HexType))
@@ -530,7 +530,7 @@ public class HexSpawner : SerializedMonoBehaviour
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
     private float Get_Z_Offset(int col) => col % 2 == 0 ? state.hexGrid.Apothem * 1.0f : 0f;
 
-    //checks to see if the Hex is on thee board
+    //checks to see if the Hex is on the board
     public bool isOnBoardHex(HexExtensions.HexExtensions.Hex h)
     {
 

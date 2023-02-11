@@ -43,11 +43,14 @@ public class Helpers : MonoBehaviour
     {
         foreach (GameObject g in ret)
         {
-#if UNITY_EDITOR
-            DestroyImmediate(g);
-#elif !UNITY_EDITOR
-            Destroy(g);
-#endif
+            //make g inactive before destroying it
+            //g.SetActive(false);
+            if (Application.isEditor)
+            {
+                DestroyImmediate(g);
+            } else {   
+                Destroy(g);
+            }
         }
     }
 }
