@@ -103,3 +103,8 @@
     white-space: normal;
     font-size: 14px;
 }
+
+.short-toggle Label {
+    width: 50px;
+    min-width: 50px;
+}

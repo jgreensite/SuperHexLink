@@ -4,6 +4,8 @@
     <ui:VisualElement name="screen" class="screen game-ui-screen" style="flex-direction: column; flex-wrap: nowrap; width: 100%; height: 100%;">
         <ui:VisualElement name="top-container" style="flex-direction: row; width: 100%; height: 50%;">
             <ui:VisualElement name="top-left-container" style="width: 50%; align-items: flex-start; margin-left: 10px; margin-top: 10px; height: 100%;">
+                <ui:Toggle label="Show" name="show-ui" tooltip="Show/hide the UI" class="quit-button short-toggle" style="width: 50%; height: 10%; font-size: 13px; -unity-text-align: middle-center; white-space: nowrap; color: rgb(255, 255, 255); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255);" />
+                <ui:VisualElement name="spacer" class="spacers" />
                 <ui:Button text="Quit Game" name="quit-game" class="quit-game-button" style="margin-left: 0; width: 30%; height: 10%;" />
             </ui:VisualElement>
             <ui:VisualElement name="top-right-container" class="top-right-container" style="align-items: flex-end; width: 50%; height: 100%;">
@@ -26,11 +28,13 @@
                 <ui:VisualElement name="spacer" class="spacers" />
                 <ui:Button text="Spawn" name="spawn-board" class="quit-game-button" style="width: 30%; height: 10%;" />
                 <ui:VisualElement name="spacer" class="spacers" />
-                <ui:Button text="Refresh" name="refresh-board" class="quit-game-button" style="width: 30%; height: 10%;" />
+                <ui:Button text="Clear" name="clear-board" class="quit-game-button" style="width: 30%; height: 10%;" />
                 <ui:VisualElement name="spacer" class="spacers" />
                 <ui:Button text="Load" name="load-board" class="quit-game-button" style="width: 30%; height: 10%;" />
                 <ui:VisualElement name="spacer" class="spacers" />
-                <ui:Button text="Clear" name="clear-board" class="quit-game-button" style="width: 30%; height: 10%;" />
+                <ui:Button text="Save" name="save-board" class="quit-game-button" style="width: 30%; height: 10%;" />
+                <ui:VisualElement name="spacer" class="spacers" />
+                <ui:Button text="Refresh" name="refresh-board" class="quit-game-button" style="width: 30%; height: 10%;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="bottom-container" style="width: 100%; height: 50%; flex-direction: row;">
