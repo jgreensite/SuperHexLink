@@ -1,11 +1,10 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-//using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
 using Toggle = UnityEngine.UIElements.Toggle;
+using System.Collections.Generic;
 //using Unity.Burst;
 //using Unity.Entities;
 //using Unity.Mathematics;
@@ -27,19 +26,10 @@ public class GameUIManager : MonoBehaviour
     public VisualElement m_JoinScreen;
     public VisualElement m_ManualConnectScreen;
 
-    private VisualElement[] elementsToHide;
-
-    //public new class UxmlFactory : UxmlFactory<GameUIManager, UxmlTraits> { }
-
-    //public GameUIManager()
-    //{
-    //    this.RegisterCallback<GeometryChangedEvent>(OnGeometryChange);
-    //}
-
     // Start is called before the first frame update
     void Start()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        VisualElement root = GetComponent<UIDocument>().rootVisualElement;
         m_ShowUI = root.Q<Toggle>("show-ui");
         m_LeaveArea = root.Q<Button>("quit-game");
         m_Spawn = root.Q<Button>("spawn-board");
@@ -56,19 +46,18 @@ public class GameUIManager : MonoBehaviour
         m_Refresh.clicked += () => ClickedButton("refresh-board");
         m_Clear.clicked += () => ClickedButton("clear-board");
 
-        //populate the array of elements to hide with all the elements in the UI except m_ShowUI
-        elementsToHide = root.Children()
-            .Where(element => element.name != "show-ui")
-        .ToArray();
-
-        //make the toggle m_ShowUI on by default
         m_ShowUI.value = true;
     }
-
 
     //capture toggle change event and show/hide the UI
     void OnToggleValueChanged(ChangeEvent<bool> evt)
     {
+        VisualElement root = GetComponent<UIDocument>().rootVisualElement;
+        //todo - This is a but clumsy, would be more elegant as a single line using a where and also changing the property
+        //todo - have a look at https://docs.unity3d.com/Manual/UIE-UQuery.html for inspiration
+        List<VisualElement> elementsToHide = root.Query("bottom-container").ToList();
+        elementsToHide.Add(root.Query("top-right-container"));
+        elementsToHide.Add(root.Query("quit-game"));
         foreach (var element in elementsToHide)
         {
             element.style.display = evt.newValue ? DisplayStyle.Flex : DisplayStyle.None;
