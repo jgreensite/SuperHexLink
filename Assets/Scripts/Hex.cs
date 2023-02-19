@@ -147,16 +147,16 @@ public class HexState
     public List<HexExtensions.HexExtensions.Hex> Neighbours()
     {
         int i = 0;
-        List<HexExtensions.HexExtensions.Hex> neighbours = new List<HexExtensions.HexExtensions.Hex>();
+        List<HexExtensions.HexExtensions.Hex> neighbours = new();
         foreach (HexExtensions.HexExtensions.Hex h in HexExtensions.HexExtensions.Hex.directions)
         {
             var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
-            /*
+           
             if (((o.col > 0)) && (o.row > 0))
             {
-            */
+            
                 neighbours.Add(Hex.Neighbor(i));
-            /*
+            
             }
             else
             {
@@ -165,7 +165,7 @@ public class HexState
                 fill.Scale(0);
                 neighbours.Add(fill);
             }
-            */
+            
             i++;
         }
         return (neighbours);
