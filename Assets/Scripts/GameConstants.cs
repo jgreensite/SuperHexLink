@@ -72,6 +72,14 @@ namespace Script
         public const string CAR_TYPE_SUB_MOUNTAIN = "ore";
         public const string CAR_TYPE_SUB_3_1 = "3_1";
 
+        //Number Token Colours
+        public static Color GetTextColor(string c){
+            //write a switch statement to return the color based on the string
+            if(c == "HIGHEST_PROBABILITY_COLOR" ) return new Color(0.8f, 0.0f, 0.0f, 1.0f);
+            else return new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        } 
+        public Color LOWEST_PROBABILITY_COLOR = new(1.0f, 1.0f, 1.0f, 1.0f);
+
         //Card Location
         public const string CAR_LOCATION_GAMEBOARD = "card is on the Gameboard";
         public const string CAR_LOCATION_RED_DECK = "card is in the Red Deck";

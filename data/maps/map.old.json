@@ -1,0 +1,1955 @@
+{
+    "$id": 0,
+    "$type": "0|HexSpawnerState, Assembly-CSharp",
+    "hexGrid": {
+        "$type": "1|HexGrid, Assembly-CSharp",
+        "cols": 7,
+        "rows": 10,
+        "radius": 1,
+        "height": 1,
+        "hexHeightVariance": {
+            "$type": "2|UnityEngine.Vector2, UnityEngine.CoreModule",
+            0,
+            0
+        }
+    },
+    "hexes": {
+        "$id": 1,
+        "$type": "3|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex, Assembly-CSharp]], mscorlib]], mscorlib",
+        "$rlength": 7,
+        "$rcontent": [
+            {
+                "$id": 2,
+                "$type": "4|System.Collections.Generic.List`1[[Hex, Assembly-CSharp]], mscorlib",
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 3,
+                        "$type": "5|Hex, Assembly-CSharp",
+                        "state": {
+                            "$id": 4,
+                            "$type": "6|HexState, Assembly-CSharp",
+                            "col": 0,
+                            "row": 0,
+                            "HexType": "null",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": "7|System.Nullable`1[[System.Int32, mscorlib]], mscorlib",
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 5,
+                                "$type": "8|UnityEngine.MeshRenderer, UnityEngine.CoreModule"
+                            }
+                        }
+                    },
+                    {
+                        "$id": 6,
+                        "$type": 5,
+                        "state": {
+                            "$id": 7,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 1,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 8,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 9,
+                        "$type": 5,
+                        "state": {
+                            "$id": 10,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 2,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                10
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 11,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 12,
+                        "$type": 5,
+                        "state": {
+                            "$id": 13,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 3,
+                            "HexType": "harbour",
+                            "HexSubType": "ore",
+                            "Rotation": 120,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 14,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 15,
+                        "$type": 5,
+                        "state": {
+                            "$id": 16,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 4,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 17,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 18,
+                        "$type": 5,
+                        "state": {
+                            "$id": 19,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 5,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                6
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 20,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 21,
+                        "$type": 5,
+                        "state": {
+                            "$id": 22,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 6,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                2
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 23,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 24,
+                        "$type": 5,
+                        "state": {
+                            "$id": 25,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 7,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 26,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 27,
+                        "$type": 5,
+                        "state": {
+                            "$id": 28,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 8,
+                            "HexType": "gold",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                5
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 29,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 30,
+                        "$type": 5,
+                        "state": {
+                            "$id": 31,
+                            "$type": 6,
+                            "col": 0,
+                            "row": 9,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 32,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "$id": 33,
+                "$type": 4,
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 34,
+                        "$type": 5,
+                        "state": {
+                            "$id": 35,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 0,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 36,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 37,
+                        "$type": 5,
+                        "state": {
+                            "$id": 38,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 1,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                6
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 39,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 40,
+                        "$type": 5,
+                        "state": {
+                            "$id": 41,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 2,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 42,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 43,
+                        "$type": 5,
+                        "state": {
+                            "$id": 44,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 3,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                8
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 45,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 46,
+                        "$type": 5,
+                        "state": {
+                            "$id": 47,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 4,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                11
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 48,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 49,
+                        "$type": 5,
+                        "state": {
+                            "$id": 50,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 5,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                10
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 51,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 52,
+                        "$type": 5,
+                        "state": {
+                            "$id": 53,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 6,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 54,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 55,
+                        "$type": 5,
+                        "state": {
+                            "$id": 56,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 7,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 57,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 58,
+                        "$type": 5,
+                        "state": {
+                            "$id": 59,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 8,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 60,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 61,
+                        "$type": 5,
+                        "state": {
+                            "$id": 62,
+                            "$type": 6,
+                            "col": 1,
+                            "row": 9,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 63,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "$id": 64,
+                "$type": 4,
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 65,
+                        "$type": 5,
+                        "state": {
+                            "$id": 66,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 0,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 67,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 68,
+                        "$type": 5,
+                        "state": {
+                            "$id": 69,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 1,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                8
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 70,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 71,
+                        "$type": 5,
+                        "state": {
+                            "$id": 72,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 2,
+                            "HexType": "harbour",
+                            "HexSubType": "wheat",
+                            "Rotation": 120,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 73,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 74,
+                        "$type": 5,
+                        "state": {
+                            "$id": 75,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 3,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 76,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 77,
+                        "$type": 5,
+                        "state": {
+                            "$id": 78,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 4,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                9
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 79,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 80,
+                        "$type": 5,
+                        "state": {
+                            "$id": 81,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 5,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 82,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 83,
+                        "$type": 5,
+                        "state": {
+                            "$id": 84,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 6,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                2
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 85,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 86,
+                        "$type": 5,
+                        "state": {
+                            "$id": 87,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 7,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                11
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 88,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 89,
+                        "$type": 5,
+                        "state": {
+                            "$id": 90,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 8,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 91,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 92,
+                        "$type": 5,
+                        "state": {
+                            "$id": 93,
+                            "$type": 6,
+                            "col": 2,
+                            "row": 9,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                9
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 94,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "$id": 95,
+                "$type": 4,
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 96,
+                        "$type": 5,
+                        "state": {
+                            "$id": 97,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 0,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 98,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 99,
+                        "$type": 5,
+                        "state": {
+                            "$id": 100,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 1,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 101,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 102,
+                        "$type": 5,
+                        "state": {
+                            "$id": 103,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 2,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                10
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 104,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 105,
+                        "$type": 5,
+                        "state": {
+                            "$id": 106,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 3,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                9
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 107,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 108,
+                        "$type": 5,
+                        "state": {
+                            "$id": 109,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 4,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 110,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 111,
+                        "$type": 5,
+                        "state": {
+                            "$id": 112,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 5,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                3
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 113,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 114,
+                        "$type": 5,
+                        "state": {
+                            "$id": 115,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 6,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                6
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 116,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 117,
+                        "$type": 5,
+                        "state": {
+                            "$id": 118,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 7,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                3
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 119,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 120,
+                        "$type": 5,
+                        "state": {
+                            "$id": 121,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 8,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 122,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 123,
+                        "$type": 5,
+                        "state": {
+                            "$id": 124,
+                            "$type": 6,
+                            "col": 3,
+                            "row": 9,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 125,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "$id": 126,
+                "$type": 4,
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 127,
+                        "$type": 5,
+                        "state": {
+                            "$id": 128,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 0,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 129,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 130,
+                        "$type": 5,
+                        "state": {
+                            "$id": 131,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 1,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                11
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 132,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 133,
+                        "$type": 5,
+                        "state": {
+                            "$id": 134,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 2,
+                            "HexType": "harbour",
+                            "HexSubType": "wood",
+                            "Rotation": 180,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 135,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 136,
+                        "$type": 5,
+                        "state": {
+                            "$id": 137,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 3,
+                            "HexType": "pasture",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                8
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 138,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 139,
+                        "$type": 5,
+                        "state": {
+                            "$id": 140,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 4,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                3
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 141,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 142,
+                        "$type": 5,
+                        "state": {
+                            "$id": 143,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 5,
+                            "HexType": "field",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                10
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 144,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 145,
+                        "$type": 5,
+                        "state": {
+                            "$id": 146,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 6,
+                            "HexType": "desert",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 147,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 148,
+                        "$type": 5,
+                        "state": {
+                            "$id": 149,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 7,
+                            "HexType": "desert",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 150,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 151,
+                        "$type": 5,
+                        "state": {
+                            "$id": 152,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 8,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 153,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 154,
+                        "$type": 5,
+                        "state": {
+                            "$id": 155,
+                            "$type": 6,
+                            "col": 4,
+                            "row": 9,
+                            "HexType": "gold",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                12
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 156,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "$id": 157,
+                "$type": 4,
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 158,
+                        "$type": 5,
+                        "state": {
+                            "$id": 159,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 0,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 160,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 161,
+                        "$type": 5,
+                        "state": {
+                            "$id": 162,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 1,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                4
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 163,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 164,
+                        "$type": 5,
+                        "state": {
+                            "$id": 165,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 2,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 166,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 167,
+                        "$type": 5,
+                        "state": {
+                            "$id": 168,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 3,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                6
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 169,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 170,
+                        "$type": 5,
+                        "state": {
+                            "$id": 171,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 4,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                11
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 172,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 173,
+                        "$type": 5,
+                        "state": {
+                            "$id": 174,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 5,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                8
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 175,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 176,
+                        "$type": 5,
+                        "state": {
+                            "$id": 177,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 6,
+                            "HexType": "mountain",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                9
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 178,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 179,
+                        "$type": 5,
+                        "state": {
+                            "$id": 180,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 7,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 181,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 182,
+                        "$type": 5,
+                        "state": {
+                            "$id": 183,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 8,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 184,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 185,
+                        "$type": 5,
+                        "state": {
+                            "$id": 186,
+                            "$type": 6,
+                            "col": 5,
+                            "row": 9,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 187,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "$id": 188,
+                "$type": 4,
+                "$rlength": 10,
+                "$rcontent": [
+                    {
+                        "$id": 189,
+                        "$type": 5,
+                        "state": {
+                            "$id": 190,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 0,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 191,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 192,
+                        "$type": 5,
+                        "state": {
+                            "$id": 193,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 1,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 194,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 195,
+                        "$type": 5,
+                        "state": {
+                            "$id": 196,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 2,
+                            "HexType": "gold",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                2
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 197,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 198,
+                        "$type": 5,
+                        "state": {
+                            "$id": 199,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 3,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 200,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 201,
+                        "$type": 5,
+                        "state": {
+                            "$id": 202,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 4,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                12
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 203,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 204,
+                        "$type": 5,
+                        "state": {
+                            "$id": 205,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 5,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                12
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 206,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 207,
+                        "$type": 5,
+                        "state": {
+                            "$id": 208,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 6,
+                            "HexType": "forest",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 209,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 210,
+                        "$type": 5,
+                        "state": {
+                            "$id": 211,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 7,
+                            "HexType": "sea",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 212,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 213,
+                        "$type": 5,
+                        "state": {
+                            "$id": 214,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 8,
+                            "HexType": "hill",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                3
+                            },
+                            "GroupID": "2",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 215,
+                                "$type": 8
+                            }
+                        }
+                    },
+                    {
+                        "$id": 216,
+                        "$type": 5,
+                        "state": {
+                            "$id": 217,
+                            "$type": 6,
+                            "col": 6,
+                            "row": 9,
+                            "HexType": "null",
+                            "HexSubType": null,
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 7,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false,
+                            "meshRenderer": {
+                                "$id": 218,
+                                "$type": 8
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    "landConfigs": {
+        "$id": 219,
+        "$type": "9|System.Collections.Generic.List`1[[landConfig, Assembly-CSharp]], mscorlib",
+        "$rlength": 17,
+        "$rcontent": [
+            {
+                "$id": 220,
+                "$type": "10|landConfig, Assembly-CSharp",
+                "landGroupID": "1",
+                "landCnt": 5,
+                "landType": "hill"
+            },
+            {
+                "$id": 221,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 6,
+                "landType": "pasture"
+            },
+            {
+                "$id": 222,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 5,
+                "landType": "mountain"
+            },
+            {
+                "$id": 223,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 6,
+                "landType": "field"
+            },
+            {
+                "$id": 224,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 6,
+                "landType": "forest"
+            },
+            {
+                "$id": 225,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 18,
+                "landType": "sea"
+            },
+            {
+                "$id": 226,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 12,
+                "landType": "null"
+            },
+            {
+                "$id": 227,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 2,
+                "landType": "desert"
+            },
+            {
+                "$id": 228,
+                "$type": 10,
+                "landGroupID": "2",
+                "landCnt": 1,
+                "landType": "pasture"
+            },
+            {
+                "$id": 229,
+                "$type": 10,
+                "landGroupID": "2",
+                "landCnt": 2,
+                "landType": "mountain"
+            },
+            {
+                "$id": 230,
+                "$type": 10,
+                "landGroupID": "2",
+                "landCnt": 1,
+                "landType": "field"
+            },
+            {
+                "$id": 231,
+                "$type": 10,
+                "landGroupID": "2",
+                "landCnt": 1,
+                "landType": "forest"
+            },
+            {
+                "$id": 232,
+                "$type": 10,
+                "landGroupID": "2",
+                "landCnt": 2,
+                "landType": "hill"
+            },
+            {
+                "$id": 233,
+                "$type": 10,
+                "landGroupID": "2",
+                "landCnt": 3,
+                "landType": "gold"
+            },
+            {
+                "$id": 234,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 1,
+                "landType": "harbour"
+            },
+            {
+                "$id": 235,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 1,
+                "landType": "harbour"
+            },
+            {
+                "$id": 236,
+                "$type": 10,
+                "landGroupID": "1",
+                "landCnt": 1,
+                "landType": "harbour"
+            }
+        ]
+    },
+    "numConfigs": {
+        "$id": 237,
+        "$type": "11|System.Collections.Generic.List`1[[numConfig, Assembly-CSharp]], mscorlib",
+        "$rlength": 20,
+        "$rcontent": [
+            {
+                "$id": 238,
+                "$type": "12|numConfig, Assembly-CSharp",
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 2
+            },
+            {
+                "$id": 239,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 3
+            },
+            {
+                "$id": 240,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 4
+            },
+            {
+                "$id": 241,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 5
+            },
+            {
+                "$id": 242,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 6
+            },
+            {
+                "$id": 243,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 8
+            },
+            {
+                "$id": 244,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 9
+            },
+            {
+                "$id": 245,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 10
+            },
+            {
+                "$id": 246,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 3,
+                "numType": 11
+            },
+            {
+                "$id": 247,
+                "$type": 12,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 12
+            },
+            {
+                "$id": 248,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 2
+            },
+            {
+                "$id": 249,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 3
+            },
+            {
+                "$id": 250,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 4
+            },
+            {
+                "$id": 251,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 5
+            },
+            {
+                "$id": 252,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 6
+            },
+            {
+                "$id": 253,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 8
+            },
+            {
+                "$id": 254,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 9
+            },
+            {
+                "$id": 255,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 10
+            },
+            {
+                "$id": 256,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 11
+            },
+            {
+                "$id": 257,
+                "$type": 12,
+                "numGroupID": "2",
+                "numCnt": 1,
+                "numType": 12
+            }
+        ]
+    }
+}

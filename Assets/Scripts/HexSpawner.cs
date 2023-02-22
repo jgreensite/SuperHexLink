@@ -161,6 +161,24 @@ public class HexSpawner : SerializedMonoBehaviour
                 SetLand(r);
             }
         }
+        //Change the camera called "Game Camera" position to the centre of the map pointed at the middle of the hexes and zoom out so all game objects are visible using the number of rows and columns
+
+        //get the  x and z coordinates of the first hex in the list
+        float x_start = state.hexes[0][0].transform.position.x;
+        float z_start = state.hexes[0][0].transform.position.z;
+        float x_end = state.hexes[state.hexGrid.cols-1][0].transform.position.x;
+        float z_end = state.hexes[0][state.hexGrid.rows-1].transform.position.z;
+        float x_mid = (x_start + x_end) / 2;
+        float z_mid = (z_start + z_end) / 2;
+        //make y_mid 2/3 the maximum of x_mid or z_mid, whichever is greater
+        float y_mid = 1.1f * Math.Max(Math.Abs(x_mid), Math.Abs(z_mid));
+        //log x_mid, y_mid and z_mid to the console
+        Debug.Log("x_mid = " + x_mid);
+        Debug.Log("y_mid = " + y_mid);
+        Debug.Log("z_mid = " + z_mid);
+
+        //reposition the camera to get the whole board in frame
+        Camera.allCameras[0].transform.position = new Vector3(x_mid, y_mid, z_mid);
     }
 
     private void SetLand(Hex h)
@@ -298,6 +316,13 @@ public class HexSpawner : SerializedMonoBehaviour
         {
             t.text = h.hexState.HexNum.ToString();
             t.GetComponent<MeshRenderer>().enabled = true;
+            if ((h.hexState.HexNum == 8) || (h.hexState.HexNum == 6))
+            {
+
+                t.color = CS.GetTextColor("HIGHEST_PROBABILITY_COLOR");
+            } else{
+                t.color = CS.GetTextColor("");;
+            }
         }
         else
         {
