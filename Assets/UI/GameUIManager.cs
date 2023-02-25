@@ -5,11 +5,10 @@ using UnityEngine.UIElements;
 using Button = UnityEngine.UIElements.Button;
 using Toggle = UnityEngine.UIElements.Toggle;
 using System.Collections.Generic;
-//using Unity.Burst;
-//using Unity.Entities;
-//using Unity.Mathematics;
-//using Unity.Networking.Transport;
-//using Unity.NetCode;
+using UnityEngine.UI;
+using System.IO;
+using SimpleFileBrowser;
+using System.Collections;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -26,9 +25,16 @@ public class GameUIManager : MonoBehaviour
     public VisualElement m_JoinScreen;
     public VisualElement m_ManualConnectScreen;
 
+    public string filePathText;
+    public string currentDir;
+
+    public HexSpawner HexSpawner;
+
     // Start is called before the first frame update
     void Start()
     {
+        HexSpawner = GameObject.Find("HexSpawner").GetComponent<HexSpawner>();
+
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
         m_ShowUI = root.Q<Toggle>("show-ui");
         m_LeaveArea = root.Q<Button>("quit-game");
@@ -47,6 +53,29 @@ public class GameUIManager : MonoBehaviour
         m_Clear.clicked += () => ClickedButton("clear-board");
 
         m_ShowUI.value = true;
+
+        //file browser
+        currentDir = System.IO.Path.GetDirectoryName(Application.dataPath);
+        // Set filters (optional)
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("Maps", ".json"));
+
+        // Set default filter (optional)
+        FileBrowser.SetDefaultFilter(".json");
+
+        // Set excluded file extensions (optional) (by default, .lnk and .tmp extensions are excluded)
+        // Note that when you use this function, .lnk and .tmp extensions will no longer be
+        // excluded unless you explicitly add them as parameters to the function
+        FileBrowser.SetExcludedExtensions(".lnk", ".tmp", ".zip", ".rar", ".exe");
+
+        // Add a listener to the file browser
+
+        FileBrowser.AddQuickLink("Maps", currentDir, null);
+
+        //Used for capturing unsupported platforms
+        if (!IsFileBrowserSupported())
+        {
+            //currently do nothing
+        }
     }
 
     //capture toggle change event and show/hide the UI
@@ -67,7 +96,6 @@ public class GameUIManager : MonoBehaviour
     // capture button click event and naviate to the correct screen/ call the correct function
     void ClickedButton(string txt)
     {
-        var HexSpawner = GameObject.Find("HexSpawner").GetComponent<HexSpawner>();
 
         Debug.Log("Clicked" + txt);
         switch (txt)
@@ -84,7 +112,7 @@ public class GameUIManager : MonoBehaviour
                 break;
             case "load-board":
                 Debug.Log("Load Board");
-                HexSpawner.LoadState(null);
+                StartCoroutine (OpenFileBrowser());
                 break;
             case "save-board":
                 Debug.Log("Save Board");
@@ -102,5 +130,32 @@ public class GameUIManager : MonoBehaviour
                 Debug.Log("Unknown Button");
                 break;
         }
+    }
+ 
+    IEnumerator OpenFileBrowser()
+    {
+        /*
+        FileBrowser.ShowLoadDialog((string[] paths) => {
+            filePathText = paths[0];
+        }, () => {
+            filePathText = null;
+        }, SimpleFileBrowser.FileBrowser.PickMode.Files, false, null, currentDir);
+        */
+        // Show a load file dialog and wait for a response from user
+        //yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, currentDir,"map.jsopn", "Select Map", "Select" );
+		
+        // Show a select folder dialog 
+		yield return FileBrowser.ShowLoadDialog( ( paths ) => { Debug.Log( "Selected: " + paths[0] ); filePathText = paths[0];HexSpawner.LoadState(filePathText);},
+								   () => { Debug.Log( "Canceled" ); },
+								   FileBrowser.PickMode.Files, false, currentDir, "map.json", "Select Map", "Select" );
+    }
+ 
+    bool IsFileBrowserSupported()
+    {
+        return Application.platform == RuntimePlatform.WindowsEditor ||
+            Application.platform == RuntimePlatform.WindowsPlayer ||
+            Application.platform == RuntimePlatform.OSXEditor ||
+            Application.platform == RuntimePlatform.OSXPlayer ||
+            Application.platform == RuntimePlatform.LinuxPlayer;
     }   
 }

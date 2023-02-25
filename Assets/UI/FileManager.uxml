@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement>
+    <ui:Toolbar>
+      <ui:Button text="New Folder" />
+    </ui:Toolbar>
+    <ui:ScrollView>
+      <ui:ListView selectionType="Single">
+        <ui:Template>
+          <ui:VisualElement>
+            <ui:Label name="file-name-label" />
+          </ui:VisualElement>
+        </ui:Template>
+      </ui:ListView>
+    </ui:ScrollView>
+    <ui:TextField name="file-path-textfield" />
+  </ui:VisualElement>
+</ui:UXML>
