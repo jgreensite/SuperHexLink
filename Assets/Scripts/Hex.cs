@@ -81,11 +81,14 @@ public class Hex : MonoBehaviour
                 neighbor.UpdateEdge(direction.Opposite());
     }
 
-    public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) => 
+    public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) {
+        var edge = Mathf.Floor(Mathf.Abs(state.meshRenderer.material.GetFloat($"_Edge{(int)direction}") - 1));
+        Debug.Log($"Updating edge {direction} to {edge}");
         state.meshRenderer.material.SetFloat(
             name: $"_Edge{(int)direction}",
-            value: Mathf.Floor(Mathf.Abs(state.meshRenderer.material.GetFloat($"_Edge{(int)direction}") - 1))
+            value: edge
         );
+    }
 }
 
 [System.Serializable]

@@ -29,6 +29,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -598,7 +599,7 @@ MonoBehaviour:
   seaMaterial: {fileID: 2100000, guid: aa6f4e763921e455ea7cad3a4593850b, type: 2}
   goldMaterial: {fileID: 2100000, guid: 7ffdd016556e548a291745b36d7486ef, type: 2}
   hexPrefab: {fileID: 6932450884815424045, guid: 0f53b7d9030d27f4e8b2a2cade7f4461, type: 3}
-  hexLandPrefab: {fileID: 5988809368511060260, guid: d69a158bc15c6480d8104aa0e9510264, type: 3}
+  hexLandPrefab: {fileID: 7368497652207135429, guid: ebbf6f9fbbeb944ac82987d3f2ddcecd, type: 3}
   hexTextPrefab: {fileID: 1514278714672149903, guid: 475aadd4dedb74c8caaa4f23640a4840, type: 3}
 --- !u!114 &6641248295233056109
 MonoBehaviour:

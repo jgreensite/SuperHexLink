@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
@@ -8,21 +6,29 @@ public class SelectHexes : MonoBehaviour
 {
     Mouse mouse => Mouse.current;
     Camera cam;
-    private void Awake() => cam = Camera.main;
 
-    public void LeftClick(CallbackContext context)
+    void Update()
     {
-        if(!context.performed)
-            return;
-            
-        if(Physics.Raycast(cam.ScreenPointToRay(mouse.position.ReadValue()), out RaycastHit hit))
+        // If the left mouse button was pressed this frame, we will
+        // check if we clicked on a hex.
+        if (mouse.leftButton.wasPressedThisFrame)
         {
-            if(hit.collider == null)
-                return;
-            
-            Hex hex = hit.collider.GetComponent<Hex>();
-            if(hex != null)
-                hex.ToggleSelect();
+            // Get the main camera.
+            cam = Camera.main;
+            // Get the mouse position.
+            Vector3 mousePosition = mouse.position.ReadValue();
+            Debug.Log(mousePosition);
+            // Create a ray from the mouse position.
+            Ray ray = cam.ScreenPointToRay(mousePosition);
+            // Check if the ray hit anything.
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                // Get the hex component from the hit object.
+                Hex hex = hit.collider.GetComponent<Hex>();
+                // If the hex component is not null, we know we hit a hex.
+                // Toggle the selection of the hex.
+                hex?.ToggleSelect();
+            }
         }
     }
 }
