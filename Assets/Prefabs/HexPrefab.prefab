@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2320336626694780573}
   m_Layer: 6
   m_Name: HexPrefab
-  m_TagString: Untagged
+  m_TagString: Hex
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -31,6 +31,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -54,6 +55,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -97,9 +99,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state:
-    col: 0
-    row: 0
     HexType: 
+    HexSubType: 
+    Rotation: 0
     GroupID: 
     Selected: 0
     meshRenderer: {fileID: 0}
@@ -132,4 +134,4 @@ MeshCollider:
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 2190622540023885545, guid: dac8114d7f41d1d43862fb67390cbb8d, type: 3}
+  m_Mesh: {fileID: 2190622540023885545, guid: 2884e1eb388484406bea9bb2798895da, type: 3}

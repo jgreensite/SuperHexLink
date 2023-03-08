@@ -39,6 +39,22 @@ public class Helpers : MonoBehaviour
         return ret;
     }
 
+    public static List<GameObject> GetChilObjectLights(GameObject root)
+    {
+        List<GameObject> ret = new List<GameObject>();
+        foreach (Transform t in root.transform.GetComponentsInChildren(typeof(Transform), true))
+        {
+            if (t.gameObject.name != root.name)
+            {
+                if (t.gameObject.GetComponent<Light>() != null)
+                {
+                    ret.Add(t.gameObject);
+                }
+            }
+        }
+        return ret;
+    }
+
     public static void DestroyObjects(List<GameObject> ret)
     {
         foreach (GameObject g in ret)

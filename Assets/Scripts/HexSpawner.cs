@@ -42,22 +42,39 @@ public class HexSpawner : SerializedMonoBehaviour
 
     //Hex Model Types
     public HexLandModel hexLandPrefab;
-    /*
-    public HexLandModel hexPasturePrefab;
-    public HexLandModel hexFieldPrefab;
-    public HexLandModel hexHillPrefab;
-    public HexLandModel hexMountainPrefab;
-    public HexLandModel hexDesertPrefab;
-    public HexLandModel hexMinePrefab;
-    public HexLandModel hexSeaPrefab;
-    */
               
     //Hex Text Prefab Types
     public HexText hexTextPrefab;
 
+    private Dictionary<string, Material> materialMap = new();
+
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landTypes = new List<landConfig>();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numTypes = new List<numConfig>();
 
+    private void Awake()
+    {
+        // Define a mapping of HexType values to materials
+        materialMap.Add(CS.CAR_TYPE_WORD_NULL, null);
+        materialMap.Add(CS.CAR_TYPE_NONE, null);
+        materialMap.Add(CS.CAR_TYPE_EMPTY, null);
+        materialMap.Add(CS.CAR_TYPE_FOREST, forestMaterial);
+        materialMap.Add(CS.CAR_TYPE_PASTURE, pastureMaterial);
+        materialMap.Add(CS.CAR_TYPE_FIELD, fieldMaterial);
+        materialMap.Add(CS.CAR_TYPE_HILL, hillMaterial);
+        materialMap.Add(CS.CAR_TYPE_MOUNTAIN, mountainMaterial);
+        materialMap.Add(CS.CAR_TYPE_MINE, mineMaterial);
+        materialMap.Add(CS.CAR_TYPE_SEA, seaMaterial);
+        materialMap.Add(CS.CAR_TYPE_HARBOUR, seaMaterial);
+        materialMap.Add(CS.CAR_TYPE_DESERT, desertMaterial);
+        materialMap.Add(CS.CAR_TYPE_GOLD, goldMaterial);
+        //log the material map
+        foreach (KeyValuePair<string, Material> kvp in materialMap)
+        {
+            var str = String.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+            Debug.Log(str);
+        }
+    }
+   
     [Button("Spawn Hexes")]
     public void SpawnHexes()
     {
@@ -183,67 +200,31 @@ public class HexSpawner : SerializedMonoBehaviour
 
     private void SetLand(Hex h)
     {
-        switch (h.hexState.HexType)
+
+        // Get the HexType value from the hex state
+        string hexType = h.hexState.HexType;
+        Debug.Log("hexType = " + hexType);
+        // Resolve the material from the IoC container based on the HexType value
+        Material material = materialMap[hexType];
+        // Set the material and visibility of the mesh renderer based on the material and HexType values
+        if (material != null)
         {
-            case CS.CAR_TYPE_FOREST:
-                h.GetComponent<Renderer>().material = forestMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_PASTURE:
-                h.GetComponent<Renderer>().material = pastureMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_FIELD:
-                h.GetComponent<Renderer>().material = fieldMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_HILL:
-                h.GetComponent<Renderer>().material = hillMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_MOUNTAIN:
-                h.GetComponent<Renderer>().material = mountainMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_MINE:
-                h.GetComponent<Renderer>().material = mineMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_SEA:
-                h.GetComponent<Renderer>().material = seaMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                //make land a little lower
-                double yNewS = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
-                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNewS, h.transform.localScale.z);
-                break;
-            case CS.CAR_TYPE_HARBOUR:
-                h.GetComponent<Renderer>().material = seaMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                //make land a little lower
-                double yNewH = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
-                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNewH, h.transform.localScale.z);
-                break;
-            case CS.CAR_TYPE_DESERT:
-                h.GetComponent<Renderer>().material = desertMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_GOLD:
-                h.GetComponent<Renderer>().material = goldMaterial;
-                h.GetComponent<MeshRenderer>().enabled = true;
-                break;
-            case CS.CAR_TYPE_NONE:
-                h.GetComponent<Renderer>().material = null;
-                h.GetComponent<MeshRenderer>().enabled = false;
-                break;
-            case CS.CAR_TYPE_WORD_NULL:
-                h.GetComponent<Renderer>().material = null;
-                h.GetComponent<MeshRenderer>().enabled = false;
-                break;
-            default:
-                h.GetComponent<Renderer>().material = null;
-                h.GetComponent<MeshRenderer>().enabled = false;
-                Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has unknown material", h.name, h.hexState.col, h.hexState.row));
-                break;
+            h.GetComponent<Renderer>().material = material;
+            h.GetComponent<MeshRenderer>().enabled = true;
+
+            if (hexType == CS.CAR_TYPE_SEA || hexType == CS.CAR_TYPE_HARBOUR)
+            {
+                // Make land a little lower for sea and harbour hex types
+                double yNew = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
+                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNew, h.transform.localScale.z);
+            }
+        }
+        else
+        {
+            // Hide the mesh renderer if no material is found for the HexType value
+            h.GetComponent<Renderer>().material = null;
+            h.GetComponent<MeshRenderer>().enabled = false;
+            Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has unknown material", h.name, h.hexState.col, h.hexState.row));
         }
 
         //Now if the hex should have a land model ontop of it and a number render them
@@ -294,16 +275,20 @@ public class HexSpawner : SerializedMonoBehaviour
             }
             if (foundSuitable == false) { Debug.Log(h.hexState.col + "_" + h.hexState.col + " Cannot find a suitable rotation"); }
         }
-
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMEMODEL);
+        
         //get list of all objects that are not of this type, they all need to be removed
         List<GameObject> ret = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType, false);
         //get list of all subtypes of this object, all not mentioned subtypes need to be removed  
         List<GameObject> sub = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType + "_" + CS.CAR_TYPE_SUB_KEYWORD, true);
         var s = h.hexState.HexType + "_" + CS.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
-        //Debug.Log(s);
+        //get list of all lights of this object
+        List<GameObject> lit = Helpers.GetChilObjectLights(newHexLandModel.gameObject);  
+        //remove all lights from the ret list
+        ret.RemoveAll((go) => lit.Contains(go));
+        //remove all needed subtypes from the sub list
         sub.RemoveAll((go) => go.name == s);
-        //merge lists and destroy
+        //merge ret & sub lists and destroy
         ret.AddRange(sub);
         Helpers.DestroyObjects(ret);
     }

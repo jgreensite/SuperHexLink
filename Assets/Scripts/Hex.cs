@@ -31,7 +31,16 @@ public class Hex : MonoBehaviour
             yield return (neighbor, direction);
         }
     }
-    
+
+
+    private Renderer renderer;
+
+    void Start()
+    {
+        renderer = GetComponent<Renderer>();
+
+    }
+
 
     private void Awake()
     {
@@ -39,39 +48,23 @@ public class Hex : MonoBehaviour
 
     }
 
-    private void Start()
+    public void ToggleSelect()
     {
-        /*
-        Instantiate(hexNumberPrefab);
-        hexNumberPrefab.transform.parent = transform;
-        hexNumberPrefab.transform.localPosition = Vector3.zero;
-        */
+        if (state.Selected) Deselect();
+        else Select();
     }
 
-    public void ToggleSelect() => (state.Selected ? (Action)Deselect : (Action)Select)();
-
-    private void Select()
+    public void Select()
     {
-        state.Selected = true;
-
-        // Update edges of this hex based on the direction to each neighbor
-        foreach(var (neighbor, direction) in NeighborsWithDirection())
-            if(neighbor == null || !neighbor.state.Selected)
-                UpdateEdge(direction);
-
-        UpdateNeighbors();
+        Debug.Log("selected");
+        //state.Selected = true;
+        renderer.material.color = Color.red;
     }
-
 
     private void Deselect()
     {
-        state.Selected = false;
-
-        // Clear self
-        for(int i = 0; i < 6; i++)
-            state.meshRenderer.material.SetFloat($"_Edge{i}", 0f);
-
-        UpdateNeighbors();
+        Debug.Log("deselcted");
+        //state.Selected = false;
     }
 
     public void UpdateNeighbors()
@@ -82,8 +75,9 @@ public class Hex : MonoBehaviour
     }
 
     public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) {
+        // Get the edge value from the material
         var edge = Mathf.Floor(Mathf.Abs(state.meshRenderer.material.GetFloat($"_Edge{(int)direction}") - 1));
-        Debug.Log($"Updating edge {direction} to {edge}");
+        // Update the edge value in the material
         state.meshRenderer.material.SetFloat(
             name: $"_Edge{(int)direction}",
             value: edge
