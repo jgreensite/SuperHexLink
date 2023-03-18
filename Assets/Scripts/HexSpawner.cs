@@ -7,7 +7,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using AnyClone;
 using FDL.Library.Numeric;
-using Script;
+//using Script;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
@@ -27,6 +27,7 @@ public class HexSpawner : SerializedMonoBehaviour
     }
     
     //Hex Materials
+    /*
     public Material forestMaterial;
     public Material pastureMaterial;
     public Material fieldMaterial;
@@ -36,7 +37,7 @@ public class HexSpawner : SerializedMonoBehaviour
     public Material mineMaterial;
     public Material seaMaterial;
     public Material goldMaterial;
-
+    */
     //Hex Prefab Types
     public Hex hexPrefab;
 
@@ -46,34 +47,11 @@ public class HexSpawner : SerializedMonoBehaviour
     //Hex Text Prefab Types
     public HexText hexTextPrefab;
 
-    private Dictionary<string, Material> materialMap = new();
+    //game constants
+    //public CS gameConstants;
 
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landTypes = new List<landConfig>();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numTypes = new List<numConfig>();
-
-    private void Awake()
-    {
-        // Define a mapping of HexType values to materials
-        materialMap.Add(CS.CAR_TYPE_WORD_NULL, null);
-        materialMap.Add(CS.CAR_TYPE_NONE, null);
-        materialMap.Add(CS.CAR_TYPE_EMPTY, null);
-        materialMap.Add(CS.CAR_TYPE_FOREST, forestMaterial);
-        materialMap.Add(CS.CAR_TYPE_PASTURE, pastureMaterial);
-        materialMap.Add(CS.CAR_TYPE_FIELD, fieldMaterial);
-        materialMap.Add(CS.CAR_TYPE_HILL, hillMaterial);
-        materialMap.Add(CS.CAR_TYPE_MOUNTAIN, mountainMaterial);
-        materialMap.Add(CS.CAR_TYPE_MINE, mineMaterial);
-        materialMap.Add(CS.CAR_TYPE_SEA, seaMaterial);
-        materialMap.Add(CS.CAR_TYPE_HARBOUR, seaMaterial);
-        materialMap.Add(CS.CAR_TYPE_DESERT, desertMaterial);
-        materialMap.Add(CS.CAR_TYPE_GOLD, goldMaterial);
-        //log the material map
-        foreach (KeyValuePair<string, Material> kvp in materialMap)
-        {
-            var str = String.Format("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-            Debug.Log(str);
-        }
-    }
    
     [Button("Spawn Hexes")]
     public void SpawnHexes()
@@ -114,7 +92,7 @@ public class HexSpawner : SerializedMonoBehaviour
                     z: newHex.transform.localScale.z * state.hexGrid.radius
                 );
                 newHex.name = String.Concat("hex ", col, "_", row);
-                newHex.gameObject.layer = LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMEBOARD);
+                newHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEBOARD);
 
                 //set default hex
                 newHex.hexState.GroupID = null;//todo - need to remove this
@@ -134,7 +112,7 @@ public class HexSpawner : SerializedMonoBehaviour
                     y: (float)(newHex.GetComponent<Renderer>().bounds.size.y * 1.1),
                     z: (float)(newHex.GetComponent<Renderer>().bounds.size.z/2 * -0.4)
                     );
-                newTextHex.gameObject.layer = LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMETEXT); 
+                newTextHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMETEXT); 
 
                 // add to the 2 dimensional list of hexes
                 state.hexes[col].Add(newHex);
@@ -166,7 +144,7 @@ public class HexSpawner : SerializedMonoBehaviour
         {
             foreach (Hex r in c)
             {
-                List<GameObject> ret = Helpers.GetObjectsInLayer(r.gameObject, LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMEMODEL));
+                List<GameObject> ret = Helpers.GetObjectsInLayer(r.gameObject, LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL));
                 foreach (GameObject g in ret)
                 {
 #if UNITY_EDITOR
@@ -205,14 +183,14 @@ public class HexSpawner : SerializedMonoBehaviour
         string hexType = h.hexState.HexType;
         Debug.Log("hexType = " + hexType);
         // Resolve the material from the IoC container based on the HexType value
-        Material material = materialMap[hexType];
+        Material material = GameConstants.materialMap[hexType];
         // Set the material and visibility of the mesh renderer based on the material and HexType values
         if (material != null)
         {
             h.GetComponent<Renderer>().material = material;
             h.GetComponent<MeshRenderer>().enabled = true;
 
-            if (hexType == CS.CAR_TYPE_SEA || hexType == CS.CAR_TYPE_HARBOUR)
+            if (hexType == GameConstants.CAR_TYPE_SEA || hexType == GameConstants.CAR_TYPE_HARBOUR)
             {
                 // Make land a little lower for sea and harbour hex types
                 double yNew = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
@@ -241,7 +219,7 @@ public class HexSpawner : SerializedMonoBehaviour
         newHexLandModel.transform.localPosition = (new Vector3(0, 0, 0) + Vector3.Scale(h.GetComponent<MeshFilter>().sharedMesh.bounds.size, Vector3.up));
 
         //Harbours can only point towards certain land types
-        if (h.hexState.HexType != CS.CAR_TYPE_HARBOUR)
+        if (h.hexState.HexType != GameConstants.CAR_TYPE_HARBOUR)
         {
             newHexLandModel.transform.Rotate(Vector3.up, h.hexState.Rotation);
         }
@@ -275,13 +253,13 @@ public class HexSpawner : SerializedMonoBehaviour
             }
             if (foundSuitable == false) { Debug.Log(h.hexState.col + "_" + h.hexState.col + " Cannot find a suitable rotation"); }
         }
-        newHexLandModel.gameObject.layer = LayerMask.NameToLayer(CS.OBJ_LOCATION_LAYER_GAMEMODEL);
+        newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
         
         //get list of all objects that are not of this type, they all need to be removed
         List<GameObject> ret = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType, false);
         //get list of all subtypes of this object, all not mentioned subtypes need to be removed  
-        List<GameObject> sub = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType + "_" + CS.CAR_TYPE_SUB_KEYWORD, true);
-        var s = h.hexState.HexType + "_" + CS.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
+        List<GameObject> sub = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD, true);
+        var s = h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
         //get list of all lights of this object
         List<GameObject> lit = Helpers.GetChilObjectLights(newHexLandModel.gameObject);  
         //remove all lights from the ret list
@@ -303,11 +281,11 @@ public class HexSpawner : SerializedMonoBehaviour
             t.GetComponent<MeshRenderer>().enabled = true;
             if ((h.hexState.HexNum == 8) || (h.hexState.HexNum == 6))
             {
-
-                t.color = CS.GetTextColor("HIGHEST_PROBABILITY_COLOR");
-            } else{
-                t.color = CS.GetTextColor("");;
+                t.color = GameConstants.HIGHEST_PROBABILITY_COLOR;
+            } else {
+                t.color = GameConstants.LOWEST_PROBABILITY_COLOR;
             }
+            
         }
         else
         {
@@ -400,7 +378,7 @@ public class HexSpawner : SerializedMonoBehaviour
     {
         if (
             (t == "") || (t == null) ||
-            (t == CS.CAR_TYPE_WORD_NULL) || (t == CS.CAR_TYPE_NONE)
+            (t == GameConstants.CAR_TYPE_WORD_NULL) || (t == GameConstants.CAR_TYPE_NONE)
             )
         {
             return true;
@@ -411,7 +389,7 @@ public class HexSpawner : SerializedMonoBehaviour
     bool isReplaceableLandType(String t)
     {
         if (
-            (isConfiguredEmpty(t)) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_HARBOUR)
+            (isConfiguredEmpty(t)) || (t == GameConstants.CAR_TYPE_SEA) || (t == GameConstants.CAR_TYPE_HARBOUR)
             )
         {
             return false;
@@ -422,7 +400,7 @@ public class HexSpawner : SerializedMonoBehaviour
     bool isNumberedLandType(String t)
     {
         if (
-            (isConfiguredEmpty(t)) || (t == CS.CAR_TYPE_SEA) || (t == CS.CAR_TYPE_DESERT) || (t == CS.CAR_TYPE_HARBOUR)
+            (isConfiguredEmpty(t)) || (t == GameConstants.CAR_TYPE_SEA) || (t == GameConstants.CAR_TYPE_DESERT) || (t == GameConstants.CAR_TYPE_HARBOUR)
             )
         {
             return false;
@@ -495,7 +473,7 @@ public class HexSpawner : SerializedMonoBehaviour
         }
         //if there are no more lands left then make the land a default type
         else {
-            randomLand = CS.CAR_TYPE_WORD_NULL;
+            randomLand = GameConstants.CAR_TYPE_WORD_NULL;
             h.hexState.GroupID = "1";
             Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has been assigned a default land as none remain to give to it", h.name, h.hexState.col, h.hexState.row));
         }

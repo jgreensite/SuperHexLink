@@ -51,8 +51,10 @@ public class SelectHexes : MonoBehaviour
                 //get all children of the hit object and set their material to the glow material
                 foreach (Transform child in go.transform)
                 {
-                    Debug.Log("got a child of the hit object");
-                    child.GetComponent<Renderer>().material = glowMaterial;
+                    if(child.GetComponent<Renderer>() != null) {
+                        Debug.Log("got a child of the hit object");
+                        child.GetComponent<Renderer>().material = glowMaterial;
+                    }
                 }
             }
         }
