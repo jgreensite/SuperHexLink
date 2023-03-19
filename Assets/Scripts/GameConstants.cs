@@ -5,37 +5,25 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 
 //todo - really should have private setters and public getters on each of these
-public class GameConstants : MonoBehaviour
+
+[CreateAssetMenu(fileName = "GameConstants", menuName = "ScriptableObjects/GameConstants", order = 1)]
+public class GameConstants : ScriptableObject
 {
-    //Hex Materials
-    public static Material forestMaterial;
-    public static Material pastureMaterial;
-    public static Material fieldMaterial;
-    public static Material hillMaterial;
-    public static Material mountainMaterial;
-    public static Material desertMaterial;
-    public static Material mineMaterial;
-    public static Material seaMaterial;
-    public static Material goldMaterial;
+    // Hex Materials
+    public Material forestMaterial;
+    public Material pastureMaterial;
+    public Material fieldMaterial;
+    public Material hillMaterial;
+    public Material mountainMaterial;
+    public Material desertMaterial;
+    public Material mineMaterial;
+    public Material seaMaterial;
+    public Material goldMaterial;
+    public Material glowMaterial;
 
     // Define a mapping of HexType values to materials
     [ShowInInspector]
-    public static Dictionary<string, Material> materialMap = new()
-    {
-        {CAR_TYPE_WORD_NULL, null},
-        {CAR_TYPE_NONE, null},
-        {CAR_TYPE_EMPTY, null},
-        {CAR_TYPE_FOREST, forestMaterial},
-        {CAR_TYPE_PASTURE, pastureMaterial},
-        {CAR_TYPE_FIELD, fieldMaterial},
-        {CAR_TYPE_HILL, hillMaterial},
-        {CAR_TYPE_MOUNTAIN, mountainMaterial},
-        {CAR_TYPE_MINE, mineMaterial},
-        {CAR_TYPE_SEA, seaMaterial},
-        {CAR_TYPE_HARBOUR, seaMaterial},
-        {CAR_TYPE_DESERT, desertMaterial},
-        {CAR_TYPE_GOLD, goldMaterial},
-    };
+    public Dictionary<string, Material> materialMap { get; private set; }
 
     //Player Defaults
     public static string NO_CLIENT_ID = "No Client ID";
@@ -103,8 +91,8 @@ public class GameConstants : MonoBehaviour
     public const string CAR_TYPE_SUB_3_1 = "3_1";
 
     //Number Token Colours
-    public static Color HIGHEST_PROBABILITY_COLOR;
-    public static Color LOWEST_PROBABILITY_COLOR;
+    public Color HIGHEST_PROBABILITY_COLOR;
+    public Color LOWEST_PROBABILITY_COLOR;
 
     //Card Location
     public const string CAR_LOCATION_GAMEBOARD = "card is on the Gameboard";
@@ -199,21 +187,36 @@ public class GameConstants : MonoBehaviour
     public const string UNXBUILDPLATFORM = "UNX";
     public const string WINBUILDPLATFORM = "WIN";
     public const string ANDBUILDPLATFORM = "AND";
-
     public const string IOSBUILDPLATFORM = "IOS";
 
     //Put all the Effects in here to make it is easy to ramdonly pick one
     //public static string[] CEP_EFFECTS = {CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_CHANGE_CARD, CEP_EFFECT_RANDOM_REMOVE_CARD};
     public static string[] CEP_EFFECTS = {CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_REVEAL_CARD};
-
-    // Start is called before the first frame update
+    
+    private void OnEnable()
+    {
+            // Initialize materialMap
+        materialMap = new Dictionary<string, Material>()
+        {
+            {CAR_TYPE_WORD_NULL, null},
+            {CAR_TYPE_NONE, null},
+            {CAR_TYPE_EMPTY, null},
+            {CAR_TYPE_FOREST, forestMaterial},
+            {CAR_TYPE_PASTURE, pastureMaterial},
+            {CAR_TYPE_FIELD, fieldMaterial},
+            {CAR_TYPE_HILL, hillMaterial},
+            {CAR_TYPE_MOUNTAIN, mountainMaterial},
+            {CAR_TYPE_MINE, mineMaterial},
+            {CAR_TYPE_SEA, seaMaterial},
+            {CAR_TYPE_HARBOUR, seaMaterial},
+            {CAR_TYPE_DESERT, desertMaterial},
+            {CAR_TYPE_GOLD, goldMaterial},
+        };
+    }
     private void Start()
     {
 
     }
-    
-    private void Awake()
-    {
-     
-    }
+
+
 }

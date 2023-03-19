@@ -14,6 +14,7 @@ using HexExtensions;
 
 public class HexSpawner : SerializedMonoBehaviour
 {
+    public GameConstants CS;
 
     [SerializeField, HideInInspector]
     public HexSpawnerState state = new HexSpawnerState();
@@ -109,7 +110,7 @@ public class HexSpawner : SerializedMonoBehaviour
                 newTextHex.name = String.Concat("text ", col, "_", row);
                 newTextHex.transform.localPosition = new Vector3(
                     x: (float)(newHex.GetComponent<Renderer>().bounds.size.x/2 * -0.25),
-                    y: (float)(newHex.GetComponent<Renderer>().bounds.size.y * 1.1),
+                    y: (float)(newHex.GetComponent<Renderer>().bounds.size.y * 1.2),
                     z: (float)(newHex.GetComponent<Renderer>().bounds.size.z/2 * -0.4)
                     );
                 newTextHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMETEXT); 
@@ -178,12 +179,11 @@ public class HexSpawner : SerializedMonoBehaviour
 
     private void SetLand(Hex h)
     {
-
         // Get the HexType value from the hex state
         string hexType = h.hexState.HexType;
         Debug.Log("hexType = " + hexType);
         // Resolve the material from the IoC container based on the HexType value
-        Material material = GameConstants.materialMap[hexType];
+        Material material = CS.materialMap[hexType];
         // Set the material and visibility of the mesh renderer based on the material and HexType values
         if (material != null)
         {
@@ -279,11 +279,12 @@ public class HexSpawner : SerializedMonoBehaviour
         {
             t.text = h.hexState.HexNum.ToString();
             t.GetComponent<MeshRenderer>().enabled = true;
+            
             if ((h.hexState.HexNum == 8) || (h.hexState.HexNum == 6))
             {
-                t.color = GameConstants.HIGHEST_PROBABILITY_COLOR;
+                t.color = CS.HIGHEST_PROBABILITY_COLOR;
             } else {
-                t.color = GameConstants.LOWEST_PROBABILITY_COLOR;
+                t.color = CS.LOWEST_PROBABILITY_COLOR;
             }
             
         }
