@@ -50,21 +50,77 @@ public class Hex : MonoBehaviour
 
     public void ToggleSelect()
     {
-        if (state.Selected) Deselect();
-        else Select();
+        Debug.Log("Toggling selection..." + gameObject.name + "...");
+        if (state.Selected)
+        {
+            Deselect();
+        }
+        else
+        {
+            Select();
+        }
     }
 
     public void Select()
     {
-        Debug.Log("selected");
-        //state.Selected = true;
-        renderer.material.color = Color.red;
+        Debug.Log("Selecting..." + gameObject.name + "...");
+        state.Selected = true;
+        ApplyGlowMaterial();
     }
 
     private void Deselect()
     {
-        Debug.Log("deselcted");
-        //state.Selected = false;
+        Debug.Log("Deselecting..." + gameObject.name + "...");
+        state.Selected = false;
+        RestoreOriginalMaterials();
+    }
+     private void ApplyGlowMaterial()
+    {
+        List<Renderer> renderers = GetAllRenderers(transform);
+        foreach (Renderer renderer in renderers)
+        {
+            Debug.Log("storing materials");
+            state.originalMaterials[renderer.gameObject] = renderer.material;
+            renderer.material.color = Color.red; // Change the color to yellow or any other desired color
+        }
+    }
+
+    private void RestoreOriginalMaterials()
+    {
+        List<Renderer> renderers = GetAllRenderers(transform);
+        List<GameObject> objectsToRemove = new List<GameObject>();
+
+        foreach (Renderer renderer in renderers)
+        {
+            if (state.originalMaterials.ContainsKey(renderer.gameObject))
+            {
+                Debug.Log("restoring materials");
+                renderer.material = state.originalMaterials[renderer.gameObject];
+                objectsToRemove.Add(renderer.gameObject);
+            }
+        }
+
+        foreach (GameObject obj in objectsToRemove)
+        {
+            state.originalMaterials.Remove(obj);
+        }
+    }
+
+    private List<Renderer> GetAllRenderers(Transform parent)
+    {
+        List<Renderer> renderers = new List<Renderer>();
+
+        foreach (Transform child in parent)
+        {
+            Renderer renderer = child.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderers.Add(renderer);
+            }
+            renderers.AddRange(GetAllRenderers(child));
+        }
+        Debug.Log("found renderers..." + renderers); 
+        return renderers;
     }
 
     public void UpdateNeighbors()
@@ -118,6 +174,8 @@ public class HexState
     public string GroupID;
     public bool Selected;
     public MeshRenderer meshRenderer;
+    public Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+
     [ShowInInspector] public HexExtensions.HexExtensions.Hex Hex { get; set; }
 
 //TODO - Tidy-up Extensions
