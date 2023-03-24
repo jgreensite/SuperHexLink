@@ -41389,6 +41389,26 @@ PrefabInstance:
       propertyPath: serializationData.PrefabModificationsReferencedUnityObjects.Array.size
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6641248295233056108, guid: edd9894b8d385468399abe568d600b92, type: 3}
+      propertyPath: m_DefaultActionMap
+      value: Move
+      objectReference: {fileID: 0}
+    - target: {fileID: 6641248295233056108, guid: edd9894b8d385468399abe568d600b92, type: 3}
+      propertyPath: m_NotificationBehavior
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6641248295233056108, guid: edd9894b8d385468399abe568d600b92, type: 3}
+      propertyPath: m_ActionEvents.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6641248295233056109, guid: edd9894b8d385468399abe568d600b92, type: 3}
+    - target: {fileID: 6641248295233056108, guid: edd9894b8d385468399abe568d600b92, type: 3}
+      propertyPath: m_ActionEvents.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnSelectHex
+      objectReference: {fileID: 0}
+    - target: {fileID: 6641248295233056109, guid: edd9894b8d385468399abe568d600b92, type: 3}
+      propertyPath: cam
+      value: 
+      objectReference: {fileID: 638887882}
     - target: {fileID: 6641248295233056109, guid: edd9894b8d385468399abe568d600b92, type: 3}
       propertyPath: glowColor.b
       value: 0.09625311

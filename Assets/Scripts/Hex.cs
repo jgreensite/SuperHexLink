@@ -76,33 +76,40 @@ public class Hex : MonoBehaviour
     }
      private void ApplyGlowMaterial()
     {
+        Debug.Log("Applying glow material..." + gameObject.name + "...");
         List<Renderer> renderers = GetAllRenderers(transform);
         foreach (Renderer renderer in renderers)
         {
-            Debug.Log("storing materials");
-            state.originalMaterials[renderer.gameObject] = renderer.material;
-            renderer.material.color = Color.red; // Change the color to yellow or any other desired color
+            //if the gameobject has a renderer with a material that has a property of color
+            if(renderer.material.HasProperty("_Color"))
+            {
+                //store the original color of the material
+                state.originalMaterialColors[renderer.gameObject] = renderer.material.color;
+                //change the color of the material to yellow
+                renderer.material.color = Color.yellow;
+            }
         }
     }
 
     private void RestoreOriginalMaterials()
     {
+        Debug.Log("Restoring original materials..." + gameObject.name + "...");
         List<Renderer> renderers = GetAllRenderers(transform);
         List<GameObject> objectsToRemove = new List<GameObject>();
 
         foreach (Renderer renderer in renderers)
         {
-            if (state.originalMaterials.ContainsKey(renderer.gameObject))
+            if (state.originalMaterialColors.ContainsKey(renderer.gameObject))
             {
-                Debug.Log("restoring materials");
-                renderer.material = state.originalMaterials[renderer.gameObject];
+                Debug.Log("Restoring original material..." + renderer.gameObject.name + "...");
+                renderer.material.color = state.originalMaterialColors[renderer.gameObject];
                 objectsToRemove.Add(renderer.gameObject);
             }
         }
 
         foreach (GameObject obj in objectsToRemove)
         {
-            state.originalMaterials.Remove(obj);
+            state.originalMaterialColors.Remove(obj);
         }
     }
 
@@ -119,7 +126,6 @@ public class Hex : MonoBehaviour
             }
             renderers.AddRange(GetAllRenderers(child));
         }
-        Debug.Log("found renderers..." + renderers); 
         return renderers;
     }
 
@@ -174,7 +180,8 @@ public class HexState
     public string GroupID;
     public bool Selected;
     public MeshRenderer meshRenderer;
-    public Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+  
+    public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
     [ShowInInspector] public HexExtensions.HexExtensions.Hex Hex { get; set; }
 

@@ -1,44 +1,46 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class SelectHexes : MonoBehaviour
+public class SelectHexes : MonoBehaviour, HexGameControls.IMoveActions
 {
-    public InputActionAsset inputActions;
-    private InputAction selectHexAction;
+    private HexGameControls inputs;
     private Camera cam;
 
     private void Awake()
     {
         cam = Camera.main;
-        var actionMap = inputActions.FindActionMap("New action map");
-        selectHexAction = actionMap.FindAction("SelectHex");
+        inputs = new HexGameControls();
+        inputs.Move.SetCallbacks(this);
     }
 
-    private void OnEnable()
-    {
-        selectHexAction.performed += OnSelectHex;
-        selectHexAction.Enable();
-    }
-
-    private void OnDisable()
-    {
-        selectHexAction.performed -= OnSelectHex;
-        selectHexAction.Disable();
-    }
-
+    private void OnEnable() =>  inputs.Move.Enable();
+    private void OnDisable() => inputs.Move.Disable();
     public void OnSelectHex(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        switch (context.phase)
         {
-            Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
-
-            if (Physics.Raycast(ray, out RaycastHit hit) &&
-                hit.collider.gameObject.CompareTag("Land") &&
-                hit.collider.gameObject.layer == LayerMask.NameToLayer("Model"))
+            case InputActionPhase.Started:
+                break;
+            case InputActionPhase.Performed:
             {
-                Hex currentHex = hit.collider.gameObject.transform.parent.GetComponent<Hex>();
-                currentHex.ToggleSelect();
+                Debug.Log("Performed...");
+                if(cam != null){
+                    Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+                    if (Physics.Raycast(ray, out RaycastHit hit) &&
+                        hit.collider.gameObject.CompareTag("Land") &&
+                        hit.collider.gameObject.layer == LayerMask.NameToLayer("Model"))
+                    {
+                        Hex currentHex = hit.collider.gameObject.transform.parent.GetComponent<Hex>();
+                        currentHex.ToggleSelect();
+                    }
+                }
             }
+                break;
+            case InputActionPhase.Canceled:
+                break;
         }
     }
+
+     public void OnStart(InputAction.CallbackContext context){}
 }

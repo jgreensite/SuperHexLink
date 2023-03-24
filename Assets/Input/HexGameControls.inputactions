@@ -1,8 +1,8 @@
 {
-    "name": "New Controls",
+    "name": "HexGameControls",
     "maps": [
         {
-            "name": "New action map",
+            "name": "Move",
             "id": "64a08479-2243-48d0-b650-0e36584d8972",
             "actions": [
                 {
@@ -18,7 +18,7 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "d5909a8e-d94d-42f0-ba7d-c5fe887a0d5a",
+                    "id": "511ffaaa-4f16-4470-b456-61c8627e088e",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
