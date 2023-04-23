@@ -6,6 +6,8 @@ public class SelectHexes : MonoBehaviour, HexGameControls.IMoveActions
     private HexGameControls inputs;
     private Camera cam;
 
+    public CircularMenu ClickMenu;
+
     private void Awake()
     {
         cam = Camera.main;
@@ -34,6 +36,7 @@ public class SelectHexes : MonoBehaviour, HexGameControls.IMoveActions
                         Hex currentHex = hit.collider.gameObject.transform.parent.GetComponent<Hex>();
                         currentHex.ToggleSelect();
                     }
+                ClickMenu.ShowCircularMenu();
                 }
             }
                 break;
