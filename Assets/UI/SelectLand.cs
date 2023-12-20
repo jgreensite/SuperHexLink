@@ -46,17 +46,45 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
         }
     }
 
-    private void HandleHexClick(GameObject hex)
+    private void HandleHexClick(GameObject go)
     {
         DestroyCircularMenu();
-        //get the parent that holds the part of the hex that has been clicked on
-        hex.transform.parent.GetComponent<Hex>().ToggleSelect();
-        ShowCircularMenuAtHex(hex);
+        // Get the parent that holds the part of the hex that has been clicked on and toggle the selection
+        go.transform.parent.GetComponent<Hex>().ToggleSelect();
+
+        // Grey out all other hexes
+        foreach (GameObject otherHex in GameObject.FindGameObjectsWithTag("Land"))
+        {
+            if (go.transform.parent == null)
+            {
+                Debug.LogError("Parent is null");
+            }
+            else if (go.transform.parent.GetComponent<Hex>() == null)
+            {
+                Debug.LogError("Hex component on parent is null");
+            }
+            else if (otherHex == null)
+            {
+                Debug.LogError("otherHex is null");
+            }
+            else        
+            {
+                if ((otherHex.transform.parent.GetComponent<Hex>() != go.transform.parent.GetComponent<Hex>())
+                && (otherHex.layer == LayerMask.NameToLayer("Model")))
+                {
+                    //call not selected method
+                    otherHex.transform.parent.GetComponent<Hex>().NotSelect();
+                }
+            }
+        }
+
+        // Show the circular menu
+        ShowCircularMenuAtHex(go.transform.parent.gameObject);
     }
 
-    private void ShowCircularMenuAtHex(GameObject hex)
+    private void ShowCircularMenuAtHex(GameObject go)
     {
-        currentMenuInstance = Instantiate(circularMenuPrefab, hex.transform.position, Quaternion.identity);
+        currentMenuInstance = Instantiate(circularMenuPrefab, go.transform.position, Quaternion.identity);
         CircularMenu circularMenu = currentMenuInstance.GetComponent<CircularMenu>();
         circularMenu.ShowMenu();
     }

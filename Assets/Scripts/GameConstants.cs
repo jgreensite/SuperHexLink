@@ -97,6 +97,10 @@ public class GameConstants : ScriptableObject
     //Floating Menus
     public const float FLOATING_MENU_OFFSET = 0.05f;
 
+    //Highlight Colours
+    public static Color SELECTED_HEX_COLOR = Color.yellow;
+    public static Color NOT_SELECTED_HEX_COLOR = Color.grey;
+
     //Card Location
     public const string CAR_LOCATION_GAMEBOARD = "card is on the Gameboard";
     public const string CAR_LOCATION_RED_DECK = "card is in the Red Deck";

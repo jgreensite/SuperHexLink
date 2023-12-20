@@ -65,16 +65,23 @@ public class Hex : MonoBehaviour
     {
         Debug.Log("Selecting..." + gameObject.name + "...");
         state.Selected = true;
-        ApplyGlowMaterial();
+        ApplyGlow(GameConstants.SELECTED_HEX_COLOR);
     }
 
-    private void Deselect()
+    public void NotSelect()
+    {
+        Debug.Log("Not Selecting..." + gameObject.name + "...");
+        state.Selected = true;
+        ApplyGlow(GameConstants.NOT_SELECTED_HEX_COLOR);
+    }
+
+    public void Deselect()
     {
         Debug.Log("Deselecting..." + gameObject.name + "...");
         state.Selected = false;
         RestoreOriginalMaterials();
     }
-     private void ApplyGlowMaterial()
+    private void ApplyGlow(Color color)
     {
         Debug.Log("Applying glow material..." + gameObject.name + "...");
         List<Renderer> renderers = GetAllRenderers(transform);
@@ -86,7 +93,7 @@ public class Hex : MonoBehaviour
                 //store the original color of the material
                 state.originalMaterialColors[renderer.gameObject] = renderer.material.color;
                 //change the color of the material to yellow
-                renderer.material.color = Color.yellow;
+                renderer.material.color = color;
             }
         }
     }
