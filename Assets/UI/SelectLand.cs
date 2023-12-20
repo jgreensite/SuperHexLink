@@ -49,6 +49,8 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
     private void HandleHexClick(GameObject hex)
     {
         DestroyCircularMenu();
+        //get the parent that holds the part of the hex that has been clicked on
+        hex.transform.parent.GetComponent<Hex>().ToggleSelect();
         ShowCircularMenuAtHex(hex);
     }
 
