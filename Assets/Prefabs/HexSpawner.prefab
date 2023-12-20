@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6641248295233056106}
   - component: {fileID: 6641248295233056107}
-  - component: {fileID: 6641248295233056109}
   - component: {fileID: 6641248295233056108}
   m_Layer: 3
   m_Name: HexSpawner
@@ -593,19 +592,6 @@ MonoBehaviour:
   hexPrefab: {fileID: 6932450884815424045, guid: 0f53b7d9030d27f4e8b2a2cade7f4461, type: 3}
   hexLandPrefab: {fileID: 3127254753887864668, guid: 6c9f384e0ff784c0bbbbdf6ab7fcb13c, type: 3}
   hexTextPrefab: {fileID: 1514278714672149903, guid: 475aadd4dedb74c8caaa4f23640a4840, type: 3}
---- !u!114 &6641248295233056109
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6641248295233056105}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fe2b824d446dda4f9f3a403b4417683, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inputActions: {fileID: -944628639613478452, guid: 131fe1ce6facc4fd5acbcb02017ef5c6, type: 3}
 --- !u!114 &6641248295233056108
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,7 +619,7 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6641248295233056109}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SelectHexes, Assembly-CSharp
         m_MethodName: OnSelectHex
         m_Mode: 0
@@ -649,6 +635,6 @@ MonoBehaviour:
     m_ActionName: New action map/SelectHex[/Mouse/leftButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: New action map
+  m_DefaultActionMap: Move
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}

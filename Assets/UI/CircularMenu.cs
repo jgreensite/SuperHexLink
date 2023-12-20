@@ -1,163 +1,131 @@
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class CircularMenu : MonoBehaviour
 {
     [System.Serializable]
     public class CircularMenuData
     {
-        public CircularMenu circularMenu;
+        public GameObject menuItemPrefab; // Prefab for menu item.
+        public CircularMenu circularMenu; // Submenu, if any.
     }
 
-    public VisualElement menuRoot;
-
-    [SerializeField] private List<VisualTreeAsset> menuItems;
-    [SerializeField] private float radius = 100f;
+    [SerializeField] private List<CircularMenuData> menuDataList;
+    [SerializeField] private GameObject backButtonPrefab; // Prefab for back button.
+    [SerializeField] private GameObject cancelButtonPrefab; // Prefab for cancel button.
+    [SerializeField] private float menuRadius = 1f;
     [SerializeField] private float startingAngle = 0f;
-    [SerializeField] private List<CircularMenuData> subMenus;
     [SerializeField] private CircularMenu parentMenu;
-
-    private VisualElement menuContainer;
-
-    private void Awake()
-    {
-        // Initialize the menuRoot property for the current menu
-        menuRoot.style.display = DisplayStyle.None;
-
-        // Initialize the menuRoot property for each submenu
-        InitializeSubmenus();
-    }
 
     private void Start()
     {
-        // Disable the menu by default
-        gameObject.SetActive(false);
-    }
-
-    private void InitializeSubmenus()
-    {
-        foreach (CircularMenuData submenuData in subMenus)
-        {
-            CircularMenu submenu = submenuData.circularMenu;
-            if (submenu != null && submenu.menuRoot != null)
-            {
-                submenu.menuRoot.style.display = DisplayStyle.None;
-                submenu.InitializeSubmenus(); // Call InitializeSubmenus() method recursively for each submenu
-            }
-        }
-    }
-
-    public void ShowCircularMenu()
-    {
-        // Check if the user has clicked the mouse button
-        if (Input.GetMouseButtonDown(0))
-        {
-            // Get the position of the mouse click in screen coordinates
-            Vector3 clickPosition = Input.mousePosition;
-            clickPosition.z = -10f; // Set the z position to a constant value
-
-            // Activate the menu at the click position
-            gameObject.SetActive(true);
-
-            if (menuRoot == null)
-            {
-                menuRoot = new VisualElement();
-                GetComponentInParent<UIDocument>().rootVisualElement.Add(menuRoot);
-                CreateCircularMenu();
-            }
-
-            // Position the menu container at the click position
-            menuRoot.style.position = Position.Absolute;
-            menuRoot.style.left = new StyleLength(clickPosition.x);
-            menuRoot.style.top = new StyleLength(Screen.height - clickPosition.y);
-
-            // Hide submenus
-            foreach (CircularMenuData submenuData in subMenus)
-            {
-                CircularMenu submenu = submenuData.circularMenu;
-                submenu.menuRoot.style.display = DisplayStyle.None;
-            }
-
-            Debug.Log("Menu Container: " + menuRoot);
-            Debug.Log("Menu Container Position: " + menuRoot.style.left.value + ", " + menuRoot.style.top.value);
-        }
+        CreateCircularMenu();
+        //gameObject.SetActive(false); // Initially hide the menu.
     }
 
     private void CreateCircularMenu()
     {
-        int itemCount = menuItems.Count;
-        float angleIncrement = 360f / itemCount;
+        float angleIncrement = 360f / (menuDataList.Count + (parentMenu ? 1 : 0));
 
-        for (int i = 0; i < itemCount; i++)
+        // Instantiate regular menu items.
+        for (int i = 0; i < menuDataList.Count; i++)
         {
-            int submenuItemCount = subMenus.Count > i && subMenus[i].circularMenu != null ? subMenus[i].circularMenu.menuItems.Count : 0;
-
-            var menuItemTemplate = menuItems[i];
-            var menuItemContainer = new VisualElement();
-            menuItemContainer.name = "MenuItemContainer";
-            menuContainer.Add(menuItemContainer);
-
-            float angle = startingAngle + (angleIncrement * i);
-            float x = radius * Mathf.Cos(angle * Mathf.Deg2Rad);
-            float y = radius * Mathf.Sin(angle * Mathf.Deg2Rad);
-
-            // Position the menu item container around the circle
-            menuItemContainer.style.position = Position.Absolute;
-            menuItemContainer.style.left = new StyleLength(x);
-            menuItemContainer.style.top = new StyleLength(y);
-
-            // Instantiate each child object separately and add them to the parent container
-            var menuItemInstance = menuItemTemplate.CloneTree();
-            menuItemContainer.Add(menuItemInstance);
-            menuItemInstance.style.position = Position.Absolute;
-            menuItemInstance.style.left = new StyleLength(0f);
-            menuItemInstance.style.top = new StyleLength(0f);
-
-            // Find the existing button within the menuItemInstance
-            Button button = menuItemInstance.Q<Button>();
-
-            if (subMenus.Count > i && subMenus[i].circularMenu != null)
-            {
-                button.clickable.clicked += () =>
-                {
-                    subMenus[i].circularMenu.menuRoot.style.display = DisplayStyle.Flex;
-                    subMenus[i].circularMenu.parentMenu = this;
-                    menuRoot.style.display = DisplayStyle.None;
-                };
-            }
-            else
-            {
-                button.clickable.clicked += () =>
-                {
-                    Debug.Log("Clicked on menu item: " + menuItemInstance.name);
-                };
-            }
+            InstantiateMenuItem(menuDataList[i].menuItemPrefab, angleIncrement, i);
         }
 
-        // Add a "Back" or "Cancel" button at the center of the circle, depending on whether there is a parent menu
-        var centerButton = new Button();
+        // Optionally add back or cancel button.
         if (parentMenu != null)
         {
-            centerButton.text = "Back";
-            centerButton.clickable.clicked += () =>
-            {
-                parentMenu.gameObject.SetActive(true);
-                gameObject.SetActive(false);
-            };
+            InstantiateMenuItem(backButtonPrefab, angleIncrement, menuDataList.Count); // Back button.
         }
         else
         {
-            centerButton.text = "Cancel";
-            centerButton.clickable.clicked += () =>
-            {
-                gameObject.SetActive(false);
-            };
+            InstantiateMenuItem(cancelButtonPrefab, angleIncrement, menuDataList.Count); // Cancel button.
         }
+    }
 
-        menuContainer.Add(centerButton);
-        centerButton.style.position = Position.Absolute;
-        centerButton.style.left = new StyleLength(-25f); // Set half of the desired button width
-        centerButton.style.top = new StyleLength(-25f);  // Set half of the desired button height
+    private void InstantiateMenuItem(GameObject prefab, float angleIncrement, int index)
+    {
+    if (prefab == null)
+    {
+        Debug.LogError("Prefab is null in InstantiateMenuItem.");
+        return;
+    }
+
+    if (menuRadius <= 0)
+    {
+        Debug.LogError("Invalid menuRadius: " + menuRadius + ". Radius must be positive.");
+        return;
+    }
+
+    if (menuDataList.Count == 0)
+    {
+        Debug.LogWarning("menuDataList is empty. No menu items to instantiate.");
+        return;
+    }
+
+    float angle = startingAngle + (angleIncrement * index);
+    float x = menuRadius * Mathf.Cos(angle * Mathf.Deg2Rad);
+    float z = menuRadius * Mathf.Sin(angle * Mathf.Deg2Rad);
+
+    // Check for NaN values
+    if (float.IsNaN(x) || float.IsNaN(z))
+    {
+        Debug.LogError("Invalid position calculated for menu item: x=" + x + ", z=" + z);
+        return;
+    }
+
+    GameObject menuItem = Instantiate(prefab, transform);
+    menuItem.transform.localPosition = new Vector3(x, GameConstants.FLOATING_MENU_OFFSET, z);
+
+    // Set the layer of the menu item
+    menuItem.layer = LayerMask.NameToLayer("CircularMenuLayer");
+
+    // If the menu item has child objects, you need to set their layers too
+    SetLayerRecursively(menuItem, menuItem.layer);
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
+    }
+
+    /*
+    public void ShowCircularMenu(Vector3 position)
+    {
+        Debug.Log("ShowCircularMenu");
+        transform.position = position;
+        gameObject.SetActive(true); // Make sure the menu is active
+
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(true); // Also activate each menu item
+        }
+    }
+    */
+    public void ForceCircularMenuVisible()
+    {
+        Debug.Log("ForceCicularMenuVisible");
+        gameObject.SetActive(true); // Make sure the menu is active
+
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(true); // Also activate each menu item
+            Debug.Log("child.gameObject.name: " + child.gameObject.name + " activeSelf: " + child.gameObject.activeSelf);
+        }
+    }
+
+    public void Hide()
+    {
+        gameObject.SetActive(false);
+        if (parentMenu != null)
+        {
+            parentMenu.Hide();
+        }
     }
 }
