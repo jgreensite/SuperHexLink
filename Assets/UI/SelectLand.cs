@@ -41,23 +41,22 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
             // Clicked elsewhere
             else
             {
-                HideCircularMenu();
+                DestroyCircularMenu();
             }
         }
     }
 
     private void HandleHexClick(GameObject hex)
     {
-        //HideCircularMenu();
+        DestroyCircularMenu();
         ShowCircularMenuAtHex(hex);
-        //ForceCircularMenuVisible();
     }
 
     private void ShowCircularMenuAtHex(GameObject hex)
     {
         currentMenuInstance = Instantiate(circularMenuPrefab, hex.transform.position, Quaternion.identity);
-        CircularMenu circularMenuScript = currentMenuInstance.GetComponent<CircularMenu>();
-        circularMenuScript.ForceCircularMenuVisible();
+        CircularMenu circularMenu = currentMenuInstance.GetComponent<CircularMenu>();
+        circularMenu.ShowMenu();
     }
 
     private void HandleMenuItemClick(GameObject menuItem)
@@ -67,7 +66,7 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
         Debug.Log("Clicked on menu item: " + menuItem.name);
     }
 
-    private void HideCircularMenu()
+    private void DestroyCircularMenu()
     {
         if (currentMenuInstance != null)
         {

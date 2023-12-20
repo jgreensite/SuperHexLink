@@ -4,24 +4,36 @@ using UnityEngine;
 
 public class HexLandModel : MonoBehaviour
 {
-    private Renderer renderer;
+    private Renderer myRenderer;
 
     // Start is called before the first frame update
-     private void Start()
+    private void Start()
     {
+        myRenderer = GetComponent<Renderer>();
 
-        renderer = GetComponent<Renderer>();
+        // Check if Renderer component is found
+        if (myRenderer == null)
+        {
+            //Debug.LogError("Renderer component not found on " + gameObject.name);
+        }
     }
 
-   
     private void OnMouseEnter()
     {
-	renderer.material.color = Color.red;
+        // Ensure renderer is not null before accessing it
+        if (myRenderer != null)
+        {
+            myRenderer.material.color = Color.red;
+        }
     }
 
     private void OnMouseExit()
     {
-        renderer.material.color = Color.white;
+        // Ensure renderer is not null before accessing it
+        if (myRenderer != null)
+        {
+            myRenderer.material.color = Color.white;
+        }
     }
 
     // Update is called once per frame
@@ -30,3 +42,4 @@ public class HexLandModel : MonoBehaviour
         
     }
 }
+

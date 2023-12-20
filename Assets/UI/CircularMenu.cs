@@ -14,14 +14,13 @@ public class CircularMenu : MonoBehaviour
     [SerializeField] private List<CircularMenuData> menuDataList;
     [SerializeField] private GameObject backButtonPrefab; // Prefab for back button.
     [SerializeField] private GameObject cancelButtonPrefab; // Prefab for cancel button.
-    [SerializeField] private float menuRadius = 1f;
+    [SerializeField] private float menuRadius = 0.05f;
     [SerializeField] private float startingAngle = 0f;
     [SerializeField] private CircularMenu parentMenu;
 
     private void Start()
     {
         CreateCircularMenu();
-        //gameObject.SetActive(false); // Initially hide the menu.
     }
 
     private void CreateCircularMenu()
@@ -95,20 +94,7 @@ public class CircularMenu : MonoBehaviour
         }
     }
 
-    /*
-    public void ShowCircularMenu(Vector3 position)
-    {
-        Debug.Log("ShowCircularMenu");
-        transform.position = position;
-        gameObject.SetActive(true); // Make sure the menu is active
-
-        foreach (Transform child in transform)
-        {
-            child.gameObject.SetActive(true); // Also activate each menu item
-        }
-    }
-    */
-    public void ForceCircularMenuVisible()
+     public void ShowMenu()
     {
         Debug.Log("ForceCicularMenuVisible");
         gameObject.SetActive(true); // Make sure the menu is active
@@ -120,12 +106,12 @@ public class CircularMenu : MonoBehaviour
         }
     }
 
-    public void Hide()
+    public void HideMenu()
     {
         gameObject.SetActive(false);
         if (parentMenu != null)
         {
-            parentMenu.Hide();
+            parentMenu.HideMenu();
         }
     }
 }

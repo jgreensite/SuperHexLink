@@ -95,7 +95,7 @@ public class GameConstants : ScriptableObject
     public Color LOWEST_PROBABILITY_COLOR;
 
     //Floating Menus
-    public const float FLOATING_MENU_OFFSET = 1.0f;
+    public const float FLOATING_MENU_OFFSET = 0.05f;
 
     //Card Location
     public const string CAR_LOCATION_GAMEBOARD = "card is on the Gameboard";
