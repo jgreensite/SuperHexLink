@@ -108,7 +108,7 @@ public class GameUIManager : MonoBehaviour
                 break;
             case "spawn-board":
                 Debug.Log("Spawn Board");
-                HexSpawner.SpawnHexes();
+                HexSpawner.Spawn();
                 break;
             case "load-board":
                 Debug.Log("Load Board");

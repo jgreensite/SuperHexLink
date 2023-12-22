@@ -12,21 +12,9 @@ using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
 
-public class HexSpawner : SerializedMonoBehaviour
+public class HexSpawner : SpawnerBase
 {
-    public GameConstants CS;
-
-    [SerializeField, HideInInspector]
-    public HexSpawnerState state = new HexSpawnerState();
-
-    [ShowInInspector]
-    public HexSpawnerState hexState
-
-    {
-        get { return this.state; }
-        set { this.state = value; }
-    }
-    
+   
     //Hex Materials
     /*
     public Material forestMaterial;
@@ -54,13 +42,7 @@ public class HexSpawner : SerializedMonoBehaviour
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landTypes = new List<landConfig>();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numTypes = new List<numConfig>();
    
-    [Button("Spawn Hexes")]
-    public void SpawnHexes()
-    {
-        BuildHexes(false);
-    }
-
-    private void BuildHexes(bool isRefresh)
+    protected override void BuildMe(bool isRefresh)
     {
         //Build the list of lands
         BuildTypes();
@@ -206,7 +188,7 @@ public class HexSpawner : SerializedMonoBehaviour
         }
 
         //Now if the hex should have a land model ontop of it and a number render them
-        if (isRenderedLandType(h.hexState.HexType))
+        if (isRenderedType(h.hexState.HexType))
         {
             LandModelPosition(Instantiate(original: hexLandPrefab, parent: h.transform), h);
             SetText(h);
@@ -303,7 +285,7 @@ public class HexSpawner : SerializedMonoBehaviour
         {
             foreach (Hex h in hc)
             {
-                RefreshLand(h);
+                Refresh(h);
             }
         }
         UpdateHexes();
@@ -336,7 +318,7 @@ public class HexSpawner : SerializedMonoBehaviour
         //it would be better if we didn't have to call update hexes and that an event fired automatically
         
         //load the hex data
-        HexSpawnerState loadedHexSpawner = new HexSpawnerState();
+        SpawnerState loadedHexSpawner = new SpawnerState();
         if ((filePath == null) || (filePath.Length == 0))
         {
             filePath = "./data/maps/map.json"; //default value
@@ -344,14 +326,14 @@ public class HexSpawner : SerializedMonoBehaviour
         if (!File.Exists(filePath)) return; // No state to load
 
         byte[] bytes = File.ReadAllBytes(filePath);
-        loadedHexSpawner = SerializationUtility.DeserializeValue<HexSpawnerState>(bytes, DataFormat.JSON);
+        loadedHexSpawner = SerializationUtility.DeserializeValue<SpawnerState>(bytes, DataFormat.JSON);
         //copy accross hexGrid and landconfig
         state.hexGrid = loadedHexSpawner.hexGrid;
         state.landConfigs = loadedHexSpawner.landConfigs;
         state.numConfigs = loadedHexSpawner.numConfigs;
 
         //create new gameobjects attached to new hexes based on loaded value, remember not possible to serialise Unity gameobjects
-        BuildHexes(true);
+        BuildMe(true);
 
         //Copy across hexState from loaded objects to new objects
         for (int col = 0; col < state.hexGrid.cols; col++)
@@ -366,7 +348,7 @@ public class HexSpawner : SerializedMonoBehaviour
         UpdateHexes();
     }
     
-    public void RefreshLand(Hex h)
+    public void Refresh(Hex h)
     {
         //do not randomize if supposed to skip
         if (isReplaceableLandType(h.hexState.HexType))
@@ -409,7 +391,7 @@ public class HexSpawner : SerializedMonoBehaviour
         else { return true; }
     }
 
-    bool isRenderedLandType(String t)
+    bool isRenderedType(String t)
     {
         if (isConfiguredEmpty(t))
         {
@@ -565,7 +547,7 @@ public class HexSpawner : SerializedMonoBehaviour
 }
 
 [System.Serializable]
-public class HexSpawnerState
+public class SpawnerState
 {
     [SerializeField] public HexGrid hexGrid;
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex>> hexes = new List<List<Hex>>();
