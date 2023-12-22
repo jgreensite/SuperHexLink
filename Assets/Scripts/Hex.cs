@@ -190,10 +190,67 @@ public class HexState
   
     public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
+    [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges;
+
+    [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners;
+
     [ShowInInspector] public HexExtensions.HexExtensions.Hex Hex { get; set; }
 
-//TODO - Tidy-up Extensions
-//These are new methods that should probably be added to HexExtensions
+    public HexState()
+    {
+        // Initialize the Edges dictionary in the constructor
+        Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
+        foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
+        {
+            RemoveEdgeStructure(direction);
+        }
+
+        // Initialize the Corners dictionary in the constructor
+        Corners = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string>();
+        foreach (SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection)))
+        {
+            RemoveCornerStructure(direction);
+        }
+    }
+
+    public void AddEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
+    {
+        Edges[direction] = true;
+    }
+
+    public void RemoveEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
+    {
+        Edges[direction] = false;
+    }
+
+    public void AddCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
+    {
+        Corners[direction] = "";
+    }
+
+    public void RemoveCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
+    {
+        Corners[direction] = "";
+    }
+
+    /*
+    If you want to use the HexExtensions library you need to convert the Hex to a Point
+    public List<HexExtensions.HexExtensions.Point> GetCorners()
+    {
+        List<HexExtensions.HexExtensions.Point> corners = new List<HexExtensions.HexExtensions.Point>();
+      
+        /*HexExtensions.HexExtensions.Layout myLayout =
+        new HexExtensions.HexExtensions.Layout(HexExtensions.HexExtensions.Layout.pointy,
+        new HexExtensions.HexExtensions.Point(sizeX, sizeY),
+        new HexExtensions.HexExtensions.Point(originX, originY));
+
+        corners = HexExtensions.HexExtensions.HexCorners(Hex, 1);
+        return corners;
+    }
+    */
+
+    //TODO - Tidy-up Extensions
+    //These are new methods that should probably be added to HexExtensions
     public HexExtensions.HexExtensions.Hex CRToHex(int col, int row)
     {
         HexExtensions.HexExtensions.OffsetCoord b = new HexExtensions.HexExtensions.OffsetCoord(col, row);

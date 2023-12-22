@@ -368,5 +368,33 @@ namespace HexExtensions
             }
 
         }
+        // Additions to the library
+        // Method to get all neighboring hexes sharing a specific corner
+        public static List<Hex> GetHexesSharingCorner(Hex hex, int corner, int boardWidth, int boardHeight)
+        {
+            List<Hex> neighboringHexes = new List<Hex>();
+
+            // Define the directions for neighbors that share a corner
+            int[] neighborDirections = { corner, (corner + 1) % 6, (corner + 5) % 6 };
+
+            foreach (int direction in neighborDirections)
+            {
+                Hex neighbor = hex.Neighbor(direction);
+
+                // Convert hex to offset to check if it's inside the board boundaries
+                // TODO - REMOVE HARDCODING FOR Q-ODD system
+                OffsetCoord offsetNeighbor = OffsetCoord.QoffsetFromCube(OffsetCoord.ODD, neighbor);
+
+                // Check if the neighbor is within the board boundaries
+                if (offsetNeighbor.col >= 0 && offsetNeighbor.col < boardWidth &&
+                    offsetNeighbor.row >= 0 && offsetNeighbor.row < boardHeight)
+                {
+                    neighboringHexes.Add(neighbor);
+                }
+            }
+
+            return neighboringHexes.Distinct().ToList();
+        }
+
     }
 }

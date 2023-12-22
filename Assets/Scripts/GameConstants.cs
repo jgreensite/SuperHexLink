@@ -95,7 +95,7 @@ public class GameConstants : ScriptableObject
     public Color LOWEST_PROBABILITY_COLOR;
 
     //Floating Menus
-    public const float FLOATING_MENU_OFFSET = 0.05f;
+    public const float FLOATING_MENU_OFFSET = 1.0f;
 
     //Highlight Colours
     public static Color SELECTED_HEX_COLOR = Color.yellow;
