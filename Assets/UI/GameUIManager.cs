@@ -28,12 +28,12 @@ public class GameUIManager : MonoBehaviour
     public string filePathText;
     public string currentDir;
 
-    public HexSpawner HexSpawner;
+    public GameSpawner GameSpawner;
 
     // Start is called before the first frame update
     void Start()
     {
-        HexSpawner = GameObject.Find("HexSpawner").GetComponent<HexSpawner>();
+        GameSpawner = GameObject.Find("GameSpawner").GetComponent<GameSpawner>();
 
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
         m_ShowUI = root.Q<Toggle>("show-ui");
@@ -108,7 +108,7 @@ public class GameUIManager : MonoBehaviour
                 break;
             case "spawn-board":
                 Debug.Log("Spawn Board");
-                HexSpawner.Spawn();
+                GameSpawner.Spawn();
                 break;
             case "load-board":
                 Debug.Log("Load Board");
@@ -116,15 +116,15 @@ public class GameUIManager : MonoBehaviour
                 break;
             case "save-board":
                 Debug.Log("Save Board");
-                HexSpawner.SaveHexes(null);
+                GameSpawner.SaveHexes(null);
                 break;
             case "refresh-board":
                 Debug.Log("Refresh Board");
-                HexSpawner.RefeshHexes();
+                GameSpawner.Refresh();
                 break;
             case "clear-board":
                 Debug.Log("Clear Board");
-                HexSpawner.ClearHexes();
+                GameSpawner.Clear();
                 break;
             default:
                 Debug.Log("Unknown Button");
@@ -145,7 +145,7 @@ public class GameUIManager : MonoBehaviour
         //yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, currentDir,"map.jsopn", "Select Map", "Select" );
 		
         // Show a select folder dialog 
-		yield return FileBrowser.ShowLoadDialog( ( paths ) => { Debug.Log( "Selected: " + paths[0] ); filePathText = paths[0];HexSpawner.LoadState(filePathText);},
+		yield return FileBrowser.ShowLoadDialog( ( paths ) => { Debug.Log( "Selected: " + paths[0] ); filePathText = paths[0];GameSpawner.LoadState(filePathText);},
 								   () => { Debug.Log( "Canceled" ); },
 								   FileBrowser.PickMode.Files, false, currentDir, "map.json", "Select Map", "Select" );
     }

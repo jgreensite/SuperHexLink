@@ -50,10 +50,23 @@ public class CornerSpawner : SpawnerBase
         }
     }
     */
-
-    protected override void BuildMe(bool isRefresh)
+    public override void Spawn()
     {
-        throw new NotImplementedException();
+        BuildMe(false);
+    }
+    public override void BuildMe(bool isRefresh)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public override void Clear()
+    {
+        //throw new NotImplementedException();
+    }
+
+    public override void Refresh()
+    {
+       //throw new NotImplementedException();
     }
 
     private Vector3 CalculateCornerPosition(Hex hex, int cornerIndex)

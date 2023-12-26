@@ -19,6 +19,7 @@ public abstract class SpawnerBase : SerializedMonoBehaviour
     public GameConstants CS;
 
     [SerializeField, HideInInspector]
+    //todo - should this be private?
     public SpawnerState state = new();
     
     [ShowInInspector]
@@ -29,13 +30,16 @@ public abstract class SpawnerBase : SerializedMonoBehaviour
         set { this.state = value; }
     }
 
-    [Button("Spawn Hexes")]
-    public void Spawn()
-    {
-        BuildMe(false);
-    }
+    [Button("Spawn")]
+    public abstract void Spawn();
 
-    protected abstract void BuildMe(bool isRefresh);
+    [Button("Refresh")]
+    public abstract void Refresh();
+  
+    public abstract void BuildMe(bool isRefresh);
+
+    [Button("Clear")]
+    public abstract void Clear();
 
     bool isConfiguredEmpty(String t)
     {

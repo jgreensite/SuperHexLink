@@ -37,32 +37,42 @@ public class HexSpawner : SpawnerBase
     public HexText hexTextPrefab;
 
     //game constants
-    //public CS gameConstants;
+    //public GameConstants CS;
 
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landTypes = new List<landConfig>();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numTypes = new List<numConfig>();
    
-    protected override void BuildMe(bool isRefresh)
+    [Button("Spawn Hexes")]
+    public override void Spawn()
     {
-        //Build the list of lands
+        BuildMe(false);
+    }
+    public override void BuildMe(bool isRefresh)
+    // builds the 
+    // “odd-q” vertical layout shoves odd columns down
+    // see https://www.redblobgames.com/grids/hexagons/ for more information
+    {
+        //Build the list of available lands and numbers we can choose from
         BuildTypes();
 
-        // “odd-q” vertical layout shoves odd columns down
-        // see https://www.redblobgames.com/grids/hexagons/ for more information
+        // clear the state of the hexes
         if (state.hexes.Count > 0)
-            ClearHexes();
+            Clear();
 
-        for (int col = 0; col < state.hexGrid.cols; col++)
+        // Now based on the dimensions of the gameboard which may have changed since the last time we called this
+        // build the hex and text associated with the hex GameObjects
+        // Note that only if we are not refreshing do we assign a land type and the text to the hex
+        for (int col = 0; col < state.hexGridConfig.cols; col++)
         {
             state.hexes.Add(new List<Hex>());
-            for (int row = 0; row < state.hexGrid.rows; row++)
+            for (int row = 0; row < state.hexGridConfig.rows; row++)
             {
                 Hex newHex = Instantiate(
                     original: hexPrefab,
                     position: new Vector3(
-                        y: UnityEngine.Random.Range(state.hexGrid.minHeight, state.hexGrid.maxHeight),
-                        z: -row * state.hexGrid.Apothem * 2 + Get_Z_Offset(col),
-                        x: (float)(col * state.hexGrid.radius * 1.5)
+                        y: UnityEngine.Random.Range(state.hexGridConfig.minHeight, state.hexGridConfig.maxHeight),
+                        z: -row * state.hexGridConfig.Apothem * 2 + Get_Z_Offset(col),
+                        x: (float)(col * state.hexGridConfig.radius * 1.5)
 
                     ),
                     rotation: Quaternion.identity,
@@ -70,9 +80,9 @@ public class HexSpawner : SpawnerBase
                 );
 
                 newHex.transform.localScale = new Vector3(
-                    x: newHex.transform.localScale.x * state.hexGrid.radius,
-                    y: newHex.transform.localScale.y * state.hexGrid.height,
-                    z: newHex.transform.localScale.z * state.hexGrid.radius
+                    x: newHex.transform.localScale.x * state.hexGridConfig.radius,
+                    y: newHex.transform.localScale.y * state.hexGridConfig.height,
+                    z: newHex.transform.localScale.z * state.hexGridConfig.radius
                 );
                 newHex.name = String.Concat("hex ", col, "_", row);
                 newHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEBOARD);
@@ -100,6 +110,8 @@ public class HexSpawner : SpawnerBase
                 // add to the 2 dimensional list of hexes
                 state.hexes[col].Add(newHex);
 
+                //When you load a saved game you don't want to randomize the hexes
+                //When you have spawned a new game you do
                 if (!isRefresh)
                 {
                     //make the hex a piece in the game
@@ -144,8 +156,8 @@ public class HexSpawner : SpawnerBase
         //get the  x and z coordinates of the first hex in the list
         float x_start = state.hexes[0][0].transform.position.x;
         float z_start = state.hexes[0][0].transform.position.z;
-        float x_end = state.hexes[state.hexGrid.cols-1][0].transform.position.x;
-        float z_end = state.hexes[0][state.hexGrid.rows-1].transform.position.z;
+        float x_end = state.hexes[state.hexGridConfig.cols-1][0].transform.position.x;
+        float z_end = state.hexes[0][state.hexGridConfig.rows-1].transform.position.z;
         float x_mid = (x_start + x_end) / 2;
         float z_mid = (z_start + z_end) / 2;
         //make y_mid 2/3 the maximum of x_mid or z_mid, whichever is greater
@@ -160,6 +172,7 @@ public class HexSpawner : SpawnerBase
     }
 
     private void SetLand(Hex h)
+    //Sets the land type and number of the hex based on its hexState, used when creating a new hex or refreshing an existing one
     {
         // Get the HexType value from the hex state
         string hexType = h.hexState.HexType;
@@ -175,7 +188,7 @@ public class HexSpawner : SpawnerBase
             if (hexType == GameConstants.CAR_TYPE_SEA || hexType == GameConstants.CAR_TYPE_HARBOUR)
             {
                 // Make land a little lower for sea and harbour hex types
-                double yNew = hexPrefab.transform.localScale.y * state.hexGrid.height * 0.95;
+                double yNew = hexPrefab.transform.localScale.y * state.hexGridConfig.height * 0.95;
                 h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNew, h.transform.localScale.z);
             }
         }
@@ -277,85 +290,32 @@ public class HexSpawner : SpawnerBase
         }
     }
 
-    [Button("Refresh Map")]
-    public void RefeshHexes()
+    [Button("Refresh Hexes")]
+    public override void Refresh()
     {
         BuildTypes();
         foreach (List<Hex> hc in state.hexes)
         {
             foreach (Hex h in hc)
             {
-                Refresh(h);
+                //do not randomize if supposed to skip
+                if (isReplaceableLandType(h.hexState.HexType))
+                {
+                    RandomizeLand(h, true);
+                }
             }
         }
         UpdateHexes();
     }
 
-    [Button("Clear Map")]
-    public void ClearHexes()
+    [Button("Clear Hexes")]
+    public override void Clear()
     {
         List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
         Helpers.DestroyObjects(ret);
         state.hexes = new List<List<Hex>>();
     }
 
-    [Button("Save Map")]
-    //todo - externalise defauilt value as a constant
-    public void SaveHexes(string filePath)
-    {
-        if ((filePath == null) || (filePath.Length == 0))
-        {
-            filePath = "./data/maps/map.json"; //default value
-        }
-            byte[] bytes = SerializationUtility.SerializeValue(state, DataFormat.JSON);
-            File.WriteAllBytes(filePath, bytes);
-    }
-
-    [Button("Load Map")]
-    public void LoadState(string filePath)
-    {
-        //TODO - this is not very elegant
-        //it would be better if we didn't have to call update hexes and that an event fired automatically
-        
-        //load the hex data
-        SpawnerState loadedHexSpawner = new SpawnerState();
-        if ((filePath == null) || (filePath.Length == 0))
-        {
-            filePath = "./data/maps/map.json"; //default value
-        }
-        if (!File.Exists(filePath)) return; // No state to load
-
-        byte[] bytes = File.ReadAllBytes(filePath);
-        loadedHexSpawner = SerializationUtility.DeserializeValue<SpawnerState>(bytes, DataFormat.JSON);
-        //copy accross hexGrid and landconfig
-        state.hexGrid = loadedHexSpawner.hexGrid;
-        state.landConfigs = loadedHexSpawner.landConfigs;
-        state.numConfigs = loadedHexSpawner.numConfigs;
-
-        //create new gameobjects attached to new hexes based on loaded value, remember not possible to serialise Unity gameobjects
-        BuildMe(true);
-
-        //Copy across hexState from loaded objects to new objects
-        for (int col = 0; col < state.hexGrid.cols; col++)
-        {
-            for (int row = 0; row < state.hexGrid.rows; row++)
-            {
-                state.hexes[col][row].hexState = loadedHexSpawner.hexes[col][row].hexState;
-            }
-        }
-
-        //update the hexstate as a result
-        UpdateHexes();
-    }
-    
-    public void Refresh(Hex h)
-    {
-        //do not randomize if supposed to skip
-        if (isReplaceableLandType(h.hexState.HexType))
-        {
-            RandomizeLand(h, true);
-        }
-    }
 
     bool isConfiguredEmpty(String t)
     {
@@ -499,14 +459,14 @@ public class HexSpawner : SpawnerBase
     }
 
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
-    private float Get_Z_Offset(int col) => col % 2 == 0 ? state.hexGrid.Apothem * 1.0f : 0f;
+    private float Get_Z_Offset(int col) => col % 2 == 0 ? state.hexGridConfig.Apothem * 1.0f : 0f;
 
     //checks to see if the Hex is on the board
     public bool isOnBoardHex(HexExtensions.HexExtensions.Hex h)
     {
 
         var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
-        if ((o.col > -1) && (o.col < state.hexGrid.cols) && (o.row > -1) && (o.row < state.hexGrid.rows))
+        if ((o.col > -1) && (o.col < state.hexGridConfig.cols) && (o.row > -1) && (o.row < state.hexGridConfig.rows))
         {
             return (true);
         }
@@ -523,7 +483,7 @@ public class HexSpawner : SpawnerBase
     }
 
     private Hex GetHexIfInBounds(int row, int col) =>
-        state.hexGrid.IsInBounds(row, col) ? state.hexes[row][col] : null;
+        state.hexGridConfig.IsInBounds(row, col) ? state.hexes[row][col] : null;
 
     private (int row, int col) GetOffsetInDirection(bool isEven, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
     {
@@ -549,7 +509,7 @@ public class HexSpawner : SpawnerBase
 [System.Serializable]
 public class SpawnerState
 {
-    [SerializeField] public HexGrid hexGrid;
+    [SerializeField] public HexGridConfig hexGridConfig;
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex>> hexes = new List<List<Hex>>();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landConfigs = new List<landConfig>();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numConfigs = new List<numConfig>();

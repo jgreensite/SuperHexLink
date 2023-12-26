@@ -56,8 +56,24 @@ public class EdgeSpawner : SpawnerBase
         return new Vector3(); // Placeholder
     }
     */
-    protected override void BuildMe(bool isRefresh)
+
+    public override void Spawn()
     {
-        throw new NotImplementedException();
+        BuildMe(false);
+    }
+
+    public override void BuildMe(bool isRefresh)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public override void Clear()
+    {
+        //throw new NotImplementedException();
+    }
+
+    public override void Refresh()
+    {
+        //throw new NotImplementedException();
     }
 }

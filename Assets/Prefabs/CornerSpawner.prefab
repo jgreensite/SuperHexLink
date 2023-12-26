@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4071566045989745732
+--- !u!1 &4931688352224537562
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,22 +8,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7314532755327205306}
-  - component: {fileID: 4093078227403912453}
+  - component: {fileID: 8032772320102146702}
+  - component: {fileID: -3029088342971579280}
   m_Layer: 0
-  m_Name: HexSpawner
+  m_Name: CornerSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7314532755327205306
+--- !u!4 &8032772320102146702
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4071566045989745732}
+  m_GameObject: {fileID: 4931688352224537562}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 6.0000286, y: 0.37450507, z: -1.7581159}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32,16 +32,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4093078227403912453
+--- !u!114 &-3029088342971579280
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4071566045989745732}
+  m_GameObject: {fileID: 4931688352224537562}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f9b42b0bb16b35469aedbb4415a4a49, type: 3}
+  m_Script: {fileID: 11500000, guid: 538c0d28669e24cf29cc42f80ad1b672, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -52,32 +52,5 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes:
-    - Name: landTypes
-      Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[landConfig, Assembly-CSharp]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: numTypes
-      Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[numConfig, Assembly-CSharp]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
+    SerializationNodes: []
   CS: {fileID: 0}
-  hexPrefab: {fileID: 6932450884815424045, guid: 0f53b7d9030d27f4e8b2a2cade7f4461, type: 3}
-  hexLandPrefab: {fileID: 0}
-  hexTextPrefab: {fileID: 1514278714672149903, guid: 475aadd4dedb74c8caaa4f23640a4840, type: 3}

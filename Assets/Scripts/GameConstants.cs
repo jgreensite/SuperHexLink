@@ -202,7 +202,7 @@ public class GameConstants : ScriptableObject
     
     private void OnEnable()
     {
-            // Initialize materialMap
+        // Initialize materialMap
         materialMap = new Dictionary<string, Material>()
         {
             {CAR_TYPE_WORD_NULL, null},

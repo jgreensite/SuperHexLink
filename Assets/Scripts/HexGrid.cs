@@ -2,7 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-public struct HexGrid
+public struct HexGridConfig
 {
     public int cols;
     [ShowInInspector, ReadOnly] public int maxCol => cols - 1;

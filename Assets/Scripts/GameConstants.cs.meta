@@ -3,7 +3,17 @@ guid: d75a69b5c11a64318abef84dff1742d2
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - forestMaterial: {fileID: 2100000, guid: 949b178715cc24e9d8bf5d9d5edba4a8, type: 2}
+  - pastureMaterial: {fileID: 6889671066085143944, guid: 4d60848e294474e7588d051807259d48, type: 3}
+  - fieldMaterial: {fileID: 2100000, guid: 519091cab1a4a4fffb843ff96a27c6a2, type: 2}
+  - hillMaterial: {fileID: 2100000, guid: 612b7901286fb4f11a8d5110a11253ad, type: 2}
+  - mountainMaterial: {fileID: 2100000, guid: f6a92a7ba707847488cb300faf1cb23f, type: 2}
+  - desertMaterial: {fileID: 2100000, guid: 70fa2c06f09b5430d9f217344537f4c6, type: 2}
+  - mineMaterial: {fileID: 2100000, guid: 552bde77c2a934ed4bd554aeec24b6e5, type: 2}
+  - seaMaterial: {fileID: 2100000, guid: aa6f4e763921e455ea7cad3a4593850b, type: 2}
+  - goldMaterial: {fileID: 2100000, guid: 7ffdd016556e548a291745b36d7486ef, type: 2}
+  - glowMaterial: {fileID: 2100000, guid: 8b9d0c535efd24ae3b97119c5a6f2e1a, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
