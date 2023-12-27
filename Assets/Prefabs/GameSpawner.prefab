@@ -100,7 +100,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  CS: {fileID: 0}
-  hexSpawner: {fileID: 0}
-  edgeSpawner: {fileID: 0}
-  cornerSpawner: {fileID: 0}
+  CS: {fileID: 11400000, guid: da7f7df06b34e4e4baac27e4598331cb, type: 2}
+  hexSpawner: {fileID: 4093078227403912453, guid: 4c6e4c837df9a4ef0ab669643b102536, type: 3}
+  edgeSpawner: {fileID: -3752769218172903985, guid: 3d47f6925c42d4668959feb0fe157616, type: 3}
+  cornerSpawner: {fileID: -3029088342971579280, guid: 07e48c8b8224f4e129d79fa096689be2, type: 3}

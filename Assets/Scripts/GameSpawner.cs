@@ -12,8 +12,18 @@ using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
 
-public class GameSpawner : SpawnerBase
+public class GameSpawner : SpawnerBase<GameSpawner.GameSpawnerState>
 {
+    private GameSpawnerState state;
+
+    public override GameSpawnerState State
+    {
+        get { return state; }
+        set { state = value; }
+    }
+
+    //public override GameSpawnerState State { set => throw new NotImplementedException(); }
+
     [SerializeField]
     private HexSpawner hexSpawner;
     [SerializeField]
@@ -23,6 +33,7 @@ public class GameSpawner : SpawnerBase
 
     public void Awake()
     {
+        //state = new GameSpawnerState();
         hexSpawner = GameObject.Find("HexSpawner").GetComponent<HexSpawner>();
         edgeSpawner = GameObject.Find("EdgeSpawner").GetComponent<EdgeSpawner>();
         cornerSpawner = GameObject.Find("CornerSpawner").GetComponent<CornerSpawner>();
@@ -70,17 +81,20 @@ public class GameSpawner : SpawnerBase
         {
             filePath = "./data/maps/map.json"; //default value
         }
-            
-            //build a List to hold the hexSpawner state and the edgeSpawner state and the cornerSpawner state
-            
-            List<SpawnerState> spawnerStates = new List<SpawnerState>();
-            spawnerStates.Add(hexSpawner.state);
-            spawnerStates.Add(edgeSpawner.state);
-            spawnerStates.Add(cornerSpawner.state);
 
-            //write a single save state comprised of the hexSpawner state and the edgeSpawner state and the cornerSpawner state
-            
-            byte[] bytes = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
+        //build a List to hold the hexSpawner state and the edgeSpawner state and the cornerSpawner state
+
+        CombinedSpawnerState spawnerStates = new CombinedSpawnerState
+        {
+            GameState = State,
+            HexState = hexSpawner.State,
+            EdgeState = edgeSpawner.State,
+            CornerState = cornerSpawner.State
+        };
+
+        //write a single save state comprised of the hexSpawner state and the edgeSpawner state and the cornerSpawner state
+
+        byte[] bytes = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
             File.WriteAllBytes(filePath, bytes);            
     }
 
@@ -91,8 +105,8 @@ public class GameSpawner : SpawnerBase
         //it would be better if we didn't have to call update hexes and that an event fired automatically
         
         //load the hex data
-        SpawnerState loadedSpawner = new SpawnerState();
-        List<SpawnerState> spawnerStates = new List<SpawnerState>();
+        CombinedSpawnerState spawnerStates = new CombinedSpawnerState();
+  
         if ((filePath == null) || (filePath.Length == 0))
         {
             filePath = "./data/maps/map.json"; //default value
@@ -100,12 +114,13 @@ public class GameSpawner : SpawnerBase
         if (!File.Exists(filePath)) return; // No state to load
 
         byte[] bytes = File.ReadAllBytes(filePath);
-        spawnerStates = SerializationUtility.DeserializeValue<List<SpawnerState>>(bytes, DataFormat.JSON);
+        spawnerStates = SerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
  
         //copy accross loaded configuration data
-        hexSpawner.state.hexGridConfig = loadedSpawner.hexGridConfig;
-        hexSpawner.state.landConfigs = loadedSpawner.landConfigs;
-        hexSpawner.state.numConfigs = loadedSpawner.numConfigs;
+        State = spawnerStates.GameState;
+        hexSpawner.State = spawnerStates.HexState;
+        edgeSpawner.State = spawnerStates.EdgeState;
+        cornerSpawner.State = spawnerStates.CornerState;
 
         //create new gameobjects attached to new hexes based on loaded values
         //remember it is not possible to serialise Unity gameobjects so we need to create new ones
@@ -113,11 +128,11 @@ public class GameSpawner : SpawnerBase
 
         //Copy across hexState from loaded objects to new gameobjects
         //ToDo - I don't think it's possible to simply copy across the hexes as Unity gameonjects are not serialisable so we'll end up with junk, but I need to check this
-        for (int col = 0; col < hexSpawner.state.hexGridConfig.cols; col++)
+        for (int col = 0; col < State.hexGridConfig.cols; col++)
         {
-            for (int row = 0; row < hexSpawner.state.hexGridConfig.rows; row++)
+            for (int row = 0; row < State.hexGridConfig.rows; row++)
             {
-                hexSpawner.state.hexes[col][row].hexState = loadedSpawner.hexes[col][row].hexState;
+                hexSpawner.State.hexes[col][row].hexState = spawnerStates.HexState.hexes[col][row].hexState;
             }
         }
 
@@ -134,5 +149,36 @@ public class GameSpawner : SpawnerBase
     private void AdjustCameraPosition()
     {
         // Logic to adjust the camera to fit the game board
+    }
+
+    [SerializeField]
+    public class GameSpawnerState
+    {
+        [SerializeField] public HexGridConfig hexGridConfig;
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landConfigs = new List<landConfig>();
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numConfigs = new List<numConfig>();
+
+    }
+
+    public class landConfig
+    {
+        public string landGroupID;
+        public int landCnt;
+        public string landType;
+    }
+
+    public class numConfig
+    {
+        public string numGroupID;
+        public int numCnt;
+        public int numType;
+    }
+
+    public class CombinedSpawnerState
+    {
+        public GameSpawnerState GameState { get; set; }
+        public HexSpawner.HexSpawnerState HexState { get; set; }
+        public EdgeSpawner.EdgeSpawnerState EdgeState { get; set; }
+        public CornerSpawner.CornerSpawnerState CornerState { get; set; }
     }
 }

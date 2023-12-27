@@ -11,8 +11,16 @@ using FDL.Library.Numeric;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
-public class EdgeSpawner : SpawnerBase
+public class EdgeSpawner : SpawnerBase<EdgeSpawner.EdgeSpawnerState>
 {
+    private EdgeSpawnerState state;
+
+    public override EdgeSpawnerState State
+    {
+        get { return state; }
+        set { state = value; }
+    }
+    
     /*
     [SerializeField]
     private Edge edgePrefab;
@@ -75,5 +83,11 @@ public class EdgeSpawner : SpawnerBase
     public override void Refresh()
     {
         //throw new NotImplementedException();
+    }
+
+    [System.Serializable]
+    public class EdgeSpawnerState
+    {
+        [SerializeField] public string myState;
     }
 }

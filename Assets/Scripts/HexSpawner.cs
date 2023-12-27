@@ -11,8 +11,9 @@ using FDL.Library.Numeric;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
+using UnityEngine.Animations;
 
-public class HexSpawner : SpawnerBase
+public class HexSpawner : SpawnerBase<HexSpawner.HexSpawnerState>
 {
    
     //Hex Materials
@@ -28,6 +29,15 @@ public class HexSpawner : SpawnerBase
     public Material goldMaterial;
     */
     //Hex Prefab Types
+
+    private HexSpawnerState state;
+
+    public override HexSpawnerState State
+    {
+        get { return state; }
+        set { state = value; }
+    }
+    
     public Hex hexPrefab;
 
     //Hex Model Types
@@ -36,11 +46,21 @@ public class HexSpawner : SpawnerBase
     //Hex Text Prefab Types
     public HexText hexTextPrefab;
 
+    //State of parent object
+    [SerializeField]
+    private GameSpawner gameSpawner;
+
     //game constants
     //public GameConstants CS;
 
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landTypes = new List<landConfig>();
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numTypes = new List<numConfig>();
+    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.landConfig> landTypes = new List<GameSpawner.landConfig>();
+    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.numConfig> numTypes = new List<GameSpawner.numConfig>();
+
+    private void Awake()
+    {
+        gameSpawner = GameObject.Find("GameSpawner").GetComponent<GameSpawner>();
+        //state = new HexSpawnerState();
+    }
    
     [Button("Spawn Hexes")]
     public override void Spawn()
@@ -62,17 +82,17 @@ public class HexSpawner : SpawnerBase
         // Now based on the dimensions of the gameboard which may have changed since the last time we called this
         // build the hex and text associated with the hex GameObjects
         // Note that only if we are not refreshing do we assign a land type and the text to the hex
-        for (int col = 0; col < state.hexGridConfig.cols; col++)
+        for (int col = 0; col < gameSpawner.State.hexGridConfig.cols; col++)
         {
             state.hexes.Add(new List<Hex>());
-            for (int row = 0; row < state.hexGridConfig.rows; row++)
+            for (int row = 0; row < gameSpawner.State.hexGridConfig.rows; row++)
             {
                 Hex newHex = Instantiate(
                     original: hexPrefab,
                     position: new Vector3(
-                        y: UnityEngine.Random.Range(state.hexGridConfig.minHeight, state.hexGridConfig.maxHeight),
-                        z: -row * state.hexGridConfig.Apothem * 2 + Get_Z_Offset(col),
-                        x: (float)(col * state.hexGridConfig.radius * 1.5)
+                        y: UnityEngine.Random.Range(gameSpawner.State.hexGridConfig.minHeight, gameSpawner.State.hexGridConfig.maxHeight),
+                        z: -row * gameSpawner.State.hexGridConfig.Apothem * 2 + Get_Z_Offset(col),
+                        x: (float)(col * gameSpawner.State.hexGridConfig.radius * 1.5)
 
                     ),
                     rotation: Quaternion.identity,
@@ -80,9 +100,9 @@ public class HexSpawner : SpawnerBase
                 );
 
                 newHex.transform.localScale = new Vector3(
-                    x: newHex.transform.localScale.x * state.hexGridConfig.radius,
-                    y: newHex.transform.localScale.y * state.hexGridConfig.height,
-                    z: newHex.transform.localScale.z * state.hexGridConfig.radius
+                    x: newHex.transform.localScale.x * gameSpawner.State.hexGridConfig.radius,
+                    y: newHex.transform.localScale.y * gameSpawner.State.hexGridConfig.height,
+                    z: newHex.transform.localScale.z * gameSpawner.State.hexGridConfig.radius
                 );
                 newHex.name = String.Concat("hex ", col, "_", row);
                 newHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEBOARD);
@@ -125,10 +145,10 @@ public class HexSpawner : SpawnerBase
     private void BuildTypes()
     {
         landTypes.Clear();
-        landTypes = state.landConfigs.Clone();
+        landTypes = gameSpawner.State.landConfigs.Clone();
 
         numTypes.Clear();
-        numTypes = state.numConfigs.Clone();
+        numTypes = gameSpawner.State.numConfigs.Clone();
     }
 
     [Button("Update Hexes")]
@@ -156,8 +176,8 @@ public class HexSpawner : SpawnerBase
         //get the  x and z coordinates of the first hex in the list
         float x_start = state.hexes[0][0].transform.position.x;
         float z_start = state.hexes[0][0].transform.position.z;
-        float x_end = state.hexes[state.hexGridConfig.cols-1][0].transform.position.x;
-        float z_end = state.hexes[0][state.hexGridConfig.rows-1].transform.position.z;
+        float x_end = state.hexes[gameSpawner.State.hexGridConfig.cols-1][0].transform.position.x;
+        float z_end = state.hexes[0][gameSpawner.State.hexGridConfig.rows-1].transform.position.z;
         float x_mid = (x_start + x_end) / 2;
         float z_mid = (z_start + z_end) / 2;
         //make y_mid 2/3 the maximum of x_mid or z_mid, whichever is greater
@@ -188,7 +208,7 @@ public class HexSpawner : SpawnerBase
             if (hexType == GameConstants.CAR_TYPE_SEA || hexType == GameConstants.CAR_TYPE_HARBOUR)
             {
                 // Make land a little lower for sea and harbour hex types
-                double yNew = hexPrefab.transform.localScale.y * state.hexGridConfig.height * 0.95;
+                double yNew = hexPrefab.transform.localScale.y * gameSpawner.State.hexGridConfig.height * 0.95;
                 h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNew, h.transform.localScale.z);
             }
         }
@@ -365,9 +385,9 @@ public class HexSpawner : SpawnerBase
         int indexToRemove;
         string randomLand;
         int randomNum;
-        IEnumerable<landConfig> types = new List<landConfig>();
+        IEnumerable<GameSpawner.landConfig> types = new List<GameSpawner.landConfig>();
         List<String> typesAll = new List<String>();
-        IEnumerable<numConfig> nums = new List<numConfig>();
+        IEnumerable<GameSpawner.numConfig> nums = new List<GameSpawner.numConfig>();
         List<int> numsAll = new List<int>();
 
         //TODO - This works but is a bit complex, consider simplification
@@ -392,7 +412,7 @@ public class HexSpawner : SpawnerBase
                  select t).ToList();
         }
 
-        foreach (landConfig t in types)
+        foreach (GameSpawner.landConfig t in types)
         {
             for (int cnt = 0; cnt < t.landCnt; cnt++)
             {
@@ -404,7 +424,7 @@ public class HexSpawner : SpawnerBase
         //now having matched on group remove the random land from the list of lands
         if ((typesAll.Count() > 0))
         {
-            List<landConfig> landRemove =
+            List<GameSpawner.landConfig> landRemove =
                 (from lt in types
                  where(
                  (lt.landType == typesAll[indexToRemove]))
@@ -434,7 +454,7 @@ public class HexSpawner : SpawnerBase
                 (n.numCnt > 0))
                 select n).ToList();
 
-            foreach (numConfig n in nums)
+            foreach (GameSpawner.numConfig n in nums)
             {
                 for (int cnt = 0; cnt < n.numCnt; cnt++)
                 {
@@ -444,7 +464,7 @@ public class HexSpawner : SpawnerBase
             indexToRemove = RandomNumber.Between(0, numsAll.Count() - 1);
             if (numsAll.Count() > 0)
             {
-                List<numConfig> numRemove =
+                List<GameSpawner.numConfig> numRemove =
                     (from nt in nums
                     where (
                     (nt.numType == numsAll[indexToRemove]))
@@ -459,14 +479,14 @@ public class HexSpawner : SpawnerBase
     }
 
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
-    private float Get_Z_Offset(int col) => col % 2 == 0 ? state.hexGridConfig.Apothem * 1.0f : 0f;
+    private float Get_Z_Offset(int col) => col % 2 == 0 ? gameSpawner.State.hexGridConfig.Apothem * 1.0f : 0f;
 
     //checks to see if the Hex is on the board
     public bool isOnBoardHex(HexExtensions.HexExtensions.Hex h)
     {
 
         var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
-        if ((o.col > -1) && (o.col < state.hexGridConfig.cols) && (o.row > -1) && (o.row < state.hexGridConfig.rows))
+        if ((o.col > -1) && (o.col < gameSpawner.State.hexGridConfig.cols) && (o.row > -1) && (o.row < gameSpawner.State.hexGridConfig.rows))
         {
             return (true);
         }
@@ -483,7 +503,7 @@ public class HexSpawner : SpawnerBase
     }
 
     private Hex GetHexIfInBounds(int row, int col) =>
-        state.hexGridConfig.IsInBounds(row, col) ? state.hexes[row][col] : null;
+        gameSpawner.State.hexGridConfig.IsInBounds(row, col) ? state.hexes[row][col] : null;
 
     private (int row, int col) GetOffsetInDirection(bool isEven, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
     {
@@ -504,27 +524,10 @@ public class HexSpawner : SpawnerBase
         }
         return (0, 0);
     }
-}
 
-[System.Serializable]
-public class SpawnerState
-{
-    [SerializeField] public HexGridConfig hexGridConfig;
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex>> hexes = new List<List<Hex>>();
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landConfigs = new List<landConfig>();
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numConfigs = new List<numConfig>();
-}
-
-public class landConfig
-{
-    public string landGroupID;
-    public int landCnt;
-    public string landType;
-}
-
-public class numConfig
-{
-    public string numGroupID;
-    public int numCnt;
-    public int numType;
+    [System.Serializable]
+    public class HexSpawnerState
+    {
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex>> hexes = new List<List<Hex>>();
+    }
 }

@@ -11,8 +11,15 @@ using FDL.Library.Numeric;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
-public class CornerSpawner : SpawnerBase
+public class CornerSpawner : SpawnerBase<CornerSpawner.CornerSpawnerState>
 {
+    private CornerSpawnerState state;
+
+    public override CornerSpawnerState State
+    {
+        get { return state; }
+        set { state = value; }
+    }
     /*
     [SerializeField]
     private Corner cornerPrefab;
@@ -67,6 +74,13 @@ public class CornerSpawner : SpawnerBase
     public override void Refresh()
     {
        //throw new NotImplementedException();
+    }
+
+    
+    [System.Serializable]
+    public class CornerSpawnerState
+    {
+        [SerializeField] public string myState;
     }
 
     private Vector3 CalculateCornerPosition(Hex hex, int cornerIndex)

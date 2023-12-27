@@ -55,7 +55,8 @@ MonoBehaviour:
     SerializationNodes:
     - Name: landTypes
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[landConfig, Assembly-CSharp]], mscorlib
+      Data: 0|System.Collections.Generic.List`1[[GameSpawner+landConfig, Assembly-CSharp]],
+        mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -67,7 +68,8 @@ MonoBehaviour:
       Data: 
     - Name: numTypes
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[numConfig, Assembly-CSharp]], mscorlib
+      Data: 1|System.Collections.Generic.List`1[[GameSpawner+numConfig, Assembly-CSharp]],
+        mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -77,7 +79,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  CS: {fileID: 0}
+  CS: {fileID: 11400000, guid: da7f7df06b34e4e4baac27e4598331cb, type: 2}
   hexPrefab: {fileID: 6932450884815424045, guid: 0f53b7d9030d27f4e8b2a2cade7f4461, type: 3}
-  hexLandPrefab: {fileID: 0}
+  hexLandPrefab: {fileID: 3127254753887864668, guid: 6c9f384e0ff784c0bbbbdf6ab7fcb13c, type: 3}
   hexTextPrefab: {fileID: 1514278714672149903, guid: 475aadd4dedb74c8caaa4f23640a4840, type: 3}
+  gameSpawner: {fileID: 0}
