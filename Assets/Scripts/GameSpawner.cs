@@ -79,7 +79,7 @@ public class GameSpawner : SpawnerBase<GameSpawner.GameSpawnerState>
     {
         if ((filePath == null) || (filePath.Length == 0))
         {
-            filePath = "./data/maps/map.json"; //default value
+            filePath = "./data/maps/"; //default value
         }
 
         //build a List to hold the hexSpawner state and the edgeSpawner state and the cornerSpawner state
@@ -94,8 +94,16 @@ public class GameSpawner : SpawnerBase<GameSpawner.GameSpawnerState>
 
         //write a single save state comprised of the hexSpawner state and the edgeSpawner state and the cornerSpawner state
 
-        byte[] bytes = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
-            File.WriteAllBytes(filePath, bytes);            
+        byte[] bytes0 = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "0 .json", bytes0);
+        byte[] bytes1 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "1 .json", bytes1);
+        byte[] bytes2 = SerializationUtility.SerializeValue(edgeSpawner.State, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "2 .json", bytes2);
+        byte[] bytes3 = SerializationUtility.SerializeValue(cornerSpawner.State, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "3 .json", bytes3);
+
+
     }
 
     [Button("Load Map")]
@@ -151,7 +159,7 @@ public class GameSpawner : SpawnerBase<GameSpawner.GameSpawnerState>
         // Logic to adjust the camera to fit the game board
     }
 
-    [SerializeField]
+    [Serializable]
     public class GameSpawnerState
     {
         [SerializeField] public HexGridConfig hexGridConfig;
@@ -174,7 +182,7 @@ public class GameSpawner : SpawnerBase<GameSpawner.GameSpawnerState>
         public int numType;
     }
 
-    [SerializeField]
+    [Serializable]
     public class CombinedSpawnerState
     {
         public GameSpawnerState GameState { get; set; }

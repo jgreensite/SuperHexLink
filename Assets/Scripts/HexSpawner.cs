@@ -525,7 +525,7 @@ public class HexSpawner : SpawnerBase<HexSpawner.HexSpawnerState>
         return (0, 0);
     }
 
-    [System.Serializable]
+    [Serializable]
     public class HexSpawnerState
     {
         [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex>> hexes = new List<List<Hex>>();
