@@ -174,6 +174,7 @@ public class GameSpawner : SpawnerBase<GameSpawner.GameSpawnerState>
         public int numType;
     }
 
+    [SerializeField]
     public class CombinedSpawnerState
     {
         public GameSpawnerState GameState { get; set; }
