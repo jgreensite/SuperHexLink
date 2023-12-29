@@ -11,11 +11,12 @@ using FDL.Library.Numeric;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
-public class EdgeSpawner : SpawnerBase<EdgeSpawner.EdgeSpawnerState>
+public class EdgeSpawner : SpawnerBase
 {
+    [ShowInInspector,OdinSerialize]
     private EdgeSpawnerState state;
 
-    public override EdgeSpawnerState State
+    public EdgeSpawnerState State
     {
         get { return state; }
         set { state = value; }

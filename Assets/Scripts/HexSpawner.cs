@@ -13,7 +13,7 @@ using SimpleHexExtensions;
 using HexExtensions;
 using UnityEngine.Animations;
 
-public class HexSpawner : SpawnerBase<HexSpawner.HexSpawnerState>
+public class HexSpawner : SpawnerBase
 {
    
     //Hex Materials
@@ -30,9 +30,10 @@ public class HexSpawner : SpawnerBase<HexSpawner.HexSpawnerState>
     */
     //Hex Prefab Types
 
+    [ShowInInspector,OdinSerialize]
     private HexSpawnerState state;
 
-    public override HexSpawnerState State
+    public HexSpawnerState State
     {
         get { return state; }
         set { state = value; }

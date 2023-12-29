@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using HexExtensions;
 using SimpleHexExtensions;
 using Sirenix.OdinInspector;
+using Sirenix.OdinInspector.Editor;
 using Sirenix.Serialization;
 using UnityEngine;
 
@@ -176,8 +177,8 @@ public class HexState
         set
         {
             _row = value;
-            Hex = CRToHex(col, row);
-            Debug.Log("q:" + Hex.q + " " + "r:" + Hex.r + " " + "s:" + Hex.s + " ");
+            PositionData = CRToHex(col, row);
+            Debug.Log("q:" + PositionData.q + " " + "r:" + PositionData.r + " " + "s:" + PositionData.s + " ");
         }
     }
     public string HexType;
@@ -186,7 +187,7 @@ public class HexState
     public int? HexNum;
     public string GroupID;
     public bool Selected;
-    public MeshRenderer meshRenderer;
+    [System.NonSerialized] public MeshRenderer meshRenderer;
   
     public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
@@ -194,7 +195,7 @@ public class HexState
 
     [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners;
 
-    [ShowInInspector] public HexExtensions.HexExtensions.Hex Hex { get; set; }
+    [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionData { get; set; }
 
     public HexState()
     {
@@ -281,7 +282,7 @@ public class HexState
             if (((o.col > 0)) && (o.row > 0))
             {
             
-                neighbours.Add(Hex.Neighbor(i));
+                neighbours.Add(PositionData.Neighbor(i));
             
             }
             else

@@ -11,11 +11,12 @@ using FDL.Library.Numeric;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
-public class CornerSpawner : SpawnerBase<CornerSpawner.CornerSpawnerState>
+public class CornerSpawner : SpawnerBase
 {
+    [ShowInInspector,OdinSerialize]
     private CornerSpawnerState state;
 
-    public override CornerSpawnerState State
+    public CornerSpawnerState State
     {
         get { return state; }
         set { state = value; }

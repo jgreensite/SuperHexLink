@@ -12,14 +12,11 @@ using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
 
-public abstract class SpawnerBase<TState> : SerializedMonoBehaviour
+public abstract class SpawnerBase : SerializedMonoBehaviour
 {
     // Define common fields that are used by all spawners, if any
 
     public GameConstants CS;
-
-    [ShowInInspector,OdinSerialize]
-    public abstract TState State { get; set; }
 
     [Button("Spawn")]
     public abstract void Spawn();
