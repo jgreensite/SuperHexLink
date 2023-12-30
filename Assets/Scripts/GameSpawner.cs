@@ -100,8 +100,8 @@ public class GameSpawner : SpawnerBase
             File.WriteAllBytes(filePath + "0 .json", bytes0);
         byte[] bytes1 = SerializationUtility.SerializeValue(State, DataFormat.JSON);
             File.WriteAllBytes(filePath + "1 .json", bytes1);
-        //byte[] bytes2 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
-        //    File.WriteAllBytes(filePath + "2 .json", bytes2);
+        byte[] bytes2 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "2 .json", bytes2);
         byte[] bytes3 = SerializationUtility.SerializeValue(edgeSpawner.State, DataFormat.JSON);
             File.WriteAllBytes(filePath + "3 .json", bytes3);
         byte[] bytes4 = SerializationUtility.SerializeValue(cornerSpawner.State, DataFormat.JSON);

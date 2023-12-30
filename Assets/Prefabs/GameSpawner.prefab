@@ -99,7 +99,69 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes: []
+    SerializationNodes:
+    - Name: state
+      Entry: 7
+      Data: 0|GameSpawner+GameSpawnerState, Assembly-CSharp
+    - Name: hexGridConfig
+      Entry: 7
+      Data: HexGridConfig, Assembly-CSharp
+    - Name: cols
+      Entry: 3
+      Data: 0
+    - Name: rows
+      Entry: 3
+      Data: 0
+    - Name: radius
+      Entry: 3
+      Data: 0
+    - Name: height
+      Entry: 4
+      Data: 0
+    - Name: hexHeightVariance
+      Entry: 7
+      Data: UnityEngine.Vector2, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: landConfigs
+      Entry: 7
+      Data: 1|System.Collections.Generic.List`1[[GameSpawner+LandConfig, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: numConfigs
+      Entry: 7
+      Data: 2|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   CS: {fileID: 11400000, guid: da7f7df06b34e4e4baac27e4598331cb, type: 2}
   hexSpawner: {fileID: 4093078227403912453, guid: 4c6e4c837df9a4ef0ab669643b102536, type: 3}
   edgeSpawner: {fileID: -3752769218172903985, guid: 3d47f6925c42d4668959feb0fe157616, type: 3}

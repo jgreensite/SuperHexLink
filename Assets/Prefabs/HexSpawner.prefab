@@ -53,9 +53,28 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
+    - Name: state
+      Entry: 7
+      Data: 0|HexSpawner+HexSpawnerState, Assembly-CSharp
+    - Name: hexes
+      Entry: 7
+      Data: 1|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex,
+        Assembly-CSharp]], mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: landTypes
       Entry: 7
-      Data: 0|System.Collections.Generic.List`1[[GameSpawner+landConfig, Assembly-CSharp]],
+      Data: 2|System.Collections.Generic.List`1[[GameSpawner+LandConfig, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
@@ -68,7 +87,7 @@ MonoBehaviour:
       Data: 
     - Name: numTypes
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[GameSpawner+numConfig, Assembly-CSharp]],
+      Data: 3|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12

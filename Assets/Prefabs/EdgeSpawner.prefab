@@ -52,5 +52,14 @@ MonoBehaviour:
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
-    SerializationNodes: []
+    SerializationNodes:
+    - Name: state
+      Entry: 7
+      Data: 0|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp
+    - Name: myState
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   CS: {fileID: 11400000, guid: da7f7df06b34e4e4baac27e4598331cb, type: 2}
