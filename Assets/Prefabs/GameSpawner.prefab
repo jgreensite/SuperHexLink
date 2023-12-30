@@ -108,16 +108,16 @@ MonoBehaviour:
       Data: HexGridConfig, Assembly-CSharp
     - Name: cols
       Entry: 3
-      Data: 0
+      Data: 7
     - Name: rows
       Entry: 3
-      Data: 0
+      Data: 7
     - Name: radius
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: height
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: hexHeightVariance
       Entry: 7
       Data: UnityEngine.Vector2, UnityEngine.CoreModule
@@ -139,7 +139,142 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 9
+    - Name: 
+      Entry: 7
+      Data: 2|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 13
+    - Name: landType
+      Entry: 1
+      Data: sea
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 3|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 5
+    - Name: landType
+      Entry: 1
+      Data: harbour
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 4|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 4
+    - Name: landType
+      Entry: 1
+      Data: forest
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 5|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 4
+    - Name: landType
+      Entry: 1
+      Data: pasture
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 6|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 4
+    - Name: landType
+      Entry: 1
+      Data: field
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 7|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 3
+    - Name: landType
+      Entry: 1
+      Data: hill
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 8|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 3
+    - Name: landType
+      Entry: 1
+      Data: mine
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 9|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 1
+    - Name: landType
+      Entry: 1
+      Data: desert
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 10|GameSpawner+LandConfig, Assembly-CSharp
+    - Name: landGroupID
+      Entry: 1
+      Data: 1
+    - Name: landCnt
+      Entry: 3
+      Data: 12
+    - Name: landType
+      Entry: 1
+      Data: none
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -148,11 +283,161 @@ MonoBehaviour:
       Data: 
     - Name: numConfigs
       Entry: 7
-      Data: 2|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]],
+      Data: 11|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 10
+    - Name: 
+      Entry: 7
+      Data: 12|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 13|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 14|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 15|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 16|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 17|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 18|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 19|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 20|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 2
+    - Name: numType
+      Entry: 3
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 21|GameSpawner+NumConfig, Assembly-CSharp
+    - Name: numGroupID
+      Entry: 1
+      Data: 1
+    - Name: numCnt
+      Entry: 3
+      Data: 1
+    - Name: numType
+      Entry: 3
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 

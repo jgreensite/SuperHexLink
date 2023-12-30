@@ -29,7 +29,7 @@ public class Hex : MonoBehaviour
     {
         foreach(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in EnumArray<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection>.Values)
         {
-            Hex neighbor = hexSpawner.GetNeighborAt(state.col, state.row, direction);
+            Hex neighbor = hexSpawner.GetNeighborAt(state.Col, state.Row, direction);
             yield return (neighbor, direction);
         }
     }
@@ -149,9 +149,9 @@ public class Hex : MonoBehaviour
 
     public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) {
         // Get the edge value from the material
-        var edge = Mathf.Floor(Mathf.Abs(state.meshRenderer.material.GetFloat($"_Edge{(int)direction}") - 1));
+        var edge = Mathf.Floor(Mathf.Abs(GetComponent<MeshRenderer>().material.GetFloat($"_Edge{(int)direction}") - 1));
         // Update the edge value in the material
-        state.meshRenderer.material.SetFloat(
+        GetComponent<MeshRenderer>().material.SetFloat(
             name: $"_Edge{(int)direction}",
             value: edge
         );
@@ -161,44 +161,55 @@ public class Hex : MonoBehaviour
 [System.Serializable]
 public class HexState
 {
+    private HexExtensions.HexExtensions.Hex _hex;
+    
+    [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionDataHex
+    {
+        get { return _hex; }
+        set
+        {
+            _hex = value;
+            _col = CFromHex(_hex);
+            _row = RFromHex(_hex);
+        }
+    }
+    
     //public int col { get { return this.col; } set { this.col = value; hex = CRToHex(col, row); } }
     private int _col;
-    public int col
+    [ShowInInspector] public int Col
     {
         get { return _col; }
         set
         {
             _col = value;
-            //_hex = CRToHex(col, row);
+            _hex = CRToHex(_col, _row);
         }
     }
     //public int row { get { return this.row; } set { this.row = value; hex = CRToHex(col, row); } }
     private int _row;
-    public int row
+    [ShowInInspector] public int Row
     {
         get { return _row; }
         set
         {
             _row = value;
-            PositionData = CRToHex(col, row);
-            Debug.Log("q:" + PositionData.q + " " + "r:" + PositionData.r + " " + "s:" + PositionData.s + " ");
+            _hex = CRToHex(_col, _row);;
         }
     }
+
     public string HexType;
     public string HexSubType;
     public int Rotation = 0;
     public int? HexNum;
     public string GroupID;
     public bool Selected;
-    [System.NonSerialized] public MeshRenderer meshRenderer;
+    //[System.NonSerialized] public MeshRenderer meshRenderer;
   
     public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
     [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges;
 
     [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners;
-
-    [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionData { get; set; }
 
     public HexState()
     {
@@ -285,7 +296,7 @@ public class HexState
             if (((o.col > 0)) && (o.row > 0))
             {
             
-                neighbours.Add(PositionData.Neighbor(i));
+                neighbours.Add(PositionDataHex.Neighbor(i));
             
             }
             else

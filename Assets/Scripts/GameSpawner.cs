@@ -97,15 +97,15 @@ public class GameSpawner : SpawnerBase
         //write a single save state comprised of the hexSpawner state and the edgeSpawner state and the cornerSpawner state
 
         byte[] bytes0 = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
-            File.WriteAllBytes(filePath + "0 .json", bytes0);
-        byte[] bytes1 = SerializationUtility.SerializeValue(State, DataFormat.JSON);
-            File.WriteAllBytes(filePath + "1 .json", bytes1);
+            File.WriteAllBytes(filePath + "map.json", bytes0);
+        //byte[] bytes1 = SerializationUtility.SerializeValue(State, DataFormat.JSON);
+        //    File.WriteAllBytes(filePath + "1 .json", bytes1);
         byte[] bytes2 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
-            File.WriteAllBytes(filePath + "2 .json", bytes2);
+            File.WriteAllBytes(filePath + "1_hexSpawnerState.json", bytes2);
         byte[] bytes3 = SerializationUtility.SerializeValue(edgeSpawner.State, DataFormat.JSON);
-            File.WriteAllBytes(filePath + "3 .json", bytes3);
+            File.WriteAllBytes(filePath + "2_edgeSpawnerState.json", bytes3);
         byte[] bytes4 = SerializationUtility.SerializeValue(cornerSpawner.State, DataFormat.JSON);
-            File.WriteAllBytes(filePath + "4 .json", bytes4);
+            File.WriteAllBytes(filePath + "3_cornerSpawnerState.json", bytes4);
 
 
     }
@@ -190,9 +190,9 @@ public class GameSpawner : SpawnerBase
     [Serializable]
     public class CombinedSpawnerState
     {
-        public GameSpawnerState GameState { get; set; }
-        public HexSpawner.HexSpawnerState HexState { get; set; }
-        public EdgeSpawner.EdgeSpawnerState EdgeState { get; set; }
-        public CornerSpawner.CornerSpawnerState CornerState { get; set; }
+        public GameSpawnerState GameState;
+        public HexSpawner.HexSpawnerState HexState;
+        public EdgeSpawner.EdgeSpawnerState EdgeState;
+        public CornerSpawner.CornerSpawnerState CornerState;
     }
 }

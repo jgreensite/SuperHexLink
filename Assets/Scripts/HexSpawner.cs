@@ -54,8 +54,8 @@ public class HexSpawner : SpawnerBase
     //game constants
     //public GameConstants CS;
 
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.LandConfig> landTypes = new List<GameSpawner.LandConfig>();
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.NumConfig> numTypes = new List<GameSpawner.NumConfig>();
+    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.LandConfig> landTypes = new();
+    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.NumConfig> numTypes = new();
 
     private void Awake()
     {
@@ -112,8 +112,8 @@ public class HexSpawner : SpawnerBase
                 newHex.hexState.GroupID = null;//todo - need to remove this
 
                 //makes newHex index this object
-                newHex.hexState.col = col;
-                newHex.hexState.row = row;
+                newHex.hexState.Col = col;
+                newHex.hexState.Row = row;
 
                 //create a Hexnumber make it a child of the hex just spawned
                 HexText newTextHex = Instantiate(
@@ -218,7 +218,7 @@ public class HexSpawner : SpawnerBase
             // Hide the mesh renderer if no material is found for the HexType value
             h.GetComponent<Renderer>().material = null;
             h.GetComponent<MeshRenderer>().enabled = false;
-            Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has unknown material", h.name, h.hexState.col, h.hexState.row));
+            Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has unknown material", h.name, h.hexState.Col, h.hexState.Row));
         }
 
         //Now if the hex should have a land model ontop of it and a number render them
@@ -267,7 +267,7 @@ public class HexSpawner : SpawnerBase
                     }
                 r++;
             }
-            if (foundSuitable == false) { Debug.Log(h.hexState.col + "_" + h.hexState.col + " Cannot find a suitable rotation"); }
+            if (foundSuitable == false) { Debug.Log(h.hexState.Col + "_" + h.hexState.Col + " Cannot find a suitable rotation"); }
         }
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
         
@@ -439,7 +439,7 @@ public class HexSpawner : SpawnerBase
         else {
             randomLand = GameConstants.CAR_TYPE_WORD_NULL;
             h.hexState.GroupID = "1";
-            Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has been assigned a default land as none remain to give to it", h.name, h.hexState.col, h.hexState.row));
+            Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has been assigned a default land as none remain to give to it", h.name, h.hexState.Col, h.hexState.Row));
         }
 
         //now finally set the hex type
