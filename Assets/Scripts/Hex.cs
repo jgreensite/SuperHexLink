@@ -24,6 +24,7 @@ public class Hex : MonoBehaviour
 
     private HexSpawner hexSpawner;
 
+    //TODO - Work out what this does, it may be am more elegant way of doing what you have
     IEnumerable<(Hex neighbor, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)> NeighborsWithDirection()
     {
         foreach(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in EnumArray<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection>.Values)
@@ -34,13 +35,15 @@ public class Hex : MonoBehaviour
     }
 
 
-    private Renderer renderer;
+    //private Renderer renderer;
 
+    /*
     void Start()
     {
         renderer = GetComponent<Renderer>();
 
     }
+    */
 
 
     private void Awake()

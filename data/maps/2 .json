@@ -1,5 +1,0 @@
-{
-    "$id": 0,
-    "$type": "0|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp",
-    "myState": "HelloEdge"
-}

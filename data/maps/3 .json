@@ -1,5 +1,1 @@
-{
-    "$id": 0,
-    "$type": "0|CornerSpawner+CornerSpawnerState, Assembly-CSharp",
-    "myState": "HelloCorner"
-}
+{"$id":0,"$type":"EdgeSpawner+EdgeSpawnerState, Assembly-CSharp","myState":"HelloEdge"}

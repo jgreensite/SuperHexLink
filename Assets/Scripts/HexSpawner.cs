@@ -54,8 +54,8 @@ public class HexSpawner : SpawnerBase
     //game constants
     //public GameConstants CS;
 
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.landConfig> landTypes = new List<GameSpawner.landConfig>();
-    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.numConfig> numTypes = new List<GameSpawner.numConfig>();
+    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.LandConfig> landTypes = new List<GameSpawner.LandConfig>();
+    [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.NumConfig> numTypes = new List<GameSpawner.NumConfig>();
 
     private void Awake()
     {
@@ -386,9 +386,9 @@ public class HexSpawner : SpawnerBase
         int indexToRemove;
         string randomLand;
         int randomNum;
-        IEnumerable<GameSpawner.landConfig> types = new List<GameSpawner.landConfig>();
+        IEnumerable<GameSpawner.LandConfig> types = new List<GameSpawner.LandConfig>();
         List<String> typesAll = new List<String>();
-        IEnumerable<GameSpawner.numConfig> nums = new List<GameSpawner.numConfig>();
+        IEnumerable<GameSpawner.NumConfig> nums = new List<GameSpawner.NumConfig>();
         List<int> numsAll = new List<int>();
 
         //TODO - This works but is a bit complex, consider simplification
@@ -413,7 +413,7 @@ public class HexSpawner : SpawnerBase
                  select t).ToList();
         }
 
-        foreach (GameSpawner.landConfig t in types)
+        foreach (GameSpawner.LandConfig t in types)
         {
             for (int cnt = 0; cnt < t.landCnt; cnt++)
             {
@@ -425,7 +425,7 @@ public class HexSpawner : SpawnerBase
         //now having matched on group remove the random land from the list of lands
         if ((typesAll.Count() > 0))
         {
-            List<GameSpawner.landConfig> landRemove =
+            List<GameSpawner.LandConfig> landRemove =
                 (from lt in types
                  where(
                  (lt.landType == typesAll[indexToRemove]))
@@ -455,7 +455,7 @@ public class HexSpawner : SpawnerBase
                 (n.numCnt > 0))
                 select n).ToList();
 
-            foreach (GameSpawner.numConfig n in nums)
+            foreach (GameSpawner.NumConfig n in nums)
             {
                 for (int cnt = 0; cnt < n.numCnt; cnt++)
                 {
@@ -465,7 +465,7 @@ public class HexSpawner : SpawnerBase
             indexToRemove = RandomNumber.Between(0, numsAll.Count() - 1);
             if (numsAll.Count() > 0)
             {
-                List<GameSpawner.numConfig> numRemove =
+                List<GameSpawner.NumConfig> numRemove =
                     (from nt in nums
                     where (
                     (nt.numType == numsAll[indexToRemove]))

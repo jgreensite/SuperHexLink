@@ -86,7 +86,7 @@ public class GameSpawner : SpawnerBase
 
         //build a List to hold the hexSpawner state and the edgeSpawner state and the cornerSpawner state
 
-        CombinedSpawnerState spawnerStates = new CombinedSpawnerState
+        CombinedSpawnerState spawnerStates = new()
         {
             GameState = State,
             HexState = hexSpawner.State,
@@ -98,12 +98,14 @@ public class GameSpawner : SpawnerBase
 
         byte[] bytes0 = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
             File.WriteAllBytes(filePath + "0 .json", bytes0);
-        byte[] bytes1 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
+        byte[] bytes1 = SerializationUtility.SerializeValue(State, DataFormat.JSON);
             File.WriteAllBytes(filePath + "1 .json", bytes1);
-        byte[] bytes2 = SerializationUtility.SerializeValue(edgeSpawner.State, DataFormat.JSON);
-            File.WriteAllBytes(filePath + "2 .json", bytes2);
-        byte[] bytes3 = SerializationUtility.SerializeValue(cornerSpawner.State, DataFormat.JSON);
+        //byte[] bytes2 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
+        //    File.WriteAllBytes(filePath + "2 .json", bytes2);
+        byte[] bytes3 = SerializationUtility.SerializeValue(edgeSpawner.State, DataFormat.JSON);
             File.WriteAllBytes(filePath + "3 .json", bytes3);
+        byte[] bytes4 = SerializationUtility.SerializeValue(cornerSpawner.State, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "4 .json", bytes4);
 
 
     }
@@ -115,7 +117,7 @@ public class GameSpawner : SpawnerBase
         //it would be better if we didn't have to call update hexes and that an event fired automatically
         
         //load the hex data
-        CombinedSpawnerState spawnerStates = new CombinedSpawnerState();
+        CombinedSpawnerState spawnerStates = new();
   
         if ((filePath == null) || (filePath.Length == 0))
         {
@@ -166,19 +168,19 @@ public class GameSpawner : SpawnerBase
     public class GameSpawnerState
     {
         [SerializeField] public HexGridConfig hexGridConfig;
-        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<landConfig> landConfigs = new List<landConfig>();
-        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<numConfig> numConfigs = new List<numConfig>();
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<LandConfig> landConfigs = new();
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<NumConfig> numConfigs = new();
 
     }
 
-    public class landConfig
+    public class LandConfig
     {
         public string landGroupID;
         public int landCnt;
         public string landType;
     }
 
-    public class numConfig
+    public class NumConfig
     {
         public string numGroupID;
         public int numCnt;
