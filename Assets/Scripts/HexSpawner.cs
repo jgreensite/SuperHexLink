@@ -85,7 +85,7 @@ public class HexSpawner : SpawnerBase
         // Note that only if we are not refreshing do we assign a land type and the text to the hex
         for (int col = 0; col < gameSpawner.State.hexGridConfig.cols; col++)
         {
-            state.hexes.Add(new List<Hex>());
+            state.hexes.Add(new List<Hex.HexState>());
             for (int row = 0; row < gameSpawner.State.hexGridConfig.rows; row++)
             {
                 Hex newHex = Instantiate(
@@ -129,7 +129,7 @@ public class HexSpawner : SpawnerBase
                 newTextHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMETEXT); 
 
                 // add to the 2 dimensional list of hexes
-                state.hexes[col].Add(newHex);
+                state.hexes[col].Add(newHex.hexState);
 
                 //When you load a saved game you don't want to randomize the hexes
                 //When you have spawned a new game you do
@@ -156,29 +156,29 @@ public class HexSpawner : SpawnerBase
     //used to update hexes based on what has been edited in the inspector
     public void UpdateHexes()
     {
-        foreach (List<Hex> c in state.hexes)
+        //get all the Hex GameObjects that are children of this HexSpawner
+        Hex[] Hexes = FindObjectsOfType<Hex>();
+        foreach (Hex h in Hexes)
         {
-            foreach (Hex r in c)
+            List<GameObject> ret = Helpers.GetObjectsInLayer(h.gameObject, LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL));
+            //get all the Hex GameObjects that are children of this HexSpawner
+            foreach (GameObject g in ret)
             {
-                List<GameObject> ret = Helpers.GetObjectsInLayer(r.gameObject, LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL));
-                foreach (GameObject g in ret)
-                {
 #if UNITY_EDITOR
-                    DestroyImmediate(g);
+                DestroyImmediate(g);
 #elif !UNITY_EDITOR
-                    Destroy(g);
+                Destroy(g);
 #endif
-                }
-                SetLand(r);
             }
+                SetLand(h);
         }
         //Change the camera called "Game Camera" position to the centre of the map pointed at the middle of the hexes and zoom out so all game objects are visible using the number of rows and columns
 
         //get the  x and z coordinates of the first hex in the list
-        float x_start = state.hexes[0][0].transform.position.x;
-        float z_start = state.hexes[0][0].transform.position.z;
-        float x_end = state.hexes[gameSpawner.State.hexGridConfig.cols-1][0].transform.position.x;
-        float z_end = state.hexes[0][gameSpawner.State.hexGridConfig.rows-1].transform.position.z;
+        float x_start = Hexes[0].transform.position.x;
+        float z_start = Hexes[0].transform.position.z;
+        float x_end = Hexes[Hexes.Length-1].transform.position.x;
+        float z_end = Hexes[Hexes.Length-1].transform.position.z;
         float x_mid = (x_start + x_end) / 2;
         float z_mid = (z_start + z_end) / 2;
         //make y_mid 2/3 the maximum of x_mid or z_mid, whichever is greater
@@ -259,7 +259,7 @@ public class HexSpawner : SpawnerBase
                 var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neigh[r]);
                 if (isOnBoardHex(neigh[r]))
                     {
-                        if (isReplaceableLandType(state.hexes[o.col][o.row].hexState.HexType))
+                        if (isReplaceableLandType(state.hexes[o.col][o.row].HexType))
                         {
                             newHexLandModel.transform.Rotate(Vector3.up, r * inc);
                         foundSuitable = true;
@@ -315,15 +315,15 @@ public class HexSpawner : SpawnerBase
     public override void Refresh()
     {
         BuildTypes();
-        foreach (List<Hex> hc in state.hexes)
+        //get all the Hex GameObjects that are children of this HexSpawner
+        Hex[] Hexes = FindObjectsOfType<Hex>();
+        foreach (Hex h in Hexes)
         {
-            foreach (Hex h in hc)
+        //do not randomize if supposed to skip
+            if (isReplaceableLandType(h.hexState.HexType))
             {
-                //do not randomize if supposed to skip
-                if (isReplaceableLandType(h.hexState.HexType))
-                {
-                    RandomizeLand(h, true);
-                }
+                RandomizeLand(h, true);
+                SetLand(h);
             }
         }
         UpdateHexes();
@@ -334,7 +334,7 @@ public class HexSpawner : SpawnerBase
     {
         List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
         Helpers.DestroyObjects(ret);
-        state.hexes = new List<List<Hex>>();
+        state.hexes = new List<List<Hex.HexState>>();
     }
 
 
@@ -503,9 +503,14 @@ public class HexSpawner : SpawnerBase
         return GetHexIfInBounds(row + offsets.row, col + offsets.col);
     }
 
-    private Hex GetHexIfInBounds(int row, int col) =>
-        gameSpawner.State.hexGridConfig.IsInBounds(row, col) ? state.hexes[row][col] : null;
-
+    private Hex GetHexIfInBounds(int row, int col)
+    {
+        //get all the Hex GameObjects that are children of this HexSpawner
+        Hex[] Hexes = FindObjectsOfType<Hex>();
+        int idx = col * gameSpawner.State.hexGridConfig.rows + row;
+        return gameSpawner.State.hexGridConfig.IsInBounds(row, col) ? Hexes[idx] : null;
+    }
+  
     private (int row, int col) GetOffsetInDirection(bool isEven, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
     {
         switch(direction)
@@ -529,6 +534,6 @@ public class HexSpawner : SpawnerBase
     [Serializable]
     public class HexSpawnerState
     {
-        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex>> hexes = new List<List<Hex>>();
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex.HexState>> hexes = new List<List<Hex.HexState>>();
     }
 }

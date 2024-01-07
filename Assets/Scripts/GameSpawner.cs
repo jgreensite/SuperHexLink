@@ -145,7 +145,7 @@ public class GameSpawner : SpawnerBase
         {
             for (int row = 0; row < State.hexGridConfig.rows; row++)
             {
-                hexSpawner.State.hexes[col][row].hexState = spawnerStates.HexState.hexes[col][row].hexState;
+                hexSpawner.State.hexes[col][row] = spawnerStates.HexState.hexes[col][row];
             }
         }
 

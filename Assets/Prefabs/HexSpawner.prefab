@@ -58,7 +58,7 @@ MonoBehaviour:
       Data: 0|HexSpawner+HexSpawnerState, Assembly-CSharp
     - Name: hexes
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex,
+      Data: 1|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+HexState,
         Assembly-CSharp]], mscorlib]], mscorlib
     - Name: 
       Entry: 12
@@ -78,22 +78,7 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 3|GameSpawner+LandConfig, Assembly-CSharp
-    - Name: landGroupID
-      Entry: 1
-      Data: 1
-    - Name: landCnt
-      Entry: 3
-      Data: 49
-    - Name: landType
-      Entry: 1
-      Data: sea
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -102,26 +87,11 @@ MonoBehaviour:
       Data: 
     - Name: numTypes
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]],
+      Data: 3|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]],
         mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 5|GameSpawner+NumConfig, Assembly-CSharp
-    - Name: numGroupID
-      Entry: 1
-      Data: 1
-    - Name: numCnt
-      Entry: 3
-      Data: 49
-    - Name: numType
-      Entry: 3
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 

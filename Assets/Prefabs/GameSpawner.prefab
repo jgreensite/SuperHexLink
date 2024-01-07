@@ -241,7 +241,7 @@ MonoBehaviour:
       Data: 3
     - Name: landType
       Entry: 1
-      Data: mine
+      Data: mountain
     - Name: 
       Entry: 8
       Data: 

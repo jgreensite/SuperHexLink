@@ -156,159 +156,160 @@ public class Hex : MonoBehaviour
             value: edge
         );
     }
-}
 
-[System.Serializable]
-public class HexState
-{
-    private HexExtensions.HexExtensions.Hex _hex;
-    
-    [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionDataHex
+
+    [System.Serializable]
+    public class HexState
     {
-        get { return _hex; }
-        set
+        private HexExtensions.HexExtensions.Hex _hex;
+        
+        [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionDataHex
         {
-            _hex = value;
-            _col = CFromHex(_hex);
-            _row = RFromHex(_hex);
-        }
-    }
-    
-    //public int col { get { return this.col; } set { this.col = value; hex = CRToHex(col, row); } }
-    private int _col;
-    [ShowInInspector] public int Col
-    {
-        get { return _col; }
-        set
-        {
-            _col = value;
-            _hex = CRToHex(_col, _row);
-        }
-    }
-    //public int row { get { return this.row; } set { this.row = value; hex = CRToHex(col, row); } }
-    private int _row;
-    [ShowInInspector] public int Row
-    {
-        get { return _row; }
-        set
-        {
-            _row = value;
-            _hex = CRToHex(_col, _row);;
-        }
-    }
-
-    public string HexType;
-    public string HexSubType;
-    public int Rotation = 0;
-    public int? HexNum;
-    public string GroupID;
-    public bool Selected;
-    //[System.NonSerialized] public MeshRenderer meshRenderer;
-  
-    public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
-
-    [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges;
-
-    [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners;
-
-    public HexState()
-    {
-        // Initialize the Edges dictionary in the constructor
-        Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
-        foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
-        {
-            RemoveEdgeStructure(direction);
-        }
-
-        // Initialize the Corners dictionary in the constructor
-        Corners = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string>();
-        foreach (SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection)))
-        {
-            RemoveCornerStructure(direction);
-        }
-    }
-
-    public void AddEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
-    {
-        Edges[direction] = true;
-    }
-
-    public void RemoveEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
-    {
-        Edges[direction] = false;
-    }
-
-    public void AddCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
-    {
-        Corners[direction] = "";
-    }
-
-    public void RemoveCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
-    {
-        Corners[direction] = "";
-    }
-
-    /*
-    If you want to use the HexExtensions library you need to convert the Hex to a Point
-    public List<HexExtensions.HexExtensions.Point> GetCorners()
-    {
-        List<HexExtensions.HexExtensions.Point> corners = new List<HexExtensions.HexExtensions.Point>();
-      
-        /*HexExtensions.HexExtensions.Layout myLayout =
-        new HexExtensions.HexExtensions.Layout(HexExtensions.HexExtensions.Layout.pointy,
-        new HexExtensions.HexExtensions.Point(sizeX, sizeY),
-        new HexExtensions.HexExtensions.Point(originX, originY));
-
-        corners = HexExtensions.HexExtensions.HexCorners(Hex, 1);
-        return corners;
-    }
-    */
-
-    //TODO - Tidy-up Extensions
-    //These are new methods that should probably be added to HexExtensions
-    public HexExtensions.HexExtensions.Hex CRToHex(int col, int row)
-    {
-        HexExtensions.HexExtensions.OffsetCoord b = new HexExtensions.HexExtensions.OffsetCoord(col, row);
-        HexExtensions.HexExtensions.Hex c = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, b);
-        return (c);
-    }
-
-    public int CFromHex(HexExtensions.HexExtensions.Hex h)
-    {
-        return (HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).col);
-    }
-
-    public int RFromHex(HexExtensions.HexExtensions.Hex h)
-    {
-        return (HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).row);
-    }
-
-    //Each Hex will have a specific set of neighbours, note that this will include hexes at co-ordinates outside the gameboard
-    //use isOnBoardHex to check to see if a Hex is on the gameboard 
-    public List<HexExtensions.HexExtensions.Hex> Neighbours()
-    {
-        int i = 0;
-        List<HexExtensions.HexExtensions.Hex> neighbours = new();
-        foreach (HexExtensions.HexExtensions.Hex h in HexExtensions.HexExtensions.Hex.directions)
-        {
-            var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
-           
-            if (((o.col > 0)) && (o.row > 0))
+            get { return _hex; }
+            set
             {
-            
-                neighbours.Add(PositionDataHex.Neighbor(i));
-            
+                _hex = value;
+                _col = CFromHex(_hex);
+                _row = RFromHex(_hex);
             }
-            else
-            {
-                //TODO - A bit of a hack in here to place a filler in the 
-                var fill = new HexExtensions.HexExtensions.Hex();
-                fill.Scale(0);
-                neighbours.Add(fill);
-            }
-            
-            i++;
         }
-        return (neighbours);
+        
+        //public int col { get { return this.col; } set { this.col = value; hex = CRToHex(col, row); } }
+        private int _col;
+        [ShowInInspector] public int Col
+        {
+            get { return _col; }
+            set
+            {
+                _col = value;
+                _hex = CRToHex(_col, _row);
+            }
+        }
+        //public int row { get { return this.row; } set { this.row = value; hex = CRToHex(col, row); } }
+        private int _row;
+        [ShowInInspector] public int Row
+        {
+            get { return _row; }
+            set
+            {
+                _row = value;
+                _hex = CRToHex(_col, _row);;
+            }
+        }
+
+        public string HexType;
+        public string HexSubType;
+        public int Rotation = 0;
+        public int? HexNum;
+        public string GroupID;
+        public bool Selected;
+        //[System.NonSerialized] public MeshRenderer meshRenderer;
+    
+        public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
+
+        [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges;
+
+        [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners;
+
+        public HexState()
+        {
+            // Initialize the Edges dictionary in the constructor
+            Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
+            foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
+            {
+                RemoveEdgeStructure(direction);
+            }
+
+            // Initialize the Corners dictionary in the constructor
+            Corners = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string>();
+            foreach (SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection)))
+            {
+                RemoveCornerStructure(direction);
+            }
+        }
+
+        public void AddEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
+        {
+            Edges[direction] = true;
+        }
+
+        public void RemoveEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
+        {
+            Edges[direction] = false;
+        }
+
+        public void AddCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
+        {
+            Corners[direction] = "";
+        }
+
+        public void RemoveCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
+        {
+            Corners[direction] = "";
+        }
+
+        /*
+        If you want to use the HexExtensions library you need to convert the Hex to a Point
+        public List<HexExtensions.HexExtensions.Point> GetCorners()
+        {
+            List<HexExtensions.HexExtensions.Point> corners = new List<HexExtensions.HexExtensions.Point>();
+        
+            /*HexExtensions.HexExtensions.Layout myLayout =
+            new HexExtensions.HexExtensions.Layout(HexExtensions.HexExtensions.Layout.pointy,
+            new HexExtensions.HexExtensions.Point(sizeX, sizeY),
+            new HexExtensions.HexExtensions.Point(originX, originY));
+
+            corners = HexExtensions.HexExtensions.HexCorners(Hex, 1);
+            return corners;
+        }
+        */
+
+        //TODO - Tidy-up Extensions
+        //These are new methods that should probably be added to HexExtensions
+        public HexExtensions.HexExtensions.Hex CRToHex(int col, int row)
+        {
+            HexExtensions.HexExtensions.OffsetCoord b = new HexExtensions.HexExtensions.OffsetCoord(col, row);
+            HexExtensions.HexExtensions.Hex c = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, b);
+            return (c);
+        }
+
+        public int CFromHex(HexExtensions.HexExtensions.Hex h)
+        {
+            return (HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).col);
+        }
+
+        public int RFromHex(HexExtensions.HexExtensions.Hex h)
+        {
+            return (HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).row);
+        }
+
+        //Each Hex will have a specific set of neighbours, note that this will include hexes at co-ordinates outside the gameboard
+        //use isOnBoardHex to check to see if a Hex is on the gameboard 
+        public List<HexExtensions.HexExtensions.Hex> Neighbours()
+        {
+            int i = 0;
+            List<HexExtensions.HexExtensions.Hex> neighbours = new();
+            foreach (HexExtensions.HexExtensions.Hex h in HexExtensions.HexExtensions.Hex.directions)
+            {
+                var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
+            
+                if (((o.col > 0)) && (o.row > 0))
+                {
+                
+                    neighbours.Add(PositionDataHex.Neighbor(i));
+                
+                }
+                else
+                {
+                    //TODO - A bit of a hack in here to place a filler in the 
+                    var fill = new HexExtensions.HexExtensions.Hex();
+                    fill.Scale(0);
+                    neighbours.Add(fill);
+                }
+                
+                i++;
+            }
+            return (neighbours);
+        }
     }
 }
