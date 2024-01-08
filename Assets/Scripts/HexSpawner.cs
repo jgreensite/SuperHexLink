@@ -157,8 +157,16 @@ public class HexSpawner : SpawnerBase
     public void UpdateHexes()
     {
         //get all the Hex GameObjects that are children of this HexSpawner
-        Hex[] Hexes = FindObjectsOfType<Hex>();
-        foreach (Hex h in Hexes)
+        Hex[] unorderedHexes = FindObjectsOfType<Hex>();
+        
+        // Group by Col and order each group by Row
+        List<List<Hex>> orderedHexes = unorderedHexes
+            .GroupBy(h => h.hexState.Col)
+            .OrderBy(g => g.Key)
+            .Select(g => g.OrderBy(h => h.hexState.Row).ToList())
+            .ToList();
+
+        foreach (Hex h in unorderedHexes)
         {
             List<GameObject> ret = Helpers.GetObjectsInLayer(h.gameObject, LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL));
             //get all the Hex GameObjects that are children of this HexSpawner
@@ -175,10 +183,10 @@ public class HexSpawner : SpawnerBase
         //Change the camera called "Game Camera" position to the centre of the map pointed at the middle of the hexes and zoom out so all game objects are visible using the number of rows and columns
 
         //get the  x and z coordinates of the first hex in the list
-        float x_start = Hexes[0].transform.position.x;
-        float z_start = Hexes[0].transform.position.z;
-        float x_end = Hexes[Hexes.Length-1].transform.position.x;
-        float z_end = Hexes[Hexes.Length-1].transform.position.z;
+        float x_start = orderedHexes.First().First().transform.position.x;
+        float z_start = orderedHexes.First().First().transform.position.z;
+        float x_end = orderedHexes.Last().Last().transform.position.x;
+        float z_end = orderedHexes.Last().Last().transform.position.z;
         float x_mid = (x_start + x_end) / 2;
         float z_mid = (z_start + z_end) / 2;
         //make y_mid 2/3 the maximum of x_mid or z_mid, whichever is greater
@@ -195,8 +203,12 @@ public class HexSpawner : SpawnerBase
     private void SetLand(Hex h)
     //Sets the land type and number of the hex based on its hexState, used when creating a new hex or refreshing an existing one
     {
+        //copy the hexState to the hex
+        h.hexState = state.hexes[h.hexState.Col][h.hexState.Row];
+        
         // Get the HexType value from the hex state
         string hexType = h.hexState.HexType;
+        
         Debug.Log("hexType = " + hexType);
         // Resolve the material from the IoC container based on the HexType value
         Material material = CS.materialMap[hexType];

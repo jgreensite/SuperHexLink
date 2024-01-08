@@ -98,8 +98,8 @@ public class GameSpawner : SpawnerBase
 
         byte[] bytes0 = SerializationUtility.SerializeValue(spawnerStates, DataFormat.JSON);
             File.WriteAllBytes(filePath + "map.json", bytes0);
-        //byte[] bytes1 = SerializationUtility.SerializeValue(State, DataFormat.JSON);
-        //    File.WriteAllBytes(filePath + "1 .json", bytes1);
+        byte[] bytes1 = SerializationUtility.SerializeValue(State, DataFormat.JSON);
+            File.WriteAllBytes(filePath + "0_gameSpawnerState.json", bytes1);
         byte[] bytes2 = SerializationUtility.SerializeValue(hexSpawner.State, DataFormat.JSON);
             File.WriteAllBytes(filePath + "1_hexSpawnerState.json", bytes2);
         byte[] bytes3 = SerializationUtility.SerializeValue(edgeSpawner.State, DataFormat.JSON);
@@ -129,27 +129,19 @@ public class GameSpawner : SpawnerBase
         byte[] bytes = File.ReadAllBytes(filePath);
         spawnerStates = SerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
  
-        //copy accross loaded configuration data
+        //copy accross loaded configuration data for the game
         State = spawnerStates.GameState;
+
+        //create new gameobjects attached to new hexes based on loaded values
+        //remember it is not possible to serialise Unity gameobjects so we need to create new ones first
+        BuildMe(false);
+
+        //then copy across hexState, edgeState and cornerState from loaded objects to newly created gameobjects
         hexSpawner.State = spawnerStates.HexState;
         edgeSpawner.State = spawnerStates.EdgeState;
         cornerSpawner.State = spawnerStates.CornerState;
 
-        //create new gameobjects attached to new hexes based on loaded values
-        //remember it is not possible to serialise Unity gameobjects so we need to create new ones
-        BuildMe(true);
-
-        //Copy across hexState from loaded objects to new gameobjects
-        //ToDo - I don't think it's possible to simply copy across the hexes as Unity gameonjects are not serialisable so we'll end up with junk, but I need to check this
-        for (int col = 0; col < State.hexGridConfig.cols; col++)
-        {
-            for (int row = 0; row < State.hexGridConfig.rows; row++)
-            {
-                hexSpawner.State.hexes[col][row] = spawnerStates.HexState.hexes[col][row];
-            }
-        }
-
-        //update the newly created gameobjects according to each ones hexState
+        //and finally update the newly created gameobjects according to each ones loaded state
         hexSpawner.UpdateHexes();
     }
 

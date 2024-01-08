@@ -1,0 +1,163 @@
+{
+    "$id": 0,
+    "$type": "0|GameSpawner+GameSpawnerState, Assembly-CSharp",
+    "hexGridConfig": {
+        "$type": "1|HexGridConfig, Assembly-CSharp",
+        "cols": 7,
+        "rows": 7,
+        "radius": 1,
+        "height": 1,
+        "hexHeightVariance": {
+            "$type": "2|UnityEngine.Vector2, UnityEngine.CoreModule",
+            0,
+            0
+        }
+    },
+    "landConfigs": {
+        "$id": 1,
+        "$type": "3|System.Collections.Generic.List`1[[GameSpawner+LandConfig, Assembly-CSharp]], mscorlib",
+        "$rlength": 9,
+        "$rcontent": [
+            {
+                "$id": 2,
+                "$type": "4|GameSpawner+LandConfig, Assembly-CSharp",
+                "landGroupID": "1",
+                "landCnt": 13,
+                "landType": "sea"
+            },
+            {
+                "$id": 3,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 5,
+                "landType": "harbour"
+            },
+            {
+                "$id": 4,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 4,
+                "landType": "forest"
+            },
+            {
+                "$id": 5,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 4,
+                "landType": "pasture"
+            },
+            {
+                "$id": 6,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 4,
+                "landType": "field"
+            },
+            {
+                "$id": 7,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 3,
+                "landType": "hill"
+            },
+            {
+                "$id": 8,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 3,
+                "landType": "mountain"
+            },
+            {
+                "$id": 9,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 1,
+                "landType": "desert"
+            },
+            {
+                "$id": 10,
+                "$type": 4,
+                "landGroupID": "1",
+                "landCnt": 12,
+                "landType": "none"
+            }
+        ]
+    },
+    "numConfigs": {
+        "$id": 11,
+        "$type": "5|System.Collections.Generic.List`1[[GameSpawner+NumConfig, Assembly-CSharp]], mscorlib",
+        "$rlength": 10,
+        "$rcontent": [
+            {
+                "$id": 12,
+                "$type": "6|GameSpawner+NumConfig, Assembly-CSharp",
+                "numGroupID": "1",
+                "numCnt": 1,
+                "numType": 2
+            },
+            {
+                "$id": 13,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 3
+            },
+            {
+                "$id": 14,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 4
+            },
+            {
+                "$id": 15,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 5
+            },
+            {
+                "$id": 16,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 6
+            },
+            {
+                "$id": 17,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 8
+            },
+            {
+                "$id": 18,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 9
+            },
+            {
+                "$id": 19,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 10
+            },
+            {
+                "$id": 20,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 2,
+                "numType": 11
+            },
+            {
+                "$id": 21,
+                "$type": 6,
+                "numGroupID": "1",
+                "numCnt": 1,
+                "numType": 12
+            }
+        ]
+    }
+}
