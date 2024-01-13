@@ -115,7 +115,8 @@ public class GameSpawner : SpawnerBase
     {
         //TODO - this is not very elegant
         //it would be better if we didn't have to call update hexes and that an event fired automatically
-        
+     
+
         //load the hex data
         CombinedSpawnerState spawnerStates = new();
   

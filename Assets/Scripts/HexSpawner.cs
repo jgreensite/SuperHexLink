@@ -153,7 +153,7 @@ public class HexSpawner : SpawnerBase
     }
 
     [Button("Update Hexes")]
-    //used to update hexes based on what has been edited in the inspector
+    //used to update hexes based on what has changed in the HexSpawnerState
     public void UpdateHexes()
     {
         //get all the Hex GameObjects that are children of this HexSpawner
@@ -169,7 +169,7 @@ public class HexSpawner : SpawnerBase
         foreach (Hex h in unorderedHexes)
         {
             List<GameObject> ret = Helpers.GetObjectsInLayer(h.gameObject, LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL));
-            //get all the Hex GameObjects that are children of this HexSpawner
+            //get all the Hex GameObjects that are children of this Hex
             foreach (GameObject g in ret)
             {
 #if UNITY_EDITOR
@@ -224,6 +224,12 @@ public class HexSpawner : SpawnerBase
                 double yNew = hexPrefab.transform.localScale.y * gameSpawner.State.hexGridConfig.height * 0.95;
                 h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNew, h.transform.localScale.z);
             }
+            
+            else{
+                // Make land a standard height for all other hex types
+                double yNew = hexPrefab.transform.localScale.y * gameSpawner.State.hexGridConfig.height * 1.0;
+                h.transform.localScale = new Vector3(h.transform.localScale.x, (float)yNew, h.transform.localScale.z);
+            }            
         }
         else
         {
@@ -236,8 +242,19 @@ public class HexSpawner : SpawnerBase
         //Now if the hex should have a land model ontop of it and a number render them
         if (isRenderedType(h.hexState.HexType))
         {
+            //reset the rotation of the hex
+            h.transform.rotation = Quaternion.identity;
+            //rotate the hex to the correct rotation
             LandModelPosition(Instantiate(original: hexLandPrefab, parent: h.transform), h);
+            //set the text of the hex
             SetText(h);
+        }
+        else
+        {
+            //if not remove any text that may be there
+            var t = h.gameObject.GetComponentInChildren<TextMeshPro>();
+            t.text = null;
+            t.GetComponent<MeshRenderer>().enabled = false;
         }
     }
 
@@ -409,6 +426,8 @@ public class HexSpawner : SpawnerBase
         {
             //set the land type and remove the land from the list of available lands
             //first make sure to find a random land in the same group
+            //TO DO - THIS IS NOT WORKING
+            // YOU NEED TO MAKE SURE THAT THE LANDS ARE NOT ALL USED UP
 
             types =
                 (from t in landTypes
