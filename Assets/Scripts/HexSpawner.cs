@@ -57,10 +57,10 @@ public class HexSpawner : SpawnerBase
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.LandConfig> landTypes = new();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.NumConfig> numTypes = new();
 
-    private void Awake()
+    private void Start()
     {
         gameSpawner = GameObject.Find("GameSpawner").GetComponent<GameSpawner>();
-        //state = new HexSpawnerState();
+        state = new HexSpawnerState();
     }
    
     [Button("Spawn Hexes")]
@@ -85,20 +85,25 @@ public class HexSpawner : SpawnerBase
         // Note that only if we are not refreshing do we assign a land type and the text to the hex
         for (int col = 0; col < gameSpawner.State.hexGridConfig.cols; col++)
         {
-            state.hexes.Add(new List<Hex.HexState>());
+            state.hexes.Add(new List<Hex.BaseHexState>());
             for (int row = 0; row < gameSpawner.State.hexGridConfig.rows; row++)
             {
-                Hex newHex = Instantiate(
-                    original: hexPrefab,
-                    position: new Vector3(
-                        y: UnityEngine.Random.Range(gameSpawner.State.hexGridConfig.minHeight, gameSpawner.State.hexGridConfig.maxHeight),
-                        z: -row * gameSpawner.State.hexGridConfig.Apothem * 2 + Get_Z_Offset(col),
-                        x: (float)(col * gameSpawner.State.hexGridConfig.radius * 1.5)
+                // First Create a HexState object and add it to state.hexes
+                Hex.BaseHexState newHexState = new Hex.BaseHexState();
+                state.hexes[col].Add(newHexState);
 
-                    ),
-                    rotation: Quaternion.identity,
-                    parent: transform
+                Hex newHex = Instantiate(hexPrefab);
+
+                // Set the following after instantiation
+                newHex.transform.parent = transform;
+
+                newHex.transform.position = new Vector3(
+                    y: UnityEngine.Random.Range(gameSpawner.State.hexGridConfig.minHeight, gameSpawner.State.hexGridConfig.maxHeight),
+                    z: -row * gameSpawner.State.hexGridConfig.Apothem * 2 + Get_Z_Offset(col),
+                    x: (float)(col * gameSpawner.State.hexGridConfig.radius * 1.5)
                 );
+
+                newHex.transform.rotation = Quaternion.identity;
 
                 newHex.transform.localScale = new Vector3(
                     x: newHex.transform.localScale.x * gameSpawner.State.hexGridConfig.radius,
@@ -129,8 +134,8 @@ public class HexSpawner : SpawnerBase
                 newTextHex.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMETEXT); 
 
                 // add to the 2 dimensional list of hexes
-                state.hexes[col].Add(newHex.hexState);
-
+                //state.hexes[col].Add(newHex.hexState);
+                
                 //When you load a saved game you don't want to randomize the hexes
                 //When you have spawned a new game you do
                 if (!isRefresh)
@@ -204,7 +209,7 @@ public class HexSpawner : SpawnerBase
     //Sets the land type and number of the hex based on its hexState, used when creating a new hex or refreshing an existing one
     {
         //copy the hexState to the hex
-        h.hexState = state.hexes[h.hexState.Col][h.hexState.Row];
+        //h.hexState = state.hexes[h.hexState.Col][h.hexState.Row];
         
         // Get the HexType value from the hex state
         string hexType = h.hexState.HexType;
@@ -363,7 +368,7 @@ public class HexSpawner : SpawnerBase
     {
         List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
         Helpers.DestroyObjects(ret);
-        state.hexes = new List<List<Hex.HexState>>();
+        state.hexes = new List<List<Hex.BaseHexState>>();
     }
 
 
@@ -565,6 +570,6 @@ public class HexSpawner : SpawnerBase
     [Serializable]
     public class HexSpawnerState
     {
-        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex.HexState>> hexes = new List<List<Hex.HexState>>();
+        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex.BaseHexState>> hexes = new List<List<Hex.BaseHexState>>();
     }
 }

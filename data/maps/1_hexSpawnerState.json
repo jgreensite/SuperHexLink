@@ -3,9 +3,254 @@
     "$type": "0|HexSpawner+HexSpawnerState, Assembly-CSharp",
     "hexes": {
         "$id": 1,
-        "$type": "1|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+HexState, Assembly-CSharp]], mscorlib]], mscorlib",
-        "$rlength": 0,
+        "$type": "1|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+BaseHexState, Assembly-CSharp]], mscorlib]], mscorlib",
+        "$rlength": 7,
         "$rcontent": [
+            {
+                "$id": 2,
+                "$type": "2|System.Collections.Generic.List`1[[Hex+BaseHexState, Assembly-CSharp]], mscorlib",
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 3,
+                        "$type": "3|Hex+BaseHexState, Assembly-CSharp"
+                    },
+                    {
+                        "$id": 4,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 5,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 6,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 7,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 8,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 9,
+                        "$type": 3
+                    }
+                ]
+            },
+            {
+                "$id": 10,
+                "$type": 2,
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 11,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 12,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 13,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 14,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 15,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 16,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 17,
+                        "$type": 3
+                    }
+                ]
+            },
+            {
+                "$id": 18,
+                "$type": 2,
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 19,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 20,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 21,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 22,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 23,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 24,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 25,
+                        "$type": 3
+                    }
+                ]
+            },
+            {
+                "$id": 26,
+                "$type": 2,
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 27,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 28,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 29,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 30,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 31,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 32,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 33,
+                        "$type": 3
+                    }
+                ]
+            },
+            {
+                "$id": 34,
+                "$type": 2,
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 35,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 36,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 37,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 38,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 39,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 40,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 41,
+                        "$type": 3
+                    }
+                ]
+            },
+            {
+                "$id": 42,
+                "$type": 2,
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 43,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 44,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 45,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 46,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 47,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 48,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 49,
+                        "$type": 3
+                    }
+                ]
+            },
+            {
+                "$id": 50,
+                "$type": 2,
+                "$rlength": 7,
+                "$rcontent": [
+                    {
+                        "$id": 51,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 52,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 53,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 54,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 55,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 56,
+                        "$type": 3
+                    },
+                    {
+                        "$id": 57,
+                        "$type": 3
+                    }
+                ]
+            }
         ]
     }
 }

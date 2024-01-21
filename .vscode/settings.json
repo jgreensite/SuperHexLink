@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "SuperHexLink.sln"
+    "dotnet.defaultSolution": "SuperHexLink.sln",
+    "CodeGPT.apiKey": "Ollama"
 }
