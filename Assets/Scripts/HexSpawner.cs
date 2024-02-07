@@ -93,6 +93,7 @@ public class HexSpawner : SpawnerBase
                 state.hexes[col].Add(newHexState);
 
                 Hex newHex = Instantiate(hexPrefab);
+                newHex.Initialize(this);
 
                 // Set the following after instantiation
                 newHex.transform.parent = transform;
