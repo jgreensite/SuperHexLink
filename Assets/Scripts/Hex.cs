@@ -19,25 +19,37 @@ public class Hex : MonoBehaviour
     //private HexState state;
 
     [ShowInInspector]
-    public HexState hexState;
-
-    /*
-    {
-        get { return this.state; }
-        set { this.state = value; }
-    }
-    */
-
     //TODO - needs to be static in order for the HexSpawner to be referenced by the HexState nested class
     //However, is this an issue if we have more than one HexSpawner? Need to test, if it is then pass a reference into the constructor for Hex instead
     public HexSpawner.HexSpawnerState hexSpawnerState;
     public HexSpawner hexSpawner;
+    public HexState hexState{ get; set; }
 
+    /*
+    public Hex(HexSpawner hs)
+    {
+
+        hexSpawner = hs;
+        hexSpawnerState = hs.State;
+        hexState = new HexState(hexSpawnerState)
+        {
+            GroupID = "0",
+            Col = 0,
+            Row = 0
+        };
+
+    }
+    */
     public void Initialize(HexSpawner hs)
     {
         hexSpawner = hs;
         hexSpawnerState = hs.State;
-        //hexState = new HexState(/*hexSpawner.GetComponent<HexSpawner>().State*/);
+        hexState = new HexState(hexSpawnerState)
+        {
+            GroupID = "0",
+            Col = 0,
+            Row = 0
+        };
     }
     
     //TODO - Work out what this does, it may be am more elegant way of doing what you have
@@ -214,7 +226,7 @@ public class Hex : MonoBehaviour
         private HexExtensions.HexExtensions.Hex _hex;
 
         public HexSpawner.HexSpawnerState hexSpawnerState;
-        
+
         [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionDataHex
         {
             get { return _hex; }
@@ -315,10 +327,11 @@ public class Hex : MonoBehaviour
         }
         */
 
-        public HexState(/*HexSpawner.HexSpawnerState hexSpawnerState*/)
+        public HexState(HexSpawner.HexSpawnerState hexSpawnerState)
         {
-            //this.hexSpawnerState = hexSpawnerState;
-            
+            // Get reference to the hexSpawnerState that this hexState is attached to
+            this.hexSpawnerState = hexSpawnerState;
+
             // Initialize the Edges dictionary in the constructor
             Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
             foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
