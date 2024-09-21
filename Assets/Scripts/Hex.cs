@@ -9,6 +9,7 @@ using Sirenix.OdinInspector.Editor;
 using Sirenix.Serialization;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class Hex : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class Hex : MonoBehaviour
     [ShowInInspector]
     //TODO - needs to be static in order for the HexSpawner to be referenced by the HexState nested class
     //However, is this an issue if we have more than one HexSpawner? Need to test, if it is then pass a reference into the constructor for Hex instead
-    public HexSpawner.HexSpawnerState hexSpawnerState;
+    public HexSpawnerState hexSpawnerState;
     public HexSpawner hexSpawner;
     public HexState hexState{ get; set; }
 
@@ -40,16 +41,23 @@ public class Hex : MonoBehaviour
 
     }
     */
+    
+    public Hex()
+    {
+
+    }
+    
     public void Initialize(HexSpawner hs)
     {
         hexSpawner = hs;
         hexSpawnerState = hs.State;
-        hexState = new HexState(hexSpawnerState)
+
+        if (hexSpawnerState == null)
         {
-            GroupID = "0",
-            Col = 0,
-            Row = 0
-        };
+            throw new InvalidOperationException("HexSpawnerState cannot be null.");
+        }
+
+        hexState = new HexState(hexSpawnerState);
     }
     
     //TODO - Work out what this does, it may be am more elegant way of doing what you have
@@ -74,7 +82,7 @@ public class Hex : MonoBehaviour
     */
 
 
-    private void Awake()
+    private void Start()
     {
 
     }
@@ -220,12 +228,61 @@ public class Hex : MonoBehaviour
         //public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners { get; set; }
     }
  
-    //TODO - STRAT HERE NEED TO PASS IN hexSpawnerState in a constructor
+    //TODO - START HERE NEED TO PASS IN hexSpawnerState in a constructor
     public class HexState : IHexState
     {
-        private HexExtensions.HexExtensions.Hex _hex;
 
-        public HexSpawner.HexSpawnerState hexSpawnerState;
+        private HexExtensions.HexExtensions.Hex _hex;
+        private bool isHandlingEvent = false;
+        private HexSpawnerState _hexSpawnerState;
+        public delegate void HexUpdatedHandler(HexState hexState);
+        public event HexUpdatedHandler onHexUpdated;
+         public HexState(HexSpawnerState hexSpawnerState)
+        {
+            _hexSpawnerState = hexSpawnerState;
+            _hexSpawnerState.OnHexesChanged += HandleHexesChanged;
+        
+            // Initialize the Edges dictionary in the constructor
+            Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
+            foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
+            {
+                RemoveEdgeStructure(direction);
+            }
+
+            // Initialize the Corners dictionary in the constructor
+            Corners = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string>();
+            foreach (SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection)))
+            {
+                RemoveCornerStructure(direction);
+            }
+
+        }
+
+        // This method will be called when the event is triggered
+        private void HandleHexesChanged(List<List<Hex.BaseHexState>> hexes)
+        {
+            isHandlingEvent = true;
+            // Loop through each list of hexes
+            foreach (var hexList in hexes)
+            {
+                // Loop through each hex in the list
+                foreach (var hex in hexList)
+                {
+                    // Check if the column and row match the current HexState instance
+                    if (hex.Col == this.Col && hex.Row == this.Row)
+                    {
+                        // Update the HexState based on the new hex
+                        this.HexType = hex.HexType;
+                        this.HexSubType = hex.HexSubType;
+                        this.Rotation = hex.Rotation;
+                        this.HexNum = hex.HexNum;
+                        this.GroupID = hex.GroupID;
+                        this.Selected = hex.Selected;
+                    }
+                }
+            }
+            isHandlingEvent = false;
+        }
 
         [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionDataHex
         {
@@ -235,6 +292,10 @@ public class Hex : MonoBehaviour
                 _hex = value;
                 Col = CFromHex(_hex);
                 Row = RFromHex(_hex);
+                if(isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
             }
         }
         
@@ -248,11 +309,14 @@ public class Hex : MonoBehaviour
         */        
         [ShowInInspector] public int Col
         {
-            get {return hexSpawnerState.hexes[Col][Row].Col;}
+            get {return _hexSpawnerState.hexes[Col][Row].Col;}
             set
             {
-                hexSpawnerState.hexes[Col][Row].Col=value;
                 _hex = CRToHex(Col, Row);
+                if(isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
             }
         }
         //public int row { get { return this.row; } set { this.row = value; hex = CRToHex(col, row); } }
@@ -265,44 +329,83 @@ public class Hex : MonoBehaviour
         */
         [ShowInInspector] public int Row
         {
-            get {return hexSpawnerState.hexes[Col][Row].Row;}
+            get {return _hexSpawnerState.hexes[Col][Row].Row;}
             set
             {
-                hexSpawnerState.hexes[Col][Row].Row =value;
                 _hex = CRToHex(Col, Row);;
+                if(isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
             }
         }
 
         public string HexType
         {
-            get {return hexSpawnerState.hexes[Col][Row].HexType;}
-            set { hexSpawnerState.hexes[Col][Row].HexType=value;}
+            get {return _hexSpawnerState.hexes[Col][Row].HexType;}
+            set
+            {
+                if (!isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
+
+            }
         }
         public string HexSubType
         {
-            get { return hexSpawnerState.hexes[Col][Row].HexSubType; }
-            set { hexSpawnerState.hexes[Col][Row].HexSubType=value; }
+            get { return _hexSpawnerState.hexes[Col][Row].HexSubType; }
+            set
+            {
+                if (!isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
+            
+            }
         }
         public int Rotation
         {
-            get { return hexSpawnerState.hexes[Col][Row].Rotation;}
-            set { hexSpawnerState.hexes[Col][Row].Rotation=value; }
-        } 
+            get { return _hexSpawnerState.hexes[Col][Row].Rotation;}
+            set
+            {
+                if (!isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
+            }
+        }
         public int? HexNum
         {
-            get { return hexSpawnerState.hexes[Col][Row].HexNum; }
-            set { hexSpawnerState.hexes[Col][Row].HexNum=value; }
+            get { return _hexSpawnerState.hexes[Col][Row].HexNum; }
+            set{
+                if (!isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
+            
+            }
         }
         public string GroupID
         {
-            get { return hexSpawnerState.hexes[Col][Row].GroupID; }
-            set { hexSpawnerState.hexes[Col][Row].GroupID=value; }
+            get { return _hexSpawnerState.hexes[Col][Row].GroupID; }
+            set {
+                if (!isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
 
+            }
         }
         public bool Selected
         {
-            get { return hexSpawnerState.hexes[Col][Row].Selected; }
-            set { hexSpawnerState.hexes[Col][Row].Selected=value; }
+            get { return _hexSpawnerState.hexes[Col][Row].Selected; }
+            set {
+                if (!isHandlingEvent)
+                {
+                    onHexUpdated?.Invoke(this);
+                }
+            }
         
         }
         //[System.NonSerialized] public MeshRenderer meshRenderer;
@@ -326,26 +429,6 @@ public class Hex : MonoBehaviour
             set {hexSpawner.State.hexes[_col][_row].Corners = value;}
         }
         */
-
-        public HexState(HexSpawner.HexSpawnerState hexSpawnerState)
-        {
-            // Get reference to the hexSpawnerState that this hexState is attached to
-            this.hexSpawnerState = hexSpawnerState;
-
-            // Initialize the Edges dictionary in the constructor
-            Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
-            foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
-            {
-                RemoveEdgeStructure(direction);
-            }
-
-            // Initialize the Corners dictionary in the constructor
-            Corners = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string>();
-            foreach (SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection)))
-            {
-                RemoveCornerStructure(direction);
-            }
-        }
 
         public void AddEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
         {

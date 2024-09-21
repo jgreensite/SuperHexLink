@@ -60,7 +60,12 @@ public class HexSpawner : SpawnerBase
     private void Start()
     {
         gameSpawner = GameObject.Find("GameSpawner").GetComponent<GameSpawner>();
-        state = new HexSpawnerState();
+        
+        if (state == null)
+        {
+            state = new HexSpawnerState(new Hex.HexState(state));
+            Debug.Log("HexSpawnerState initialized.");
+        }
     }
    
     [Button("Spawn Hexes")]
@@ -70,7 +75,7 @@ public class HexSpawner : SpawnerBase
     }
     public override void BuildMe(bool isRefresh)
     // builds the 
-    // “odd-q” vertical layout shoves odd columns down
+    // "odd-q" vertical layout shoves odd columns down
     // see https://www.redblobgames.com/grids/hexagons/ for more information
     {
         //Build the list of available lands and numbers we can choose from
@@ -93,10 +98,11 @@ public class HexSpawner : SpawnerBase
                 state.hexes[col].Add(newHexState);
 
                 Hex newHex = Instantiate(hexPrefab);
-                newHex.Initialize(this);
 
                 // Set the following after instantiation
                 newHex.transform.parent = transform;
+
+                newHex.Initialize(this);
 
                 newHex.transform.position = new Vector3(
                     y: UnityEngine.Random.Range(gameSpawner.State.hexGridConfig.minHeight, gameSpawner.State.hexGridConfig.maxHeight),
@@ -178,11 +184,14 @@ public class HexSpawner : SpawnerBase
             //get all the Hex GameObjects that are children of this Hex
             foreach (GameObject g in ret)
             {
-#if UNITY_EDITOR
-                DestroyImmediate(g);
-#elif !UNITY_EDITOR
-                Destroy(g);
-#endif
+                if (g != null) // Check if the GameObject is not null
+                {
+                    #if UNITY_EDITOR
+                    DestroyImmediate(g);
+                    #elif !UNITY_EDITOR
+                    Destroy(g);
+                    #endif
+                }
             }
                 SetLand(h);
         }
@@ -566,11 +575,5 @@ public class HexSpawner : SpawnerBase
                 return isEven ? (1, 0) : (1, -1);
         }
         return (0, 0);
-    }
-
-    [Serializable]
-    public class HexSpawnerState
-    {
-        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex.BaseHexState>> hexes = new List<List<Hex.BaseHexState>>();
     }
 }

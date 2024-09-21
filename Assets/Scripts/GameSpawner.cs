@@ -184,7 +184,7 @@ public class GameSpawner : SpawnerBase
     public class CombinedSpawnerState
     {
         public GameSpawnerState GameState;
-        public HexSpawner.HexSpawnerState HexState;
+        public HexSpawnerState HexState;
         public EdgeSpawner.EdgeSpawnerState EdgeState;
         public CornerSpawner.CornerSpawnerState CornerState;
     }
