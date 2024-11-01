@@ -9,13 +9,13 @@ public class HexSpawnerState
 {
     private bool isHandlingEvent = false;
     // Define a delegate for the event
-    public delegate void HexesChangedHandler(List<List<Hex.BaseHexState>> hexes);
+    public delegate void HexesChangedHandler(List<List<IHexState>> hexes);
     public event HexesChangedHandler OnHexesChanged;
 
     [TableList(ShowIndexLabels = true)] [OdinSerialize] 
-    private List<List<Hex.BaseHexState>> _hexes = new List<List<Hex.BaseHexState>>();
+    private List<List<IHexState>> _hexes = new List<List<IHexState>>();
 
-    public List<List<Hex.BaseHexState>> hexes
+    public List<List<IHexState>> hexes
     {
         get { return _hexes; }
         set
@@ -27,7 +27,7 @@ public class HexSpawnerState
             }
         }
     }
-   public HexSpawnerState(Hex.HexState hexState)
+   public HexSpawnerState(HexState hexState)
     {
         if (hexState == null)
         {
@@ -37,7 +37,7 @@ public class HexSpawnerState
         Debug.Log("HexSpawnerState created and subscribed to hex updates.");
     }
 
-    private void HandleHexUpdated(Hex.HexState hexState)
+    private void HandleHexUpdated(IHexState hexState)
     {
         isHandlingEvent = true;
         hexes[hexState.Col][hexState.Row].HexType = hexState.HexType;

@@ -30,6 +30,8 @@ public class HexSpawner : SpawnerBase
     */
     //Hex Prefab Types
 
+    
+
     [ShowInInspector,OdinSerialize]
     private HexSpawnerState state;
 
@@ -90,11 +92,11 @@ public class HexSpawner : SpawnerBase
         // Note that only if we are not refreshing do we assign a land type and the text to the hex
         for (int col = 0; col < gameSpawner.State.hexGridConfig.cols; col++)
         {
-            state.hexes.Add(new List<Hex.BaseHexState>());
+            state.hexes.Add(new List<IHexState>());
             for (int row = 0; row < gameSpawner.State.hexGridConfig.rows; row++)
             {
                 // First Create a HexState object and add it to state.hexes
-                Hex.BaseHexState newHexState = new Hex.BaseHexState();
+                IHexState newHexState = new HexState();
                 state.hexes[col].Add(newHexState);
 
                 Hex newHex = Instantiate(hexPrefab);
@@ -378,7 +380,7 @@ public class HexSpawner : SpawnerBase
     {
         List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
         Helpers.DestroyObjects(ret);
-        state.hexes = new List<List<Hex.BaseHexState>>();
+        state.hexes = new List<List<BaseHexState>>();
     }
 
 
