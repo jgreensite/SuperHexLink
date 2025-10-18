@@ -115,11 +115,10 @@ public class GameSpawner : SpawnerBase
     {
         //TODO - this is not very elegant
         //it would be better if we didn't have to call update hexes and that an event fired automatically
-     
 
         //load the hex data
         CombinedSpawnerState spawnerStates = new();
-  
+
         if ((filePath == null) || (filePath.Length == 0))
         {
             filePath = "./data/maps/map.json"; //default value
@@ -129,18 +128,25 @@ public class GameSpawner : SpawnerBase
 
         byte[] bytes = File.ReadAllBytes(filePath);
         spawnerStates = SerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
- 
+
         //copy accross loaded configuration data for the game
         State = spawnerStates.GameState;
 
-        //create new gameobjects attached to new hexes based on loaded values
-        //remember it is not possible to serialise Unity gameobjects so we need to create new ones first
-        BuildMe(false);
+    // Assign spawner states BEFORE creating GameObjects so BuildMe doesn't overwrite loaded state
+    hexSpawner.State = spawnerStates.HexState;
+    edgeSpawner.State = spawnerStates.EdgeState;
+    cornerSpawner.State = spawnerStates.CornerState;
 
-        //then copy across hexState, edgeState and cornerState from loaded objects to newly created gameobjects
-        hexSpawner.State = spawnerStates.HexState;
-        edgeSpawner.State = spawnerStates.EdgeState;
-        cornerSpawner.State = spawnerStates.CornerState;
+    //create new gameobjects attached to new hexes based on loaded values
+    //remember it is not possible to serialise Unity gameobjects so we need to create new ones first
+    //Call BuildMe with isRefresh = true so that BuildMe does not randomize lands
+    BuildMe(true);
+
+        //TOOD - CHECK IF THIS IS NECESSARY
+        // Refresh the hexes to ensure they are correctly initialized, not that this will cause issues with loaded states
+        hexSpawner.Refresh();
+        edgeSpawner.Refresh();
+        cornerSpawner.Refresh();
 
         //and finally update the newly created gameobjects according to each ones loaded state
         hexSpawner.UpdateHexes();

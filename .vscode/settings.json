@@ -51,5 +51,10 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "SuperHexLink.sln"
+    "dotnet.defaultSolution": "SuperHexLink.sln",
+    "dotnet.preferCSharpExtension": true
+    ,
+    // Prefer Unity's Mono runtime for OmniSharp to reduce dependency on local .NET Framework targeting packs
+    "omnisharp.useModernNet": false,
+    "omnisharp.useGlobalMono": "always"
 }
