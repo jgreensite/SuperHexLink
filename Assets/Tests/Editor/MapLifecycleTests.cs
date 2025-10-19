@@ -1,18 +1,22 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.IO;
+using System.Linq;
 
 namespace Tests.Editor
 {
     public class MapLifecycleTests
     {
-        private const string TempMapPath = "./data/maps/test_map.json";
+    private const string TempMapDir = "./data/maps/testmap_dir/";
+    private const string TempMapPath = TempMapDir + "map.json";
 
         [SetUp]
         public void SetUp()
         {
             // Ensure cleaned environment
-            if (File.Exists(TempMapPath)) File.Delete(TempMapPath);
+            // Ensure directory exists and is clean
+            if (Directory.Exists(TempMapDir)) Directory.Delete(TempMapDir, true);
+            Directory.CreateDirectory(TempMapDir);
         }
 
         [TearDown]
@@ -21,12 +25,13 @@ namespace Tests.Editor
             // Clean up any created GameObjects
             foreach (var go in Object.FindObjectsOfType<GameObject>())
             {
-                if (go.name.StartsWith("hex") || go.name.StartsWith("HexSpawner") || go.name.StartsWith("GameSpawner") || go.name.StartsWith("text_") || go.name.StartsWith("landModel"))
+                if (go.name.StartsWith("hex") || go.name.StartsWith("HexSpawner") || go.name.StartsWith("GameSpawner") || go.name.StartsWith("text_") || go.name.StartsWith("landModel") || go.name.StartsWith("hex_prefab") )
                 {
                     Object.DestroyImmediate(go);
                 }
             }
-            if (File.Exists(TempMapPath)) File.Delete(TempMapPath);
+            // Remove temp map dir
+            if (Directory.Exists(TempMapDir)) Directory.Delete(TempMapDir, true);
         }
 
         [Test]
@@ -100,27 +105,28 @@ namespace Tests.Editor
             var created = Object.FindObjectsOfType<Hex>();
             Assert.IsTrue(created.Length > 0, "BuildMe should create hex GameObjects");
 
-            // Save using GameSpawner.SaveHexes
-            gameSpawner.GetType().GetMethod("SaveHexes").Invoke(gameSpawner, new object[] { Path.GetDirectoryName(TempMapPath) + "/" });
+            // Save using GameSpawner.SaveHexes (saves to directory + "map.json")
+            gameSpawner.GetType().GetMethod("SaveHexes").Invoke(gameSpawner, new object[] { TempMapDir });
 
-            // Clear all
+            // Read original saved bytes
+            Assert.IsTrue(File.Exists(TempMapPath), "map.json should have been written by SaveHexes");
+            var beforeBytes = File.ReadAllBytes(TempMapPath);
+
+            // Clear all and ensure no hexes
             hexSpawner.Clear();
+            Assert.AreEqual(0, Object.FindObjectsOfType<Hex>().Length, "Clear should remove created hexes before Load");
 
-            // Load via GameSpawner.LoadState
+            // Load via GameSpawner.LoadState using the exact map.json path
             gameSpawner.GetType().GetMethod("LoadState").Invoke(gameSpawner, new object[] { TempMapPath });
 
-            // After loading, update hexes
-            hexSpawner.UpdateHexes();
+            // After loading, re-save to the same directory
+            gameSpawner.GetType().GetMethod("SaveHexes").Invoke(gameSpawner, new object[] { TempMapDir });
 
-            var post = Object.FindObjectsOfType<Hex>();
-            Assert.IsTrue(post.Length > 0, "Load should re-create hex GameObjects");
-            // Check that at least one hex preserved its type
-            bool foundField = false;
-            foreach (var h in post)
-            {
-                if (h.hexState.HexType == "FIELD") foundField = true;
-            }
-            Assert.IsTrue(foundField, "Saved FIELD type should be present after Load");
+            Assert.IsTrue(File.Exists(TempMapPath), "map.json should exist after re-save");
+            var afterBytes = File.ReadAllBytes(TempMapPath);
+
+            // The saved file before load and after load->save should be identical
+            Assert.IsTrue(beforeBytes.SequenceEqual(afterBytes), "Saved map.json differs after Load->Save (state not preserved)");
 
             // Cleanup
             Object.DestroyImmediate(gsGo);
