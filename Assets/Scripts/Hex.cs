@@ -36,8 +36,9 @@ public class Hex : MonoBehaviour
     [ShowInInspector, OdinSerialize] public string GroupID;
     [ShowInInspector, OdinSerialize] public bool Selected;
 
-        // runtime-only visuals
-    [ShowInInspector, OdinSerialize] public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
+        // runtime-only visuals - do NOT serialize GameObject references into saved state
+    [System.NonSerialized]
+    public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
         public HexState() { }
 

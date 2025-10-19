@@ -60,7 +60,8 @@ public class HexSpawner : SpawnerBase
     private void Awake()
     {
         gameSpawner = GameObject.Find("GameSpawner").GetComponent<GameSpawner>();
-        //state = new HexSpawnerState();
+    // Ensure state is initialized to avoid null reference exceptions when BuildMe/Clear are called
+    if (state == null) state = new HexSpawnerState();
     }
    
     [Button("Spawn Hexes")]
@@ -73,12 +74,13 @@ public class HexSpawner : SpawnerBase
     // “odd-q” vertical layout shoves odd columns down
     // see https://www.redblobgames.com/grids/hexagons/ for more information
     {
-        //Build the list of available lands and numbers we can choose from
-        BuildTypes();
+    // Build the list of available lands and numbers we can choose from
+    BuildTypes();
 
-        // clear the state of the hexes
-        if (state.hexes.Count > 0)
-            Clear();
+    // Always clear any existing hex GameObjects and reset internal state before (re)building.
+    // This prevents duplicate/stacked hexes when BuildMe is called multiple times (e.g. Load -> BuildMe(true)).
+    Clear();
+    state.hexes = new System.Collections.Generic.List<System.Collections.Generic.List<Hex.HexState>>();
 
         // Now based on the dimensions of the gameboard which may have changed since the last time we called this
         // build the hex and text associated with the hex GameObjects
@@ -361,9 +363,10 @@ public class HexSpawner : SpawnerBase
     [Button("Clear Hexes")]
     public override void Clear()
     {
-        List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
-        Helpers.DestroyObjects(ret);
-        state.hexes = new List<List<Hex.HexState>>();
+    List<GameObject> ret = Helpers.GetChildObjectsByName(this.gameObject, true);
+    Helpers.DestroyObjects(ret);
+    if (state == null) state = new HexSpawnerState();
+    state.hexes = new System.Collections.Generic.List<System.Collections.Generic.List<Hex.HexState>>();
     }
 
 
