@@ -302,20 +302,21 @@ public class HexSpawner : SpawnerBase
         }
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
         
-        //get list of all objects that are not of this type, they all need to be removed
-        List<GameObject> ret = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType, false);
-        //get list of all subtypes of this object, all not mentioned subtypes need to be removed  
-        List<GameObject> sub = Helpers.GetChildObjectsByName(newHexLandModel.gameObject, h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD, true);
-        var s = h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
-        //get list of all lights of this object
-        List<GameObject> lit = Helpers.GetChilObjectLights(newHexLandModel.gameObject);  
-        //remove all lights from the ret list
-        ret.RemoveAll((go) => lit.Contains(go));
-        //remove all needed subtypes from the sub list
-        sub.RemoveAll((go) => go.name == s);
-        //merge ret & sub lists and destroy
-        ret.AddRange(sub);
-        Helpers.DestroyObjects(ret);
+    // Remove any existing models/children on the hex itself (not the newly instantiated model)
+    // so we don't accumulate stacked models when re-building or refreshing.
+    List<GameObject> ret = Helpers.GetChildObjectsByName(h.gameObject, h.hexState.HexType, false);
+    // get list of all subtypes of children under the hex; remove any that aren't the expected subtype
+    List<GameObject> sub = Helpers.GetChildObjectsByName(h.gameObject, h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD, true);
+    var s = h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
+    // get list of all lights under the hex model
+    List<GameObject> lit = Helpers.GetChilObjectLights(h.gameObject);
+    // remove lights from the removal list
+    ret.RemoveAll((go) => lit.Contains(go));
+    // remove subtypes we want to keep
+    sub.RemoveAll((go) => go.name == s);
+    // merge ret & sub lists and destroy
+    ret.AddRange(sub);
+    Helpers.DestroyObjects(ret);
     }
 
     private void SetText(Hex h)
