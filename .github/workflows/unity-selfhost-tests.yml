@@ -1,0 +1,30 @@
+name: Unity EditMode tests (self-hosted)
+
+on:
+  push:
+    branches: [ main, 'feature/*' ]
+  pull_request:
+
+jobs:
+  unity-tests:
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dotnet build (fast sanity)
+        run: dotnet build "Assembly-CSharp.csproj" /property:GenerateFullPaths=true
+
+      - name: Run Unity EditMode tests (batch)
+        shell: powershell
+        run: |
+          $unityPath = "C:\\Program Files\\Unity\\Hub\\Editor\\2021.3.18f1\\Editor\\Unity.exe"
+          if (-not (Test-Path $unityPath)) { Write-Error "Unity executable not found at $unityPath"; exit 2 }
+          New-Item -ItemType Directory -Path "$env:GITHUB_WORKSPACE\TestResults" -Force | Out-Null
+          & $unityPath -batchmode -projectPath "$env:GITHUB_WORKSPACE" -runTests -testPlatform EditMode -testResults "$env:GITHUB_WORKSPACE\TestResults\editmode-results.xml" -logFile "$env:GITHUB_WORKSPACE\TestResults\unity-batch-log.txt" -quit
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-test-results
+          path: TestResults/
