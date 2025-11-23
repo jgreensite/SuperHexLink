@@ -1,0 +1,48 @@
+# EditorConfig helps maintain consistent coding styles
+root = true
+
+[*.cs]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+end_of_line = crlf
+
+# Roslyn analyzer severity defaults for dotnet analyzers
+dotnet_analyzer_diagnostic.severity = warning
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+
+# Triage: relax a few noisy rules for migrated CoreLogic files and tests.
+# - SA1636 (file header copyright mismatch) is noisy because header text
+#   in some files was added programmatically; suppress for now and fix later.
+dotnet_diagnostic.SA1636.severity = none
+
+# Allow underscores in test names (many existing tests use underscores).
+[CoreLogic/tests/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+# Suppress test-related style warnings that are common in test files.
+dotnet_diagnostic.SA1001.severity = none
+dotnet_diagnostic.SA1021.severity = none
+dotnet_diagnostic.SA1122.severity = none
+dotnet_diagnostic.SA1208.severity = none
+dotnet_diagnostic.SA1210.severity = none
+dotnet_diagnostic.SA1413.severity = none
+dotnet_diagnostic.SA1500.severity = none
+dotnet_diagnostic.SA0001.severity = none
+
+# Reduce noise for the migrated CoreLogic source while we incrementally fix style.
+[CoreLogic/src/**.cs]
+# These rules are noisy for auto-migrated files; we'll address them incrementally.
+dotnet_diagnostic.SA1101.severity = none
+dotnet_diagnostic.SA1503.severity = none
+dotnet_diagnostic.SA1208.severity = none
+# Suppress XML documentation warnings for now; add docs incrementally when API stabilizes.
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.SA1600.severity = none
+
+[*.{yml,yaml,md,txt}]
+indent_style = space
+indent_size = 2

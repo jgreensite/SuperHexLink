@@ -72,3 +72,29 @@ crashlytics-build.properties
 
 # Mac temporary files
 *.DS_Store
+
+# GitHub Actions runner artifacts (should not be in repo)
+/scripts/actions-runner/
+/scripts/actions-runner.zip
+/scripts/*.log
+/scripts/*-log-tail.txt
+
+# Build artifacts and temporary files
+/TestResults/
+/tmp-runners.json
+
+# Unity license files (should not be committed)
+*.alf
+
+# CoreLogic build products (dotnet/bin outputs)
+/CoreLogic/**/bin/
+/CoreLogic/**/obj/
+
+# CoreLogic plugin copies after running deploy-{tools,test}
+/Assets/Plugins/CoreLogic/
+
+# Third-party asset packages are not tracked; download them per docs/DEV_SETUP.md
+/Assets/Plugins/Sirenix/
+/Assets/ParadoxNotion/
+/Assets/Plugins/SimpleFileBrowser/
+/Assets/Plugins/NativeFilePicker/

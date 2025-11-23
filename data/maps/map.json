@@ -182,52 +182,33 @@
                             "$type": "11|Hex+HexState, Assembly-CSharp",
                             "Col": 0,
                             "Row": 0,
-                            "HexType": "sea",
+                            "HexType": "pasture",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": "12|System.Nullable`1[[System.Int32, mscorlib]], mscorlib",
-                                null
+                                8
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 27,
-                                "$type": "13|System.Collections.Generic.Dictionary`2[[UnityEngine.GameObject, UnityEngine.CoreModule],[UnityEngine.Color, UnityEngine.CoreModule]], mscorlib",
-                                "comparer": {
-                                    "$id": 28,
-                                    "$type": "14|System.Collections.Generic.ObjectEqualityComparer`1[[UnityEngine.GameObject, UnityEngine.CoreModule]], mscorlib"
-                                },
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 29,
+                            "$id": 27,
                             "$type": 11,
                             "Col": 0,
                             "Row": 1,
-                            "HexType": "forest",
+                            "HexType": "sea",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                3
+                                null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 30,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 31,
+                            "$id": 28,
                             "$type": 11,
                             "Col": 0,
                             "Row": 2,
@@ -239,64 +220,40 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 32,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 33,
+                            "$id": 29,
                             "$type": 11,
                             "Col": 0,
                             "Row": 3,
-                            "HexType": "mountain",
+                            "HexType": "field",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                4
+                                12
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 34,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 35,
+                            "$id": 30,
                             "$type": 11,
                             "Col": 0,
                             "Row": 4,
-                            "HexType": "none",
+                            "HexType": "field",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                null
+                                2
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 36,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 37,
+                            "$id": 31,
                             "$type": 11,
                             "Col": 0,
                             "Row": 5,
@@ -308,38 +265,134 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 38,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 39,
+                            "$id": 32,
                             "$type": 11,
                             "Col": 0,
                             "Row": 6,
-                            "HexType": "field",
+                            "HexType": "none",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                11
+                                null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 40,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
+                        }
+                    ]
+                },
+                {
+                    "$id": 33,
+                    "$type": 10,
+                    "$rlength": 7,
+                    "$rcontent": [
+                        {
+                            "$id": 34,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 0,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 35,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 1,
+                            "HexType": "forest",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                10
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 36,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 2,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 37,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 3,
+                            "HexType": "mountain",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 38,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 4,
+                            "HexType": "mountain",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                9
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 39,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 5,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 40,
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 6,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -351,7 +404,7 @@
                         {
                             "$id": 42,
                             "$type": 11,
-                            "Col": 1,
+                            "Col": 2,
                             "Row": 0,
                             "HexType": "sea",
                             "HexSubType": "",
@@ -361,22 +414,29 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 43,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
+                        },
+                        {
+                            "$id": 43,
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 1,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 44,
                             "$type": 11,
-                            "Col": 1,
-                            "Row": 1,
-                            "HexType": "sea",
+                            "Col": 2,
+                            "Row": 2,
+                            "HexType": "harbour",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
@@ -384,21 +444,28 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 45,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
+                        },
+                        {
+                            "$id": 45,
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 3,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 46,
                             "$type": 11,
-                            "Col": 1,
-                            "Row": 2,
+                            "Col": 2,
+                            "Row": 4,
                             "HexType": "sea",
                             "HexSubType": "",
                             "Rotation": 0,
@@ -407,22 +474,29 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 47,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
+                        },
+                        {
+                            "$id": 47,
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 5,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 48,
                             "$type": 11,
-                            "Col": 1,
-                            "Row": 3,
-                            "HexType": "none",
+                            "Col": 2,
+                            "Row": 6,
+                            "HexType": "sea",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
@@ -430,21 +504,20 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 49,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
+                            "Selected": false
+                        }
+                    ]
+                },
+                {
+                    "$id": 49,
+                    "$type": 10,
+                    "$rlength": 7,
+                    "$rcontent": [
                         {
                             "$id": 50,
                             "$type": 11,
-                            "Col": 1,
-                            "Row": 4,
+                            "Col": 3,
+                            "Row": 0,
                             "HexType": "harbour",
                             "HexSubType": "",
                             "Rotation": 0,
@@ -453,74 +526,58 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 51,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
+                        },
+                        {
+                            "$id": 51,
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 1,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 52,
                             "$type": 11,
-                            "Col": 1,
-                            "Row": 5,
-                            "HexType": "hill",
+                            "Col": 3,
+                            "Row": 2,
+                            "HexType": "none",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                9
+                                null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 53,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
+                        },
+                        {
+                            "$id": 53,
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 3,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 54,
                             "$type": 11,
-                            "Col": 1,
-                            "Row": 6,
-                            "HexType": "none",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 55,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "$id": 56,
-                    "$type": 10,
-                    "$rlength": 7,
-                    "$rcontent": [
-                        {
-                            "$id": 57,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 0,
+                            "Col": 3,
+                            "Row": 4,
                             "HexType": "sea",
                             "HexSubType": "",
                             "Rotation": 0,
@@ -529,381 +586,51 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 58,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 59,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 1,
-                            "HexType": "pasture",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                10
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 60,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 61,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 2,
-                            "HexType": "pasture",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                12
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 62,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 63,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 3,
-                            "HexType": "none",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 64,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 65,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 4,
-                            "HexType": "hill",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                6
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 66,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 67,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 5,
-                            "HexType": "forest",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                10
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 68,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 69,
-                            "$type": 11,
-                            "Col": 2,
-                            "Row": 6,
-                            "HexType": "none",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 70,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "$id": 71,
-                    "$type": 10,
-                    "$rlength": 7,
-                    "$rcontent": [
-                        {
-                            "$id": 72,
-                            "$type": 11,
-                            "Col": 3,
-                            "Row": 0,
-                            "HexType": "none",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 73,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 74,
-                            "$type": 11,
-                            "Col": 3,
-                            "Row": 1,
-                            "HexType": "forest",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                8
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 75,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 76,
-                            "$type": 11,
-                            "Col": 3,
-                            "Row": 2,
-                            "HexType": "field",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                5
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 77,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 78,
-                            "$type": 11,
-                            "Col": 3,
-                            "Row": 3,
-                            "HexType": "harbour",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 79,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 80,
-                            "$type": 11,
-                            "Col": 3,
-                            "Row": 4,
-                            "HexType": "none",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 81,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 82,
+                            "$id": 55,
                             "$type": 11,
                             "Col": 3,
                             "Row": 5,
-                            "HexType": "harbour",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 83,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 84,
-                            "$type": 11,
-                            "Col": 3,
-                            "Row": 6,
-                            "HexType": "sea",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 85,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        }
-                    ]
-                },
-                {
-                    "$id": 86,
-                    "$type": 10,
-                    "$rlength": 7,
-                    "$rcontent": [
-                        {
-                            "$id": 87,
-                            "$type": 11,
-                            "Col": 4,
-                            "Row": 0,
                             "HexType": "mountain",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                5
+                                9
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 88,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 89,
+                            "$id": 56,
                             "$type": 11,
-                            "Col": 4,
-                            "Row": 1,
-                            "HexType": "pasture",
+                            "Col": 3,
+                            "Row": 6,
+                            "HexType": "field",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                9
+                                8
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 90,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
+                            "Selected": false
+                        }
+                    ]
+                },
+                {
+                    "$id": 57,
+                    "$type": 10,
+                    "$rlength": 7,
+                    "$rcontent": [
                         {
-                            "$id": 91,
+                            "$id": 58,
                             "$type": 11,
                             "Col": 4,
-                            "Row": 2,
-                            "HexType": "sea",
+                            "Row": 0,
+                            "HexType": "harbour",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
@@ -911,18 +638,40 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 92,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 93,
+                            "$id": 59,
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 1,
+                            "HexType": "field",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 60,
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 2,
+                            "HexType": "hill",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 61,
                             "$type": 11,
                             "Col": 4,
                             "Row": 3,
@@ -934,22 +683,44 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 94,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 95,
+                            "$id": 62,
                             "$type": 11,
                             "Col": 4,
                             "Row": 4,
-                            "HexType": "field",
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 63,
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 5,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 64,
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 6,
+                            "HexType": "forest",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
@@ -957,97 +728,50 @@
                                 6
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 96,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 97,
-                            "$type": 11,
-                            "Col": 4,
-                            "Row": 5,
-                            "HexType": "sea",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 98,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 99,
-                            "$type": 11,
-                            "Col": 4,
-                            "Row": 6,
-                            "HexType": "harbour",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                null
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 100,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         }
                     ]
                 },
                 {
-                    "$id": 101,
+                    "$id": 65,
                     "$type": 10,
                     "$rlength": 7,
                     "$rcontent": [
                         {
-                            "$id": 102,
+                            "$id": 66,
                             "$type": 11,
                             "Col": 5,
                             "Row": 0,
-                            "HexType": "hill",
+                            "HexType": "pasture",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                8
+                                11
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 103,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 104,
+                            "$id": 67,
                             "$type": 11,
                             "Col": 5,
                             "Row": 1,
+                            "HexType": "pasture",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 68,
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 2,
                             "HexType": "sea",
                             "HexSubType": "",
                             "Rotation": 0,
@@ -1056,21 +780,13 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 105,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 106,
+                            "$id": 69,
                             "$type": 11,
                             "Col": 5,
-                            "Row": 2,
+                            "Row": 3,
                             "HexType": "desert",
                             "HexSubType": "",
                             "Rotation": 0,
@@ -1079,22 +795,14 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 107,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 108,
+                            "$id": 70,
                             "$type": 11,
                             "Col": 5,
-                            "Row": 3,
-                            "HexType": "none",
+                            "Row": 4,
+                            "HexType": "sea",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
@@ -1102,22 +810,14 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 109,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 110,
+                            "$id": 71,
                             "$type": 11,
                             "Col": 5,
-                            "Row": 4,
-                            "HexType": "pasture",
+                            "Row": 5,
+                            "HexType": "forest",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
@@ -1125,41 +825,10 @@
                                 3
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 111,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 112,
-                            "$type": 11,
-                            "Col": 5,
-                            "Row": 5,
-                            "HexType": "field",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                11
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 113,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 114,
+                            "$id": 72,
                             "$type": 11,
                             "Col": 5,
                             "Row": 6,
@@ -1171,25 +840,17 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 115,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         }
                     ]
                 },
                 {
-                    "$id": 116,
+                    "$id": 73,
                     "$type": 10,
                     "$rlength": 7,
                     "$rcontent": [
                         {
-                            "$id": 117,
+                            "$id": 74,
                             "$type": 11,
                             "Col": 6,
                             "Row": 0,
@@ -1201,90 +862,43 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 118,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 119,
+                            "$id": 75,
                             "$type": 11,
                             "Col": 6,
                             "Row": 1,
-                            "HexType": "harbour",
+                            "HexType": "hill",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                null
+                                10
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 120,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 121,
+                            "$id": 76,
                             "$type": 11,
                             "Col": 6,
                             "Row": 2,
-                            "HexType": "forest",
+                            "HexType": "pasture",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                4
+                                3
                             },
                             "GroupID": "1",
-                            "Selected": true,
-                            "originalMaterialColors": {
-                                "$id": 122,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 123,
+                            "$id": 77,
                             "$type": 11,
                             "Col": 6,
                             "Row": 3,
-                            "HexType": "mountain",
-                            "HexSubType": "",
-                            "Rotation": 0,
-                            "HexNum": {
-                                "$type": 12,
-                                2
-                            },
-                            "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 124,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
-                        },
-                        {
-                            "$id": 125,
-                            "$type": 11,
-                            "Col": 6,
-                            "Row": 4,
                             "HexType": "none",
                             "HexSubType": "",
                             "Rotation": 0,
@@ -1293,41 +907,40 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 126,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 127,
+                            "$id": 78,
                             "$type": 11,
                             "Col": 6,
-                            "Row": 5,
-                            "HexType": "sea",
+                            "Row": 4,
+                            "HexType": "hill",
                             "HexSubType": "",
                             "Rotation": 0,
                             "HexNum": {
                                 "$type": 12,
-                                null
+                                6
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 128,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         },
                         {
-                            "$id": 129,
+                            "$id": 79,
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 5,
+                            "HexType": "forest",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                11
+                            },
+                            "GroupID": "1",
+                            "Selected": false
+                        },
+                        {
+                            "$id": 80,
                             "$type": 11,
                             "Col": 6,
                             "Row": 6,
@@ -1339,15 +952,7 @@
                                 null
                             },
                             "GroupID": "1",
-                            "Selected": false,
-                            "originalMaterialColors": {
-                                "$id": 130,
-                                "$type": 13,
-                                "comparer": $iref:28,
-                                "$rlength": 0,
-                                "$rcontent": [
-                                ]
-                            }
+                            "Selected": false
                         }
                     ]
                 }
@@ -1355,13 +960,13 @@
         }
     },
     "EdgeState": {
-        "$id": 131,
-        "$type": "15|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp",
+        "$id": 81,
+        "$type": "13|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp",
         "myState": "MyEdgeState"
     },
     "CornerState": {
-        "$id": 132,
-        "$type": "16|CornerSpawner+CornerSpawnerState, Assembly-CSharp",
+        "$id": 82,
+        "$type": "14|CornerSpawner+CornerSpawnerState, Assembly-CSharp",
         "myState": "MyCornerState"
     }
 }

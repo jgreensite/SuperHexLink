@@ -1,4 +1,10 @@
-# SuperHexLink Repository Assessment and Roadmap
+# SuperHexLink Repository Assessment (Historical)
+
+**Note**: This document is archived for historical reference. See [ARCHITECTURE.md](ARCHITECTURE.md) for current architecture and [TODO.md](TODO.md) for current tasks.
+
+---
+
+# Original Assessment - SuperHexLink Repository
 
 ## Overview
 SuperHexLink is a Unity-based hex–grid strategy prototype. The repository mixes runtime gameplay scripts in `Assets/Scripts/`, third-party tooling under `Assets/ParadoxNotion/` and `Assets/Plugins/`, and various serialization helpers within `data/`. The project targets Unity `2021.3.18f1` per `ProjectSettings/ProjectVersion.txt`. The assessment below captures the current state of core systems (spawning, persistence, messaging), documents the actions completed so far, and enumerates the detailed roadmap required to stabilize the project on the new workstation.

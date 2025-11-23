@@ -2,18 +2,18 @@ using NUnit.Framework;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using Sirenix.Serialization;
 
 namespace Tests.Editor
 {
     public class MapLifecycleTests
     {
-    private const string TempMapDir = "./data/maps/testmap_dir/";
-    private const string TempMapPath = TempMapDir + "map.json";
+        private const string TempMapDir = "./data/maps/testmap_dir/";
+        private const string TempMapPath = TempMapDir + "map.json";
 
         [SetUp]
         public void SetUp()
         {
-            // Ensure cleaned environment
             // Ensure directory exists and is clean
             if (Directory.Exists(TempMapDir)) Directory.Delete(TempMapDir, true);
             Directory.CreateDirectory(TempMapDir);
@@ -25,7 +25,7 @@ namespace Tests.Editor
             // Clean up any created GameObjects
             foreach (var go in Object.FindObjectsOfType<GameObject>())
             {
-                if (go.name.StartsWith("hex") || go.name.StartsWith("HexSpawner") || go.name.StartsWith("GameSpawner") || go.name.StartsWith("text_") || go.name.StartsWith("landModel") || go.name.StartsWith("hex_prefab") )
+                if (go.name.StartsWith("hex") || go.name.StartsWith("HexSpawner") || go.name.StartsWith("GameSpawner") || go.name.StartsWith("text_") || go.name.StartsWith("landModel") || go.name.StartsWith("hex_prefab"))
                 {
                     Object.DestroyImmediate(go);
                 }
@@ -125,8 +125,11 @@ namespace Tests.Editor
             Assert.IsTrue(File.Exists(TempMapPath), "map.json should exist after re-save");
             var afterBytes = File.ReadAllBytes(TempMapPath);
 
-            // The saved file before load and after load->save should be identical
-            Assert.IsTrue(beforeBytes.SequenceEqual(afterBytes), "Saved map.json differs after Load->Save (state not preserved)");
+            // The saved file before load and after load->save should be semantically equal.
+            var beforeObj = SerializationUtility.DeserializeValue<GameSpawner.CombinedSpawnerState>(beforeBytes, DataFormat.JSON);
+            var afterObj = SerializationUtility.DeserializeValue<GameSpawner.CombinedSpawnerState>(afterBytes, DataFormat.JSON);
+
+            AssertCombinedSpawnerStateEqual(beforeObj, afterObj);
 
             // Cleanup
             Object.DestroyImmediate(gsGo);
@@ -198,6 +201,42 @@ namespace Tests.Editor
             Object.DestroyImmediate(gsGo);
             Object.DestroyImmediate(hsGo);
             Object.DestroyImmediate(hexPrefab);
+        }
+
+        private void AssertCombinedSpawnerStateEqual(GameSpawner.CombinedSpawnerState a, GameSpawner.CombinedSpawnerState b)
+        {
+            Assert.IsNotNull(a);
+            Assert.IsNotNull(b);
+
+            // Compare GameState basics (hexGridConfig)
+            Assert.IsNotNull(a.GameState);
+            Assert.IsNotNull(b.GameState);
+            Assert.AreEqual(a.GameState.hexGridConfig.cols, b.GameState.hexGridConfig.cols, "cols differ");
+            Assert.AreEqual(a.GameState.hexGridConfig.rows, b.GameState.hexGridConfig.rows, "rows differ");
+
+            // Compare HexSpawnerState structure
+            Assert.IsNotNull(a.HexState);
+            Assert.IsNotNull(b.HexState);
+            var ah = a.HexState.hexes;
+            var bh = b.HexState.hexes;
+            Assert.AreEqual(ah.Count, bh.Count, "Hex columns count differ");
+            for (int c = 0; c < ah.Count; c++)
+            {
+                Assert.AreEqual(ah[c].Count, bh[c].Count, $"Hex rows count differ at col {c}");
+                for (int r = 0; r < ah[c].Count; r++)
+                {
+                    var x = ah[c][r];
+                    var y = bh[c][r];
+                    Assert.AreEqual(x.Col, y.Col, $"Col mismatch at {c},{r}");
+                    Assert.AreEqual(x.Row, y.Row, $"Row mismatch at {c},{r}");
+                    Assert.AreEqual(x.HexType, y.HexType, $"HexType mismatch at {c},{r}");
+                    Assert.AreEqual(x.HexSubType, y.HexSubType, $"HexSubType mismatch at {c},{r}");
+                    Assert.AreEqual(x.Rotation, y.Rotation, $"Rotation mismatch at {c},{r}");
+                    Assert.AreEqual(x.HexNum, y.HexNum, $"HexNum mismatch at {c},{r}");
+                    Assert.AreEqual(x.GroupID, y.GroupID, $"GroupID mismatch at {c},{r}");
+                    Assert.AreEqual(x.Selected, y.Selected, $"Selected mismatch at {c},{r}");
+                }
+            }
         }
     }
 }

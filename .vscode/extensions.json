@@ -1,4 +1,15 @@
 {
+  "recommendations": [
+    "ms-dotnettools.csharp",
+    "unity.unity-debug",
+    "unity.unity-tutorials",
+    "ms-vscode.powershell",
+    "vector-of-bool.unity-code-snippets",
+    "kreativgeist.unity-snippets"
+  ],
+  "unwantedRecommendations": []
+}
+{
     "recommendations": [
       "visualstudiotoolsforunity.vstuc"
     ]

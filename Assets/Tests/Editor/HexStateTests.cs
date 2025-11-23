@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using CoreLogic.Serialization;
 
 namespace Tests.Editor
 {
@@ -41,6 +42,37 @@ namespace Tests.Editor
 
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(spawnerGO);
+        }
+
+        [Test]
+        public void CoreLogic_BaseHexState_SerializeDeserialize_Roundtrip()
+        {
+            var backing = new Hex.BaseHexState
+            {
+                Col = 7,
+                Row = 8,
+                HexType = "FIELD",
+                HexSubType = "SUB",
+                Rotation = 2,
+                HexNum = 5,
+                GroupID = "grp",
+                Selected = true
+            };
+
+            // Convert to CoreLogic model, serialize, deserialize, convert back
+            var core = backing.ToCore();
+            var json = BaseHexStateSerializer.Serialize(core);
+            var core2 = BaseHexStateSerializer.Deserialize(json);
+            var backing2 = core2.FromCore();
+
+            Assert.AreEqual(backing.Col, backing2.Col);
+            Assert.AreEqual(backing.Row, backing2.Row);
+            Assert.AreEqual(backing.HexType, backing2.HexType);
+            Assert.AreEqual(backing.HexSubType, backing2.HexSubType);
+            Assert.AreEqual(backing.Rotation, backing2.Rotation);
+            Assert.AreEqual(backing.HexNum, backing2.HexNum);
+            Assert.AreEqual(backing.GroupID, backing2.GroupID);
+            Assert.AreEqual(backing.Selected, backing2.Selected);
         }
 
         [Test]

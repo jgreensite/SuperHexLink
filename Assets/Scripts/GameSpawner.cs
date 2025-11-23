@@ -11,6 +11,7 @@ using FDL.Library.Numeric;
 using TMPro;
 using SimpleHexExtensions;
 using HexExtensions;
+using SuperHexLink.Logging;
 
 public class GameSpawner : SpawnerBase
 {
@@ -32,6 +33,8 @@ public class GameSpawner : SpawnerBase
     private EdgeSpawner edgeSpawner;
     [SerializeField]
     private CornerSpawner cornerSpawner;
+    [SerializeField]
+    private ActionLogSettings actionLogSettings;
 
     public void Awake()
     {
@@ -49,6 +52,7 @@ public class GameSpawner : SpawnerBase
 
         AssociateElements();
         AdjustCameraPosition();
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "GameSpawner BuildMe isRefresh={0}", isRefresh);
     }
 
     [Button("Spawn All Game Elements")]
@@ -57,6 +61,7 @@ public class GameSpawner : SpawnerBase
         hexSpawner.Spawn();
         edgeSpawner.Spawn();
         cornerSpawner.Spawn();
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "GameSpawner Spawn triggered");
     }
 
     [Button("Clear All Game Elements")]
@@ -65,6 +70,7 @@ public class GameSpawner : SpawnerBase
         hexSpawner.Clear();
         edgeSpawner.Clear();
         cornerSpawner.Clear();
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "GameSpawner Clear executed");
     }
 
     [Button("Refresh All Game Elements")]
@@ -73,6 +79,7 @@ public class GameSpawner : SpawnerBase
         hexSpawner.Refresh();
         edgeSpawner.Refresh();
         cornerSpawner.Refresh();
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "GameSpawner Refresh executed");
     }
 
     [Button("Save Map")]
@@ -132,24 +139,18 @@ public class GameSpawner : SpawnerBase
         //copy accross loaded configuration data for the game
         State = spawnerStates.GameState;
 
+    Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState applying saved data from {0}", filePath);
     // Assign spawner states BEFORE creating GameObjects so BuildMe doesn't overwrite loaded state
     hexSpawner.State = spawnerStates.HexState;
     edgeSpawner.State = spawnerStates.EdgeState;
     cornerSpawner.State = spawnerStates.CornerState;
 
-    //create new gameobjects attached to new hexes based on loaded values
-    //remember it is not possible to serialise Unity gameobjects so we need to create new ones first
-    //Call BuildMe with isRefresh = true so that BuildMe does not randomize lands
-    BuildMe(true);
+        //create new gameobjects attached to the loaded hex state without randomizing the board
+        BuildMe(true);
 
-        //TOOD - CHECK IF THIS IS NECESSARY
-        // Refresh the hexes to ensure they are correctly initialized, not that this will cause issues with loaded states
-        hexSpawner.Refresh();
-        edgeSpawner.Refresh();
-        cornerSpawner.Refresh();
-
-        //and finally update the newly created gameobjects according to each ones loaded state
+        //reapply visuals (materials/models/camera) once the objects exist
         hexSpawner.UpdateHexes();
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState finished");
     }
 
 
@@ -184,6 +185,11 @@ public class GameSpawner : SpawnerBase
         public string numGroupID;
         public int numCnt;
         public int numType;
+    }
+
+    private void Log(ActionLogCategory category, ActionLogSeverity severity, string message, params object[] args)
+    {
+        ActionLogger.Log(actionLogSettings, category, severity, message, args);
     }
 
     [Serializable]
