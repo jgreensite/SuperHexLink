@@ -55,6 +55,8 @@ public class HexSpawner : SpawnerBase
     [SerializeField]
     private GameSpawner gameSpawner;
 
+    private HexPlacementRuleEngine placementRuleEngine;
+
     //game constants
     //public GameConstants CS;
 
@@ -71,6 +73,8 @@ public class HexSpawner : SpawnerBase
         Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info,
             "HexSpawner awake; GameSpawner={0}, grid={1}x{2}",
             gameSpawner?.name ?? "<missing>", grid?.cols ?? 0, grid?.rows ?? 0);
+
+        placementRuleEngine = new HexPlacementRuleEngine(TryGetHexState, isReplaceableLandType);
     }
    
     [Button("Spawn Hexes")]
@@ -405,7 +409,7 @@ public class HexSpawner : SpawnerBase
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
     }
 
-    private bool TryGetHexState(int col, int row, out Hex.HexState hexState)
+    public bool TryGetHexState(int col, int row, out Hex.HexState hexState)
     {
         hexState = null;
         if (state?.hexes == null) return false;
@@ -583,36 +587,22 @@ public class HexSpawner : SpawnerBase
 
     private void RandomizeLand(Hex h, bool isRefresh)
     {
-        int indexToRemove;
-        string randomLand;
+        string randomLand = GameConstants.CAR_TYPE_WORD_NULL;
         int randomNum;
         IEnumerable<GameSpawner.LandConfig> types = new List<GameSpawner.LandConfig>();
-        List<String> typesAll = new List<String>();
+        List<string> typesAll = new List<string>();
         IEnumerable<GameSpawner.NumConfig> nums = new List<GameSpawner.NumConfig>();
-        List<int> numsAll = new List<int>();
+        List<int> numsAll = new();
 
-        //TODO - This works but is a bit complex, consider simplification
-        // if this is a refresh then only "replaceable" lands can be placed
         if (isRefresh)
         {
-            //set the land type and remove the land from the list of available lands
-            //first make sure to find a random land in the same group
-            //TO DO - THIS IS NOT WORKING
-            // YOU NEED TO MAKE SURE THAT THE LANDS ARE NOT ALL USED UP
-
-            types =
-                (from t in landTypes
-                where (
-                (t.landGroupID == h.hexState.GroupID) &&
-                (isReplaceableLandType(t.landType) && (t.landCnt > 0)))
-                select t).ToList();
+            types = landTypes
+                .Where(t => t.landGroupID == h.hexState.GroupID && isReplaceableLandType(t.landType) && t.landCnt > 0)
+                .ToList();
         }
-        else {
-            types =
-                (from t in landTypes
-                 where (
-                 (t.landCnt > 0))
-                 select t).ToList();
+        else
+        {
+            types = landTypes.Where(t => t.landCnt > 0).ToList();
         }
 
         foreach (GameSpawner.LandConfig t in types)
@@ -622,43 +612,50 @@ public class HexSpawner : SpawnerBase
                 typesAll.Add(t.landType);
             }
         }
-        indexToRemove = RandomNumber.Between(0, typesAll.Count() - 1);
 
-        //now having matched on group remove the random land from the list of lands
-        if ((typesAll.Count() > 0))
+        var (selectedHexType, selectionRule, usedCandidate, usedFallback, selectionAttempts) = SelectLandType(h, typesAll);
+        if (string.IsNullOrEmpty(selectedHexType))
         {
-            List<GameSpawner.LandConfig> landRemove =
-                (from lt in types
-                 where(
-                 (lt.landType == typesAll[indexToRemove]))
-                 select lt).ToList();
-            landRemove[0].landCnt = landRemove[0].landCnt - 1;
-            randomLand = typesAll[indexToRemove];
-            //strictly only needed when not refreshing
-            h.hexState.GroupID = landRemove[0].landGroupID;
-        }
-        //if there are no more lands left then make the land a default type
-        else {
-            randomLand = GameConstants.CAR_TYPE_WORD_NULL;
-            h.hexState.GroupID = "1";
-            Debug.Log(string.Format("{0} @ Col: {1} Row: {2} has been assigned a default land as none remain to give to it", h.name, h.hexState.Col, h.hexState.Row));
+            Debug.LogWarning("RandomizeLand: No land candidates available for " + h.name);
         }
 
-        //now finally set the hex type
+        if (usedFallback)
+        {
+            Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Warning,
+                "RandomizeLand falling back to {0} for {1} after {2} attempts ({3})",
+                selectedHexType, h.name, selectionAttempts, selectionRule?.ruleName ?? "<rule>");
+        }
+
+        randomLand = string.IsNullOrEmpty(selectedHexType) ? GameConstants.CAR_TYPE_WORD_NULL : selectedHexType;
+
+        if (usedCandidate || usedFallback)
+        {
+            var landEntry = types.FirstOrDefault(lt => string.Equals(lt.landType, randomLand, StringComparison.OrdinalIgnoreCase));
+            if (landEntry != null)
+            {
+                landEntry.landCnt--;
+                h.hexState.GroupID = landEntry.landGroupID;
+            }
+            else if (usedCandidate)
+            {
+                Debug.LogWarning($"RandomizeLand: missing LandConfig for {randomLand}");
+            }
+        }
+        else
+        {
+            h.hexState.GroupID = h.hexState.GroupID ?? "1";
+        }
+
         h.hexState.HexType = randomLand;
         Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Info,
             "RandomizeLand assigned {0} (group {1}) at {2}_{3}",
             randomLand, h.hexState.GroupID, h.hexState.Col, h.hexState.Row);
-        
-        //update the text associated with the hex
+
         if (isNumberedLandType(h.hexState.HexType))
         {
-            //set the land number and remove the number from the list of available numbers
-            nums =
-                (from n in numTypes
-                where ((n.numGroupID == h.hexState.GroupID) &&
-                (n.numCnt > 0))
-                select n).ToList();
+            nums = numTypes
+                .Where(n => string.Equals(n.numGroupID, h.hexState.GroupID) && n.numCnt > 0)
+                .ToList();
 
             foreach (GameSpawner.NumConfig n in nums)
             {
@@ -667,24 +664,74 @@ public class HexSpawner : SpawnerBase
                     numsAll.Add(n.numType);
                 }
             }
-            indexToRemove = RandomNumber.Between(0, numsAll.Count() - 1);
-            if (numsAll.Count() > 0)
-            {
-                List<GameSpawner.NumConfig> numRemove =
-                    (from nt in nums
-                    where (
-                    (nt.numType == numsAll[indexToRemove]))
-                    select nt).ToList();
-                numRemove[0].numCnt = numRemove[0].numCnt - 1;
-                randomNum = numsAll[indexToRemove];
 
-                h.hexState.HexNum = randomNum;
-                Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Info,
-                    "RandomizeLand picked number {0} for {1}_{2}",
-                    randomNum, h.hexState.Col, h.hexState.Row);
+            if (numsAll.Count > 0)
+            {
+                int indexRemoval = RandomNumber.Between(0, numsAll.Count - 1);
+                List<GameSpawner.NumConfig> numRemove = nums
+                    .Where(nt => nt.numType == numsAll[indexRemoval])
+                    .ToList();
+                if (numRemove.Count > 0)
+                {
+                    numRemove[0].numCnt--;
+                    randomNum = numsAll[indexRemoval];
+
+                    h.hexState.HexNum = randomNum;
+                    Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Info,
+                        "RandomizeLand picked number {0} for {1}_{2}",
+                        randomNum, h.hexState.Col, h.hexState.Row);
+                }
             }
         }
-        else { h.hexState.HexNum = null; }
+        else
+        {
+            h.hexState.HexNum = null;
+        }
+    }
+
+    private (string hexType, HexPlacementRuleConfig rule, bool usedCandidate, bool usedFallback, int attempts) SelectLandType(Hex h, List<string> candidates)
+    {
+        if (candidates == null || candidates.Count == 0)
+        {
+            return (GameConstants.CAR_TYPE_WORD_NULL, null, false, false, 0);
+        }
+
+        var ruleAttempts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        int iteration = 0;
+        int maxIterations = Math.Max(candidates.Count * 2, 80);
+
+        while (iteration < maxIterations)
+        {
+            iteration++;
+            int index = RandomNumber.Between(0, candidates.Count - 1);
+            string candidate = candidates[index];
+            var rule = CS.GetPlacementRule(candidate);
+            if (rule == null)
+            {
+                return (candidate, null, true, false, iteration);
+            }
+
+            if (!ruleAttempts.TryGetValue(candidate, out int attemptCount))
+            {
+                attemptCount = 0;
+            }
+            attemptCount++;
+            ruleAttempts[candidate] = attemptCount;
+
+            if (placementRuleEngine.AllowsPlacement(rule, h))
+            {
+                return (candidate, rule, true, false, attemptCount);
+            }
+
+            if (attemptCount >= Math.Max(rule.maxAttemptsBeforeFallback, 1))
+            {
+                string fallback = string.IsNullOrEmpty(rule.fallbackHexType) ? GameConstants.CAR_TYPE_SEA : rule.fallbackHexType;
+                return (fallback, rule, false, true, attemptCount);
+            }
+        }
+
+        string fallbackType = candidates[iteration % candidates.Count];
+        return (fallbackType, CS.GetPlacementRule(fallbackType), true, false, iteration);
     }
 
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
