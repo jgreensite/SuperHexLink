@@ -384,37 +384,36 @@ public class HexSpawner : SpawnerBase
         else
         {
             bool foundSuitable = false;
-            int r = h.hexState.Rotation/60;
-            var neigh = h.hexState.Neighbours();
-            int inc = 360 / neigh.Count;
 
-            //first check to see if the rotation given is valid
-            if (isOnBoardHex(neigh[r]))
+            var directions = HexExtensions.HexExtensions.Hex.directions;
+            int targetIndex = Mathf.FloorToInt(h.hexState.Rotation / 60f);
+            if (directions.Count > 0)
             {
-                newHexLandModel.transform.Rotate(Vector3.up, h.hexState.Rotation);
-                foundSuitable = true;
-            }
-            //if not set a new rotation based on first valid point
-            r = 0;
-            while ((r < neigh.Count) && (foundSuitable == false))
-            {
-                if (!isOnBoardHex(neigh[r]))
+                targetIndex = ((targetIndex % directions.Count) + directions.Count) % directions.Count;
+                if (HasValidHarbourDirection(h, targetIndex))
                 {
-                    r++;
-                    continue;
-                }
-
-                var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neigh[r]);
-                if (TryGetHexState(o.col, o.row, out var neighborState) &&
-                    isReplaceableLandType(neighborState.HexType))
-                {
-                    newHexLandModel.transform.Rotate(Vector3.up, r * inc);
+                    newHexLandModel.transform.Rotate(Vector3.up, targetIndex * 60);
                     foundSuitable = true;
+                    h.hexState.Rotation = targetIndex * 60;
                 }
-
-                r++;
+                else
+                {
+                    for (int dirIndex = 0; dirIndex < directions.Count && !foundSuitable; dirIndex++)
+                    {
+                        if (HasValidHarbourDirection(h, dirIndex))
+                        {
+                            newHexLandModel.transform.Rotate(Vector3.up, dirIndex * 60);
+                            foundSuitable = true;
+                            h.hexState.Rotation = dirIndex * 60;
+                        }
+                    }
+                }
             }
-            if (foundSuitable == false) { Debug.Log(h.hexState.Col + "_" + h.hexState.Col + " Cannot find a suitable rotation"); }
+
+            if (!foundSuitable)
+            {
+                Debug.Log(h.hexState.Col + "_" + h.hexState.Row + " Cannot find a suitable rotation");
+            }
         }
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
     }
@@ -429,6 +428,32 @@ public class HexSpawner : SpawnerBase
         if (column == null || row >= column.Count) return false;
         hexState = column[row];
         return hexState != null;
+    }
+
+    private bool HasValidHarbourDirection(Hex h, int directionIndex)
+    {
+        if (h == null || h.hexState == null) return false;
+        if (gameSpawner?.State?.hexGridConfig == null) return false;
+
+        var directions = HexExtensions.HexExtensions.Hex.directions;
+        if (directionIndex < 0 || directionIndex >= directions.Count) return false;
+
+        var baseOffset = new HexExtensions.HexExtensions.OffsetCoord(h.hexState.Col, h.hexState.Row);
+        var baseHex = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, baseOffset);
+        var neighborHex = baseHex.Add(directions[directionIndex]);
+        var neighborOffset = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neighborHex);
+
+        if (!gameSpawner.State.hexGridConfig.IsInBounds(neighborOffset.row, neighborOffset.col))
+        {
+            return false;
+        }
+
+        if (TryGetHexState(neighborOffset.col, neighborOffset.row, out var neighborState))
+        {
+            return isReplaceableLandType(neighborState.HexType);
+        }
+
+        return false;
     }
 
     private void CleanUpOldLandChildren(Hex h)
