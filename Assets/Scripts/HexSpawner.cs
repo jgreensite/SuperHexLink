@@ -705,7 +705,7 @@ public class HexSpawner : SpawnerBase
             iteration++;
             int index = RandomNumber.Between(0, candidates.Count - 1);
             string candidate = candidates[index];
-            var rule = CS.GetPlacementRule(candidate);
+            var rule = CS?.GetPlacementRule(candidate);
             if (rule == null)
             {
                 return (candidate, null, true, false, iteration);
@@ -731,7 +731,7 @@ public class HexSpawner : SpawnerBase
         }
 
         string fallbackType = candidates[iteration % candidates.Count];
-        return (fallbackType, CS.GetPlacementRule(fallbackType), true, false, iteration);
+        return (fallbackType, CS?.GetPlacementRule(fallbackType), true, false, iteration);
     }
 
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
