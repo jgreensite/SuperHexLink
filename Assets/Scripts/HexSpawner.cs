@@ -57,6 +57,16 @@ public class HexSpawner : SpawnerBase
 
     private HexPlacementRuleEngine placementRuleEngine;
 
+    private HexPlacementRuleEngine GetPlacementRuleEngine()
+    {
+        if (placementRuleEngine == null)
+        {
+            placementRuleEngine = new HexPlacementRuleEngine(TryGetHexState, isReplaceableLandType);
+        }
+
+        return placementRuleEngine;
+    }
+
     //game constants
     //public GameConstants CS;
 
@@ -718,7 +728,7 @@ public class HexSpawner : SpawnerBase
             attemptCount++;
             ruleAttempts[candidate] = attemptCount;
 
-            if (placementRuleEngine.AllowsPlacement(rule, h))
+            if (GetPlacementRuleEngine().AllowsPlacement(rule, h))
             {
                 return (candidate, rule, true, false, attemptCount);
             }
