@@ -50,7 +50,7 @@ public class HexPlacementRuleEngine
 
         foreach (var direction in hex.hexState.Neighbours())
         {
-            var offset = OffsetCoord.QoffsetFromCube(OffsetCoord.ODD, direction);
+            var offset = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, direction);
             if (stateLookup(offset.col, offset.row, out var neighborState) && isReplaceableLand(neighborState.HexType))
             {
                 return true;
