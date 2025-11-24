@@ -460,9 +460,12 @@ public class HexSpawner : SpawnerBase
 
     private bool IsHarbourFacingNeighbor(string neighborType)
     {
-        // Allow harbours to point at any non-sea neighbour (including other harbours).
-        if (isConfiguredEmpty(neighborType)) return false;
-        return neighborType != GameConstants.CAR_TYPE_SEA;
+        if (CS == null)
+        {
+            return false;
+        }
+
+        return CS.IsHarbourFacingLandType(neighborType);
     }
 
     private void CleanUpOldLandChildren(Hex h)
