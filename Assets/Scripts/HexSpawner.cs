@@ -412,7 +412,9 @@ public class HexSpawner : SpawnerBase
 
             if (!foundSuitable)
             {
-                Debug.Log(h.hexState.Col + "_" + h.hexState.Row + " Cannot find a suitable rotation");
+                float fallbackRotation = Mathf.Repeat(h.hexState.Rotation, 360f);
+                newHexLandModel.transform.Rotate(Vector3.up, fallbackRotation);
+                Debug.Log(h.hexState.Col + "_" + h.hexState.Row + " Cannot find a suitable rotation; using stored rotation " + fallbackRotation);
             }
         }
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
@@ -450,10 +452,17 @@ public class HexSpawner : SpawnerBase
 
         if (TryGetHexState(neighborOffset.col, neighborOffset.row, out var neighborState))
         {
-            return isReplaceableLandType(neighborState.HexType);
+            return IsHarbourFacingNeighbor(neighborState.HexType);
         }
 
         return false;
+    }
+
+    private bool IsHarbourFacingNeighbor(string neighborType)
+    {
+        // Allow harbours to point at any non-sea neighbour (including other harbours).
+        if (isConfiguredEmpty(neighborType)) return false;
+        return neighborType != GameConstants.CAR_TYPE_SEA;
     }
 
     private void CleanUpOldLandChildren(Hex h)
