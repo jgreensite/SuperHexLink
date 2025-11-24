@@ -381,23 +381,40 @@ public class HexSpawner : SpawnerBase
                 foundSuitable = true;
             }
             //if not set a new rotation based on first valid point
-            r = 0;    
+            r = 0;
             while ((r < neigh.Count) && (foundSuitable == false))
             {
+                if (!isOnBoardHex(neigh[r]))
+                {
+                    r++;
+                    continue;
+                }
+
                 var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neigh[r]);
-                if (isOnBoardHex(neigh[r]))
-                    {
-                        if (isReplaceableLandType(state.hexes[o.col][o.row].HexType))
-                        {
-                            newHexLandModel.transform.Rotate(Vector3.up, r * inc);
-                        foundSuitable = true;
-                        }
-                    }
+                if (TryGetHexState(o.col, o.row, out var neighborState) &&
+                    isReplaceableLandType(neighborState.HexType))
+                {
+                    newHexLandModel.transform.Rotate(Vector3.up, r * inc);
+                    foundSuitable = true;
+                }
+
                 r++;
             }
             if (foundSuitable == false) { Debug.Log(h.hexState.Col + "_" + h.hexState.Col + " Cannot find a suitable rotation"); }
         }
         newHexLandModel.gameObject.layer = LayerMask.NameToLayer(GameConstants.OBJ_LOCATION_LAYER_GAMEMODEL);
+    }
+
+    private bool TryGetHexState(int col, int row, out Hex.HexState hexState)
+    {
+        hexState = null;
+        if (state?.hexes == null) return false;
+        if (col < 0 || row < 0) return false;
+        if (col >= state.hexes.Count) return false;
+        var column = state.hexes[col];
+        if (column == null || row >= column.Count) return false;
+        hexState = column[row];
+        return hexState != null;
     }
 
     private void CleanUpOldLandChildren(Hex h)
