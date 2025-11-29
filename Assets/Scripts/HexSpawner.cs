@@ -55,6 +55,8 @@ public class HexSpawner : SpawnerBase
     [SerializeField]
     private GameSpawner gameSpawner;
 
+    public HexGridConfig? GridConfig => gameSpawner?.State?.hexGridConfig;
+
     private HexPlacementRuleEngine placementRuleEngine;
 
     private HexPlacementRuleEngine GetPlacementRuleEngine()
@@ -72,6 +74,7 @@ public class HexSpawner : SpawnerBase
 
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.LandConfig> landTypes = new();
     [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<GameSpawner.NumConfig> numTypes = new();
+    private List<GameSpawner.LandConfig> harbourConfigs = new();
 
     private void Awake()
     {
@@ -206,6 +209,10 @@ public class HexSpawner : SpawnerBase
                 SetLand(newHex);
             }
         }
+        if (!isRefresh)
+        {
+            RunReplacementPipeline();
+        }
     }
 
     private void BuildTypes()
@@ -213,8 +220,30 @@ public class HexSpawner : SpawnerBase
         landTypes.Clear();
         landTypes = gameSpawner.State.landConfigs.Clone();
 
+        harbourConfigs = landTypes
+            .Where(cfg => string.Equals(cfg.landType, GameConstants.CAR_TYPE_HARBOUR, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        landTypes.RemoveAll(cfg => string.Equals(cfg.landType, GameConstants.CAR_TYPE_HARBOUR, StringComparison.OrdinalIgnoreCase));
+
         numTypes.Clear();
         numTypes = gameSpawner.State.numConfigs.Clone();
+    }
+
+    private int GetHarbourReplacementTarget()
+    {
+        return harbourConfigs?.Sum(cfg => Math.Max(cfg?.landCnt ?? 0, 0)) ?? 0;
+    }
+
+    private void RunReplacementPipeline()
+    {
+        if (CS == null || gameSpawner == null) return;
+        int targetHarbours = GetHarbourReplacementTarget();
+        if (targetHarbours <= 0) return;
+
+        var context = new HexReplacementContext(this, actionLogSettings);
+        var pipeline = new HexReplacementPipeline();
+        pipeline.AddRule(new HarbourReplacementRule(CS, CS.GetPlacementRule(GameConstants.CAR_TYPE_HARBOUR), targetHarbours));
+        pipeline.Run(context);
     }
 
     [Button("Update Hexes")]
@@ -275,6 +304,17 @@ public class HexSpawner : SpawnerBase
         Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Info,
             "Camera target position ({0}, {1}, {2})", x_mid, y_mid, z_mid);
         Camera.allCameras[0].transform.position = new Vector3(x_mid, y_mid, z_mid);
+    }
+
+    public void RefreshHex(Hex hex)
+    {
+        if (hex == null)
+        {
+            return;
+        }
+
+        CleanUpOldLandChildren(hex);
+        SetLand(hex);
     }
 
     private void SetLand(Hex h)

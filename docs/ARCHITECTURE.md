@@ -75,6 +75,13 @@ This document describes the technical architecture and design decisions for Supe
 **Current Issues**: Mixed responsibilities
 **Planned**: Split into HexFactory, HexRegistry, SelectionManager
 
+### Harbour Replacement Pipeline
+- Executed immediately after initial board generation to convert spare sea tiles into configured harbour counts.
+- Candidates are derived from a snapshot of the current board and only allow harbours whose rotation faces one of the `GameConstants.harbourFacingLandTypes` entries.
+- Orientation validation reruns after each pass so harbours that lose valid land neighbors revert back to sea and can be retried, which keeps replacement outcomes deterministic even when fallback attempts fire.
+- `HexSpawner.RefreshHex(Hex)` is called whenever the pipeline changes a hex so the mesh/material/model combination is re-rendered without rebuilding the entire board.
+- Unit tests exercise `HarbourBoardSnapshot` to ensure harbour direction lookups, updates, and tracking remain consistent.
+
 ### Hex (MonoBehaviour)
 - Runtime hex representation
 - Visual state management
