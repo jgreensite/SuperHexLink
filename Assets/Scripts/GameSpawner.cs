@@ -173,42 +173,61 @@ public class GameSpawner : SpawnerBase
         }
 
         byte[] bytes = File.ReadAllBytes(targetMapPath);
-
-        // Check for legacy format (old files have "HexSpawnerState" as root, new have "CombinedSpawnerState")
-        string jsonPreview = System.Text.Encoding.UTF8.GetString(bytes, 0, Math.Min(bytes.Length, 500));
-        if (jsonPreview.Contains("\"$type\": \"HexSpawnerState") || jsonPreview.Contains("\"$type\": \"0|HexSpawnerState"))
-        {
-            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
-                "LoadState failed: File {0} uses legacy format (HexSpawnerState). Please re-save using the current version.",
-                targetMapPath);
-            return;
-        }
+        string jsonContent = System.Text.Encoding.UTF8.GetString(bytes);
 
         CombinedSpawnerState spawnerStates;
-        try
-        {
-            spawnerStates = SirenixSerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
-        }
-        catch (Exception ex)
-        {
-            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
-                "LoadState failed to deserialize {0}: {1}", targetMapPath, ex.Message);
-            return;
-        }
 
-        if (spawnerStates == null)
+        // Check for legacy format and attempt conversion
+        if (LegacyMapConverter.IsLegacyFormat(jsonContent))
         {
-            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "LoadState could not deserialize state from {0}", targetMapPath);
-            return;
-        }
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
+                "LoadState detected legacy format in {0}, attempting conversion...", targetMapPath);
 
-        // Validate that hex state has usable data
-        if (spawnerStates.HexState?.hexes == null)
+            var conversionResult = LegacyMapConverter.TryConvertLegacyJson(jsonContent);
+            if (!conversionResult.Success)
+            {
+                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                    "LoadState failed to convert legacy file {0}: {1}", targetMapPath, conversionResult.ErrorMessage);
+                return;
+            }
+
+            spawnerStates = conversionResult.ConvertedState;
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info,
+                "Legacy conversion: {0}", conversionResult.Report.ToString());
+
+            foreach (var warning in conversionResult.Report.Warnings)
+            {
+                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "Legacy conversion warning: {0}", warning);
+            }
+        }
+        else
         {
-            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
-                "LoadState failed: File {0} has no valid hex data. The file may be corrupted or in an incompatible format.",
-                targetMapPath);
-            return;
+            // Normal deserialization for current format
+            try
+            {
+                spawnerStates = SirenixSerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
+            }
+            catch (Exception ex)
+            {
+                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                    "LoadState failed to deserialize {0}: {1}", targetMapPath, ex.Message);
+                return;
+            }
+
+            if (spawnerStates == null)
+            {
+                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "LoadState could not deserialize state from {0}", targetMapPath);
+                return;
+            }
+
+            // Validate that hex state has usable data
+            if (spawnerStates.HexState?.hexes == null)
+            {
+                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                    "LoadState failed: File {0} has no valid hex data. The file may be corrupted or in an incompatible format.",
+                    targetMapPath);
+                return;
+            }
         }
 
         State = spawnerStates.GameState ?? new GameSpawnerState();
