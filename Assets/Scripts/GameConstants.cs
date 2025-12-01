@@ -250,6 +250,7 @@ public class GameConstants : ScriptableObject
         EnsurePlacementRules();
         EnsureHarbourFacingLandTypes();
     }
+
     private void Start()
     {
 
@@ -267,39 +268,6 @@ public class GameConstants : ScriptableObject
             hexPlacementRules.Add(new HexPlacementRuleConfig
             {
                 ruleName = "HarbourAdjacency",
-
-        private void EnsureHarbourFacingLandTypes()
-        {
-            if (harbourFacingLandTypes == null)
-            {
-                harbourFacingLandTypes = new List<string>();
-            }
-
-            if (harbourFacingLandTypes.Count == 0)
-            {
-                harbourFacingLandTypes.AddRange(new[]
-                {
-                    CAR_TYPE_FOREST,
-                    CAR_TYPE_PASTURE,
-                    CAR_TYPE_FIELD,
-                    CAR_TYPE_HILL,
-                    CAR_TYPE_MOUNTAIN,
-                    CAR_TYPE_MINE,
-                    CAR_TYPE_GOLD,
-                    CAR_TYPE_DESERT
-                });
-            }
-        }
-
-        public bool IsHarbourFacingLandType(string hexType)
-        {
-            if (string.IsNullOrEmpty(hexType))
-            {
-                return false;
-            }
-
-            return harbourFacingLandTypes?.Contains(hexType) ?? false;
-        }
                 applicableHexTypes = new List<string> {CAR_TYPE_HARBOUR},
                 fallbackHexType = CAR_TYPE_SEA,
                 maxAttemptsBeforeFallback = 30,
@@ -308,7 +276,33 @@ public class GameConstants : ScriptableObject
         }
     }
 
+    private void EnsureHarbourFacingLandTypes()
+    {
+        if (harbourFacingLandTypes == null)
+        {
+            harbourFacingLandTypes = new List<string>();
+        }
 
+        if (harbourFacingLandTypes.Count == 0)
+        {
+            harbourFacingLandTypes.AddRange(new[]
+            {
+                CAR_TYPE_FOREST,
+                CAR_TYPE_PASTURE,
+                CAR_TYPE_FIELD,
+                CAR_TYPE_HILL,
+                CAR_TYPE_MOUNTAIN,
+                CAR_TYPE_MINE,
+                CAR_TYPE_GOLD,
+                CAR_TYPE_DESERT
+            });
+        }
+    }
+
+    public bool IsHarbourFacingLandType(string hexType)
+    {
+        return !string.IsNullOrEmpty(hexType) && (harbourFacingLandTypes?.Contains(hexType) ?? false);
+    }
 }
 
 public enum HexPlacementRuleType

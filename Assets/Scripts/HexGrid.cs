@@ -10,6 +10,14 @@ public struct HexGridConfig
     [ShowInInspector, ReadOnly] public readonly int maxRow => rows - 1;
     public int radius;
     public float height;
+
+    public static HexGridConfig CreateDefault() => new HexGridConfig
+    {
+        cols = 7,
+        rows = 7,
+        radius = 1,
+        height = 1
+    };
     [SerializeField, MinMaxSlider(-64, 64, true)] private Vector2 hexHeightVariance;
     [ShowInInspector, ReadOnly] public readonly float minHeight => hexHeightVariance.x;
     [ShowInInspector, ReadOnly] public readonly float maxHeight => hexHeightVariance.y;

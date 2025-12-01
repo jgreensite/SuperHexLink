@@ -100,6 +100,16 @@ public class HexSpawner : SpawnerBase
     // "odd-q" vertical layout shoves odd columns down
     // see https://www.redblobgames.com/grids/hexagons/ for more information
     {
+    // Ensure we have a valid grid config before proceeding
+    if (gameSpawner?.State?.hexGridConfig.cols <= 0 || gameSpawner?.State?.hexGridConfig.rows <= 0)
+    {
+        Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Warning,
+            "BuildMe aborted: Invalid grid config (cols={0}, rows={1}). Configure hexGridConfig in GameSpawner.",
+            gameSpawner?.State?.hexGridConfig.cols ?? 0,
+            gameSpawner?.State?.hexGridConfig.rows ?? 0);
+        return;
+    }
+
     // Build the list of available lands and numbers we can choose from
     BuildTypes();
 
@@ -873,9 +883,16 @@ public class HexSpawner : SpawnerBase
         return (0, 0);
     }
 
+    public HexStateRepairReport RepairLoadedState(HexGridConfig gridConfig, HexSpawnerState loadedState, GameConstants constants)
+    {
+        return HexStateRepairer.Repair(loadedState, gridConfig, constants);
+    }
+
     [Serializable]
     public class HexSpawnerState
     {
-        [TableList(ShowIndexLabels = true)] [OdinSerialize] public List<List<Hex.HexState>> hexes = new List<List<Hex.HexState>>();
+        [TableList(ShowIndexLabels = true)]
+        [OdinSerialize]
+        public List<List<Hex.HexState>> hexes = new();
     }
 }

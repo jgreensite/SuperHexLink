@@ -226,19 +226,51 @@ public class HarbourBoardSnapshot
         return new HarbourBoardSnapshot(gridConfig, cells);
     }
 
+    public static HarbourBoardSnapshot FromState(HexGridConfig gridConfig, HexSpawner.HexSpawnerState state)
+    {
+        List<(int Col, int Row, string HexType)> cells = new();
+        if (state?.hexes != null)
+        {
+            for (int col = 0; col < state.hexes.Count; col++)
+            {
+                List<Hex.HexState> column = state.hexes[col];
+                if (column == null)
+                {
+                    continue;
+                }
+
+                for (int row = 0; row < column.Count; row++)
+                {
+                    Hex.HexState hex = column[row];
+                    if (hex == null)
+                    {
+                        continue;
+                    }
+
+                    cells.Add((hex.Col, hex.Row, hex.HexType ?? GameConstants.CAR_TYPE_WORD_NULL));
+                }
+            }
+        }
+
+        return new HarbourBoardSnapshot(gridConfig, cells);
+    }
+
     public bool TryGetHarbourFacingDirection(int col, int row, GameConstants constants, out int directionIndex)
     {
-        if (constants == null) throw new ArgumentNullException(nameof(constants));
+        if (constants == null)
+        {
+            throw new ArgumentNullException(nameof(constants));
+        }
         directionIndex = -1;
 
-        if (!TryGetNeighboringDirections(col, row, out var directions))
+        if (!TryGetNeighboringDirections(col, row, out List<(int DirectionIndex, (int Col, int Row) Coordinates)> directions))
         {
             return false;
         }
 
-        foreach (var (dirIndex, neighbor) in directions)
+        foreach ((int dirIndex, (int Col, int Row) neighbor) in directions)
         {
-            if (!TryGetCellType(neighbor.Col, neighbor.Row, out var neighborType))
+            if (!TryGetCellType(neighbor.Col, neighbor.Row, out string neighborType))
             {
                 continue;
             }
@@ -267,7 +299,7 @@ public class HarbourBoardSnapshot
 
     public IEnumerable<(int Col, int Row)> GetHarbourPositions()
     {
-        foreach (var kvp in cells)
+        foreach (KeyValuePair<(int Col, int Row), string> kvp in cells)
         {
             if (string.Equals(kvp.Value, GameConstants.CAR_TYPE_HARBOUR, StringComparison.OrdinalIgnoreCase))
             {
@@ -279,13 +311,13 @@ public class HarbourBoardSnapshot
     private bool TryGetNeighboringDirections(int col, int row, out List<(int DirectionIndex, (int Col, int Row) Coordinates)> result)
     {
         result = new List<(int, (int, int))>();
-        var directions = HexExtensions.HexExtensions.Hex.directions;
-        for (var dirIndex = 0; dirIndex < directions.Count; dirIndex++)
+        List<HexExtensions.HexExtensions.Hex> directions = HexExtensions.HexExtensions.Hex.directions;
+        for (int dirIndex = 0; dirIndex < directions.Count; dirIndex++)
         {
-            var baseOffset = new HexExtensions.HexExtensions.OffsetCoord(col, row);
-            var baseHex = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, baseOffset);
-            var neighborHex = baseHex.Add(directions[dirIndex]);
-            var neighborOffset = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neighborHex);
+            HexExtensions.HexExtensions.OffsetCoord baseOffset = new(col, row);
+            HexExtensions.HexExtensions.Hex baseHex = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, baseOffset);
+            HexExtensions.HexExtensions.Hex neighborHex = baseHex.Add(directions[dirIndex]);
+            HexExtensions.HexExtensions.OffsetCoord neighborOffset = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neighborHex);
 
             if (!gridConfig.IsInBounds(neighborOffset.row, neighborOffset.col))
             {
