@@ -20,7 +20,14 @@ public class MapValidationWindow : EditorWindow
     private bool _showWarnings = true;
     private bool _showInfo = false;
     private bool _showAutoFixableOnly = false;
+    private bool _groupByFixType = true;
     private ValidationCategory? _filterCategory = null;
+    
+    // Group fold states
+    private bool _foldAutoFix = true;
+    private bool _foldSaveReload = true;
+    private bool _foldManualEdit = true;
+    private bool _foldNoFix = true;
     
     // Selection
     private ValidationIssue _selectedIssue;
@@ -135,6 +142,9 @@ public class MapValidationWindow : EditorWindow
             _showErrors = GUILayout.Toggle(_showErrors, $"Errors", EditorStyles.toolbarButton, GUILayout.Width(60));
             _showWarnings = GUILayout.Toggle(_showWarnings, $"Warnings", EditorStyles.toolbarButton, GUILayout.Width(70));
             _showInfo = GUILayout.Toggle(_showInfo, $"Info", EditorStyles.toolbarButton, GUILayout.Width(50));
+            
+            GUILayout.Space(5);
+            _groupByFixType = GUILayout.Toggle(_groupByFixType, "Group", EditorStyles.toolbarButton, GUILayout.Width(50));
             
             GUILayout.FlexibleSpace();
             
@@ -354,12 +364,199 @@ public class MapValidationWindow : EditorWindow
 
         _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
         
-        foreach (var issue in filteredIssues)
+        if (_groupByFixType)
         {
-            DrawIssueRow(issue);
+            DrawGroupedIssues(filteredIssues);
+        }
+        else
+        {
+            foreach (var issue in filteredIssues)
+            {
+                DrawIssueRow(issue);
+            }
         }
         
         EditorGUILayout.EndScrollView();
+    }
+
+    private void DrawGroupedIssues(List<ValidationIssue> issues)
+    {
+        // Group by fix type
+        var autoFixIssues = issues.Where(i => i.FixType == FixType.AutoFix).ToList();
+        var saveReloadIssues = issues.Where(i => i.FixType == FixType.SaveAndReload).ToList();
+        var manualEditIssues = issues.Where(i => i.FixType == FixType.ManualEdit).ToList();
+        var noFixIssues = issues.Where(i => i.FixType == FixType.None).ToList();
+        
+        // Further group auto-fix issues by field name for batch operations
+        var autoFixByField = autoFixIssues.GroupBy(i => i.FieldName ?? "Unknown").ToList();
+        
+        // Auto-Fix Group
+        if (autoFixIssues.Count > 0)
+        {
+            DrawIssueGroup(
+                ref _foldAutoFix, 
+                $"🔧 Auto-Fixable ({autoFixIssues.Count})", 
+                autoFixIssues, 
+                new Color(0.3f, 0.8f, 0.3f, 0.3f),
+                () => ApplyFixesToGroup(autoFixIssues),
+                autoFixByField
+            );
+        }
+        
+        // Save & Reload Group
+        if (saveReloadIssues.Count > 0)
+        {
+            DrawIssueGroup(
+                ref _foldSaveReload, 
+                $"💾 Fixed by Save & Reload ({saveReloadIssues.Count})", 
+                saveReloadIssues, 
+                new Color(0.3f, 0.5f, 0.9f, 0.3f),
+                () => {
+                    if (_gameSpawner != null)
+                    {
+                        _gameSpawner.SaveToConfiguredPath();
+                        _gameSpawner.LoadFromConfiguredPath();
+                        RunValidation();
+                    }
+                }
+            );
+        }
+        
+        // Manual Edit Group
+        if (manualEditIssues.Count > 0)
+        {
+            DrawIssueGroup(
+                ref _foldManualEdit, 
+                $"✏️ Manual Edit Required ({manualEditIssues.Count})", 
+                manualEditIssues, 
+                new Color(0.9f, 0.7f, 0.3f, 0.3f)
+            );
+        }
+        
+        // No Fix Group
+        if (noFixIssues.Count > 0)
+        {
+            DrawIssueGroup(
+                ref _foldNoFix, 
+                $"ℹ️ Informational ({noFixIssues.Count})", 
+                noFixIssues, 
+                new Color(0.5f, 0.5f, 0.5f, 0.3f)
+            );
+        }
+    }
+
+    private void DrawIssueGroup(
+        ref bool foldout, 
+        string title, 
+        List<ValidationIssue> issues, 
+        Color bgColor,
+        Action fixAllAction = null,
+        List<IGrouping<string, ValidationIssue>> subGroups = null)
+    {
+        var oldBg = GUI.backgroundColor;
+        GUI.backgroundColor = bgColor;
+        
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            GUI.backgroundColor = oldBg;
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                foldout = EditorGUILayout.Foldout(foldout, title, true, EditorStyles.foldoutHeader);
+                
+                GUILayout.FlexibleSpace();
+                
+                if (fixAllAction != null)
+                {
+                    if (GUILayout.Button($"Fix All ({issues.Count})", EditorStyles.miniButton, GUILayout.Width(80)))
+                    {
+                        fixAllAction();
+                    }
+                }
+            }
+            
+            if (foldout)
+            {
+                // Draw sub-groups if provided (for auto-fix by field type)
+                if (subGroups != null && subGroups.Count > 1)
+                {
+                    foreach (var subGroup in subGroups)
+                    {
+                        DrawSubGroup(subGroup.Key, subGroup.ToList());
+                    }
+                }
+                else
+                {
+                    // Draw issues directly
+                    foreach (var issue in issues)
+                    {
+                        DrawIssueRow(issue);
+                    }
+                }
+            }
+        }
+        
+        EditorGUILayout.Space(2);
+    }
+
+    private void DrawSubGroup(string fieldName, List<ValidationIssue> issues)
+    {
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            GUILayout.Space(15);
+            
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField($"  {GetFieldDisplayName(fieldName)} ({issues.Count})", EditorStyles.boldLabel);
+                    
+                    GUILayout.FlexibleSpace();
+                    
+                    if (GUILayout.Button($"Fix All", EditorStyles.miniButton, GUILayout.Width(60)))
+                    {
+                        ApplyFixesToGroup(issues);
+                    }
+                }
+                
+                foreach (var issue in issues)
+                {
+                    DrawIssueRow(issue);
+                }
+            }
+        }
+    }
+
+    private string GetFieldDisplayName(string fieldName)
+    {
+        return fieldName switch
+        {
+            "GroupID" => "Empty GroupID → '1'",
+            "Rotation" => "Invalid Rotation",
+            "HexNum" => "Number Token Issues",
+            "HexType" => "Land Type Issues",
+            _ => fieldName
+        };
+    }
+
+    private void ApplyFixesToGroup(List<ValidationIssue> issues)
+    {
+        if (_hexSpawner == null) return;
+        
+        int fixedCount = 0;
+        foreach (var issue in issues.Where(i => i.CanAutoFix))
+        {
+            if (ApplyFix(issue))
+            {
+                fixedCount++;
+            }
+        }
+        
+        if (fixedCount > 0)
+        {
+            Debug.Log($"Applied {fixedCount} fixes. Re-validating...");
+            RunValidation();
+        }
     }
 
     private void DrawIssueRow(ValidationIssue issue)
