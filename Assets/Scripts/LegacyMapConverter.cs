@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -77,49 +78,62 @@ public static class LegacyMapConverter
                 result.Report.GridRows = 7;
             }
 
-            // Create the converted state
-            var gameState = new GameSpawner.GameSpawnerState();
-            gameState.hexGridConfig = new HexGridConfig
-            {
-                cols = result.Report.GridCols,
-                rows = result.Report.GridRows,
-                radius = 1,
-                height = 1
-            };
+            // Parse hex states - match entire state blocks and extract fields individually
+            // This handles various formats: "HexSubType": "value", "HexSubType": null, etc.
+            var stateBlockPattern = new Regex(@"""state"":\s*\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}", RegexOptions.Singleline);
+            var stateMatches = stateBlockPattern.Matches(jsonContent);
 
-            var hexState = new HexSpawner.HexSpawnerState
-            {
-                hexes = new List<List<Hex.HexState>>()
-            };
-
-            // Parse hex states from the nested structure
-            // Pattern: "state": { ... "HexType": "xxx", "HexSubType": "xxx", "Rotation": N, ... }
-            var hexStatePattern = new Regex(
-                @"""state"":\s*\{[^{}]*?" +
-                @"""HexType"":\s*""([^""]*)""\s*," +
-                @"[^{}]*?""HexSubType"":\s*""([^""]*)""\s*," +
-                @"[^{}]*?""Rotation"":\s*(\d+)",
-                RegexOptions.Singleline);
-
-            var matches = hexStatePattern.Matches(jsonContent);
-
-            // Organize into grid based on expected dimensions
-            int totalExpected = result.Report.GridCols * result.Report.GridRows;
             var flatHexes = new List<Hex.HexState>();
+            bool anyHexHasColRow = false;
 
-            foreach (Match match in matches)
+            foreach (Match stateMatch in stateMatches)
             {
+                string stateContent = stateMatch.Groups[1].Value;
+
+                // Extract HexType (required)
+                var hexTypeMatch = Regex.Match(stateContent, @"""HexType"":\s*""([^""]*)""", RegexOptions.IgnoreCase);
+                string hexType = hexTypeMatch.Success ? hexTypeMatch.Groups[1].Value : "";
+
+                // Extract HexSubType (can be string or null)
+                var hexSubTypeMatch = Regex.Match(stateContent, @"""HexSubType"":\s*(?:""([^""]*)""|null)", RegexOptions.IgnoreCase);
+                string hexSubType = hexSubTypeMatch.Success ? (hexSubTypeMatch.Groups[1].Value ?? "") : "";
+
+                // Extract Rotation
+                var rotationMatch = Regex.Match(stateContent, @"""Rotation"":\s*(\d+)", RegexOptions.IgnoreCase);
+                int rotation = rotationMatch.Success ? int.Parse(rotationMatch.Groups[1].Value) : 0;
+
+                // Extract col/row if present (some formats have lowercase)
+                var colMatch = Regex.Match(stateContent, @"""col"":\s*(\d+)", RegexOptions.IgnoreCase);
+                var rowMatch = Regex.Match(stateContent, @"""row"":\s*(\d+)", RegexOptions.IgnoreCase);
+                int? col = colMatch.Success ? int.Parse(colMatch.Groups[1].Value) : (int?)null;
+                int? row = rowMatch.Success ? int.Parse(rowMatch.Groups[1].Value) : (int?)null;
+                
+                // Track whether ANY hex has col/row data in file (not just non-zero values)
+                if (colMatch.Success && rowMatch.Success)
+                {
+                    anyHexHasColRow = true;
+                }
+
                 var hexData = new Hex.HexState
                 {
-                    HexType = match.Groups[1].Value,
-                    HexSubType = match.Groups[2].Value,
-                    Rotation = int.Parse(match.Groups[3].Value)
+                    HexType = hexType,
+                    HexSubType = hexSubType,
+                    Rotation = rotation,
+                    Col = col ?? 0,
+                    Row = row ?? 0
                 };
 
-                // Normalize "null" string to sea
-                if (string.Equals(hexData.HexType, "null", StringComparison.OrdinalIgnoreCase) ||
-                    string.IsNullOrWhiteSpace(hexData.HexType))
+                // Track if we didn't find col/row in file
+                if (!col.HasValue || !row.HasValue)
                 {
+                    result.Report.HexesMissingCoords++;
+                }
+
+                // Only normalize truly empty/missing types to sea
+                // Keep "null" as-is since it represents intentional empty/off-board hexes
+                if (string.IsNullOrWhiteSpace(hexData.HexType))
+                {
+                    UnityEngine.Debug.Log($"LegacyMapConverter: Converting empty HexType to 'sea'");
                     hexData.HexType = GameConstants.CAR_TYPE_SEA;
                     result.Report.HexesMissingType++;
                 }
@@ -136,35 +150,89 @@ public static class LegacyMapConverter
                 result.Report.HexesConverted++;
             }
 
-            // Organize into 2D grid (column-major as expected by current format)
-            for (int col = 0; col < result.Report.GridCols; col++)
+            // Create the hex state structure
+            var hexState = new HexSpawner.HexSpawnerState
             {
-                var column = new List<Hex.HexState>();
-                for (int row = 0; row < result.Report.GridRows; row++)
+                hexes = new List<List<Hex.HexState>>()
+            };
+
+            // Use col/row data if the file contained those fields (even if values are 0)
+            bool hasColRowData = anyHexHasColRow;
+
+            if (hasColRowData)
+            {
+                // Organize by col/row from the data itself
+                var hexesByCol = flatHexes.GroupBy(h => h.Col).OrderBy(g => g.Key);
+                foreach (var colGroup in hexesByCol)
                 {
-                    int flatIndex = col * result.Report.GridRows + row;
-                    if (flatIndex < flatHexes.Count)
-                    {
-                        var hex = flatHexes[flatIndex];
-                        hex.Col = col;
-                        hex.Row = row;
-                        column.Add(hex);
-                    }
-                    else
-                    {
-                        // Fill missing with default sea hex
-                        column.Add(new Hex.HexState
-                        {
-                            Col = col,
-                            Row = row,
-                            HexType = GameConstants.CAR_TYPE_SEA,
-                            HexSubType = "",
-                            Rotation = 0
-                        });
-                        result.Report.HexesMissingCoords++;
-                    }
+                    var column = colGroup.OrderBy(h => h.Row).ToList();
+                    hexState.hexes.Add(column);
                 }
-                hexState.hexes.Add(column);
+
+                // Update grid dimensions based on actual data
+                if (hexState.hexes.Count > 0)
+                {
+                    result.Report.GridCols = hexState.hexes.Count;
+                    result.Report.GridRows = hexState.hexes.Max(c => c.Count);
+                }
+            }
+            else
+            {
+                // Organize into 2D grid based on position in array (column-major)
+                for (int c = 0; c < result.Report.GridCols; c++)
+                {
+                    var column = new List<Hex.HexState>();
+                    for (int r = 0; r < result.Report.GridRows; r++)
+                    {
+                        int flatIndex = c * result.Report.GridRows + r;
+                        if (flatIndex < flatHexes.Count)
+                        {
+                            var hex = flatHexes[flatIndex];
+                            hex.Col = c;
+                            hex.Row = r;
+                            column.Add(hex);
+                        }
+                        else
+                        {
+                            // Fill missing with default sea hex
+                            column.Add(new Hex.HexState
+                            {
+                                Col = c,
+                                Row = r,
+                                HexType = GameConstants.CAR_TYPE_SEA,
+                                HexSubType = "",
+                                Rotation = 0
+                            });
+                        }
+                    }
+                    hexState.hexes.Add(column);
+                }
+            }
+
+            // Create game state with grid config
+            var gameState = new GameSpawner.GameSpawnerState();
+            gameState.hexGridConfig = new HexGridConfig
+            {
+                cols = result.Report.GridCols,
+                rows = result.Report.GridRows,
+                radius = 1,
+                height = 1
+            };
+
+            // Parse landConfigs from legacy format
+            gameState.landConfigs = ParseLegacyLandConfigs(jsonContent);
+            if (gameState.landConfigs == null || gameState.landConfigs.Count == 0)
+            {
+                result.Report.Warnings.Add("No landConfigs found in legacy file, using defaults");
+                gameState.landConfigs = GameSpawner.GameSpawnerState.CreateDefaultLandConfigs();
+            }
+
+            // Parse numConfigs from legacy format
+            gameState.numConfigs = ParseLegacyNumConfigs(jsonContent);
+            if (gameState.numConfigs == null || gameState.numConfigs.Count == 0)
+            {
+                result.Report.Warnings.Add("No numConfigs found in legacy file, using defaults");
+                gameState.numConfigs = GameSpawner.GameSpawnerState.CreateDefaultNumConfigs();
             }
 
             // Build final state
@@ -183,6 +251,7 @@ public static class LegacyMapConverter
                 return result;
             }
 
+            int totalExpected = result.Report.GridCols * result.Report.GridRows;
             if (result.Report.HexesConverted != totalExpected)
             {
                 result.Report.Warnings.Add($"Found {result.Report.HexesConverted} hexes but expected {totalExpected} for {result.Report.GridCols}x{result.Report.GridRows} grid");
@@ -207,8 +276,125 @@ public static class LegacyMapConverter
         if (string.IsNullOrWhiteSpace(jsonContent))
             return false;
 
-        // Legacy format has HexSpawnerState as root type
+        // Legacy format has HexSpawnerState as root type (with or without type ID prefix)
         return jsonContent.Contains("\"$type\": \"HexSpawnerState") ||
                jsonContent.Contains("\"$type\": \"0|HexSpawnerState");
+    }
+
+    /// <summary>
+    /// Parses landConfigs from legacy JSON format.
+    /// </summary>
+    private static List<GameSpawner.LandConfig> ParseLegacyLandConfigs(string jsonContent)
+    {
+        var configs = new List<GameSpawner.LandConfig>();
+
+        try
+        {
+            // Find the landConfigs section and extract entries
+            // Pattern matches: "landGroupID": "1", "landCnt": 5, "landType": "hill"
+            var landConfigPattern = new Regex(
+                @"\{\s*" +
+                @"(?:[^{}]*""landGroupID"":\s*""([^""]*)"")?" +
+                @"[^{}]*""landCnt"":\s*(\d+)" +
+                @"[^{}]*""landType"":\s*""([^""]*)""" +
+                @"[^{}]*\}",
+                RegexOptions.Singleline);
+
+            // Also try alternate field order
+            var landConfigPatternAlt = new Regex(
+                @"\{\s*" +
+                @"[^{}]*""landType"":\s*""([^""]*)""" +
+                @"[^{}]*""landCnt"":\s*(\d+)" +
+                @"(?:[^{}]*""landGroupID"":\s*""([^""]*)"")?" +
+                @"[^{}]*\}",
+                RegexOptions.Singleline);
+
+            // Find the landConfigs array section
+            var landConfigsSection = Regex.Match(jsonContent, @"""landConfigs"":\s*\{[^}]*""\$rcontent"":\s*\[(.*?)\]\s*\}", RegexOptions.Singleline);
+            if (landConfigsSection.Success)
+            {
+                string content = landConfigsSection.Groups[1].Value;
+
+                var matches = landConfigPattern.Matches(content);
+                foreach (Match match in matches)
+                {
+                    configs.Add(new GameSpawner.LandConfig
+                    {
+                        landGroupID = string.IsNullOrEmpty(match.Groups[1].Value) ? "1" : match.Groups[1].Value,
+                        landCnt = int.Parse(match.Groups[2].Value),
+                        landType = match.Groups[3].Value
+                    });
+                }
+
+                // If no matches, try alternate pattern
+                if (configs.Count == 0)
+                {
+                    matches = landConfigPatternAlt.Matches(content);
+                    foreach (Match match in matches)
+                    {
+                        configs.Add(new GameSpawner.LandConfig
+                        {
+                            landType = match.Groups[1].Value,
+                            landCnt = int.Parse(match.Groups[2].Value),
+                            landGroupID = string.IsNullOrEmpty(match.Groups[3].Value) ? "1" : match.Groups[3].Value
+                        });
+                    }
+                }
+            }
+
+            UnityEngine.Debug.Log($"LegacyMapConverter: Parsed {configs.Count} landConfigs");
+        }
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.LogWarning($"LegacyMapConverter: Failed to parse landConfigs: {ex.Message}");
+        }
+
+        return configs;
+    }
+
+    /// <summary>
+    /// Parses numConfigs from legacy JSON format.
+    /// </summary>
+    private static List<GameSpawner.NumConfig> ParseLegacyNumConfigs(string jsonContent)
+    {
+        var configs = new List<GameSpawner.NumConfig>();
+
+        try
+        {
+            // Find the numConfigs array section
+            var numConfigsSection = Regex.Match(jsonContent, @"""numConfigs"":\s*\{[^}]*""\$rcontent"":\s*\[(.*?)\]\s*\}", RegexOptions.Singleline);
+            if (numConfigsSection.Success)
+            {
+                string content = numConfigsSection.Groups[1].Value;
+
+                // Pattern: "numGroupID": "1", "numCnt": 2, "numType": 2
+                var numConfigPattern = new Regex(
+                    @"\{\s*" +
+                    @"(?:[^{}]*""numGroupID"":\s*""([^""]*)"")?" +
+                    @"[^{}]*""numCnt"":\s*(\d+)" +
+                    @"[^{}]*""numType"":\s*(\d+)" +
+                    @"[^{}]*\}",
+                    RegexOptions.Singleline);
+
+                var matches = numConfigPattern.Matches(content);
+                foreach (Match match in matches)
+                {
+                    configs.Add(new GameSpawner.NumConfig
+                    {
+                        numGroupID = string.IsNullOrEmpty(match.Groups[1].Value) ? "1" : match.Groups[1].Value,
+                        numCnt = int.Parse(match.Groups[2].Value),
+                        numType = int.Parse(match.Groups[3].Value)
+                    });
+                }
+            }
+
+            UnityEngine.Debug.Log($"LegacyMapConverter: Parsed {configs.Count} numConfigs");
+        }
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.LogWarning($"LegacyMapConverter: Failed to parse numConfigs: {ex.Message}");
+        }
+
+        return configs;
     }
 }

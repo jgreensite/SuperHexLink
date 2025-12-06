@@ -51,7 +51,10 @@ public static class HexStateRepairer
                     report.CoordinatesFixed++;
                 }
 
-                if (string.IsNullOrWhiteSpace(hex.HexType))
+                // Normalize hex type - handle empty, whitespace, and "null" string
+                if (string.IsNullOrWhiteSpace(hex.HexType) || 
+                    string.Equals(hex.HexType, GameConstants.CAR_TYPE_WORD_NULL, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(hex.HexType, GameConstants.CAR_TYPE_NONE, StringComparison.OrdinalIgnoreCase))
                 {
                     hex.HexType = GameConstants.CAR_TYPE_SEA;
                     report.HexTypesDefaulted++;

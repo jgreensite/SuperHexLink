@@ -35,15 +35,12 @@ public class GameSpawner : SpawnerBase
     private ActionLogSettings actionLogSettings;
 
     [BoxGroup("Save Map")]
-    [HorizontalGroup("Save Map/Path", 0.75f)]
-    [LabelText("Save map file")]
-    [Sirenix.OdinInspector.FilePath(ParentFolder = "data/maps", Extensions = "json")]
+    [LabelText("Save to path")]
     public string saveMapPath = "./data/maps/map.json";
 
     [BoxGroup("Save Map")]
-    [HorizontalGroup("Save Map/Path", 0.25f)]
-    [HideLabel]
-    [Button("Browse", ButtonSizes.Small)]
+    [HorizontalGroup("Save Map/Buttons")]
+    [Button("Browse...", ButtonSizes.Medium)]
     public void BrowseSaveMapPath()
     {
 #if UNITY_EDITOR
@@ -52,50 +49,94 @@ public class GameSpawner : SpawnerBase
     }
 
     [BoxGroup("Save Map")]
-    [Button("Save to selected path", ButtonSizes.Large)]
+    [HorizontalGroup("Save Map/Buttons")]
+    [Button("Save Map", ButtonSizes.Medium)]
+    [GUIColor(0.4f, 0.8f, 0.4f)]
     public void SaveToConfiguredPath()
     {
         SaveHexes(saveMapPath);
+        Debug.Log($"Map saved to: {saveMapPath}");
     }
 
     [BoxGroup("Load Map")]
-    [HorizontalGroup("Load Map/Path", 0.75f)]
-    [LabelText("Load map file")]
-    [Sirenix.OdinInspector.FilePath(ParentFolder = "data/maps", Extensions = "json")]
+    [LabelText("Load from path")]
     public string loadMapPath = "./data/maps/map.json";
 
     [BoxGroup("Load Map")]
-    [HorizontalGroup("Load Map/Path", 0.25f)]
-    [HideLabel]
-        [Button("Browse", ButtonSizes.Small)]
+    [HorizontalGroup("Load Map/Buttons")]
+    [Button("Browse...", ButtonSizes.Medium)]
     public void BrowseLoadMapPath()
-        {
-    #if UNITY_EDITOR
-            BrowseMapFile(ref loadMapPath, false);
-    #endif
-        }
+    {
+#if UNITY_EDITOR
+        BrowseMapFile(ref loadMapPath, false);
+#endif
+    }
 
     [BoxGroup("Load Map")]
-    [Button("Load from selected path", ButtonSizes.Large)]
+    [HorizontalGroup("Load Map/Buttons")]
+    [Button("Load Map", ButtonSizes.Medium)]
+    [GUIColor(0.4f, 0.6f, 0.9f)]
     public void LoadFromConfiguredPath()
-        {
-            LoadState(loadMapPath);
-        }
+    {
+        LoadState(loadMapPath);
+    }
 
     public void Awake()
     {
-        // Ensure State is initialized to avoid null reference exceptions
+        // Ensure State is initialized with valid defaults
         if (SerializedState == null)
         {
             SerializedState = new GameSpawnerState();
+        }
+        else if (SerializedState.hexGridConfig.cols <= 0 || SerializedState.hexGridConfig.rows <= 0)
+        {
+            // Existing state has invalid grid config - apply defaults
+            SerializedState.hexGridConfig = HexGridConfig.CreateDefault();
         }
         hexSpawner = GameObject.Find("HexSpawner").GetComponent<HexSpawner>();
         edgeSpawner = GameObject.Find("EdgeSpawner").GetComponent<EdgeSpawner>();
         cornerSpawner = GameObject.Find("CornerSpawner").GetComponent<CornerSpawner>();
     }
+
+    /// <summary>
+    /// Ensures state has valid grid config and land configs. Call before any operation needing dimensions.
+    /// </summary>
+    private void EnsureValidState()
+    {
+        if (SerializedState == null)
+        {
+            SerializedState = new GameSpawnerState();
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
+                "EnsureValidState: Created new GameSpawnerState");
+        }
+
+        if (SerializedState.hexGridConfig.cols <= 0 || SerializedState.hexGridConfig.rows <= 0)
+        {
+            SerializedState.hexGridConfig = HexGridConfig.CreateDefault();
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
+                "EnsureValidState: Applied default grid config (7x7)");
+        }
+        
+        // Ensure land configs are populated - required for Spawn to work
+        if (SerializedState.landConfigs == null || SerializedState.landConfigs.Count == 0)
+        {
+            SerializedState.landConfigs = GameSpawnerState.CreateDefaultLandConfigs();
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
+                "EnsureValidState: Applied default land configs ({0} types)", SerializedState.landConfigs.Count);
+        }
+        
+        // Ensure num configs are populated - required for hex numbers
+        if (SerializedState.numConfigs == null || SerializedState.numConfigs.Count == 0)
+        {
+            SerializedState.numConfigs = GameSpawnerState.CreateDefaultNumConfigs();
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
+                "EnsureValidState: Applied default num configs ({0} types)", SerializedState.numConfigs.Count);
+        }
+    }
     
     public override void BuildMe(bool isRefresh)
     {
+        EnsureValidState();
         hexSpawner.BuildMe(isRefresh);
         edgeSpawner.BuildMe(isRefresh);
         cornerSpawner.BuildMe(isRefresh);
@@ -108,6 +149,7 @@ public class GameSpawner : SpawnerBase
     [Button("Spawn All Game Elements")]
     public override void Spawn()
     {
+        EnsureValidState();
         hexSpawner.Spawn();
         edgeSpawner.Spawn();
         cornerSpawner.Spawn();
@@ -126,6 +168,7 @@ public class GameSpawner : SpawnerBase
     [Button("Refresh All Game Elements")]
     public override void Refresh()
     {
+        EnsureValidState();
         hexSpawner.Refresh();
         edgeSpawner.Refresh();
         cornerSpawner.Refresh();
@@ -165,35 +208,63 @@ public class GameSpawner : SpawnerBase
 
     public void LoadState(string filePath = null)
     {
+        Debug.Log("=== LOADSTATE START ===");
         string targetMapPath = ResolveMapPath(filePath, loadMapPath);
+        Debug.Log($"LoadState: Loading from {targetMapPath}");
+        
         if (!File.Exists(targetMapPath))
         {
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "LoadState could not find file {0}", targetMapPath);
+            Debug.LogError($"LoadState: File not found: {targetMapPath}");
             return;
         }
 
         byte[] bytes = File.ReadAllBytes(targetMapPath);
         string jsonContent = System.Text.Encoding.UTF8.GetString(bytes);
+        Debug.Log($"LoadState: Read {bytes.Length} bytes from file");
 
         CombinedSpawnerState spawnerStates;
 
         // Check for legacy format and attempt conversion
-        if (LegacyMapConverter.IsLegacyFormat(jsonContent))
+        bool isLegacy = LegacyMapConverter.IsLegacyFormat(jsonContent);
+        Debug.Log($"LoadState: IsLegacyFormat={isLegacy}");
+        
+        if (isLegacy)
         {
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
                 "LoadState detected legacy format in {0}, attempting conversion...", targetMapPath);
 
             var conversionResult = LegacyMapConverter.TryConvertLegacyJson(jsonContent);
+            Debug.Log($"LoadState: Legacy conversion success={conversionResult.Success}");
+            
             if (!conversionResult.Success)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
                     "LoadState failed to convert legacy file {0}: {1}", targetMapPath, conversionResult.ErrorMessage);
+                Debug.LogError($"LoadState: Legacy conversion failed: {conversionResult.ErrorMessage}");
                 return;
             }
 
             spawnerStates = conversionResult.ConvertedState;
+            Debug.Log($"LoadState: Conversion report: {conversionResult.Report}");
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info,
                 "Legacy conversion: {0}", conversionResult.Report.ToString());
+
+            // Debug: Log first few hex types to verify conversion worked
+            if (spawnerStates.HexState?.hexes != null && spawnerStates.HexState.hexes.Count > 0)
+            {
+                Debug.Log($"LoadState: Converted state has {spawnerStates.HexState.hexes.Count} columns");
+                var firstCol = spawnerStates.HexState.hexes[0];
+                Debug.Log($"LoadState: First column has {firstCol.Count} rows");
+                for (int i = 0; i < Math.Min(3, firstCol.Count); i++)
+                {
+                    Debug.Log($"LoadState: After conversion, hex[0][{i}] HexType='{firstCol[i]?.HexType ?? "NULL OBJ"}'");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("LoadState: Converted state has no hex data!");
+            }
 
             foreach (var warning in conversionResult.Report.Warnings)
             {
@@ -202,21 +273,25 @@ public class GameSpawner : SpawnerBase
         }
         else
         {
+            Debug.Log("LoadState: Deserializing as current format...");
             // Normal deserialization for current format
             try
             {
                 spawnerStates = SirenixSerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
+                Debug.Log($"LoadState: Deserialization completed, spawnerStates is {(spawnerStates == null ? "NULL" : "not null")}");
             }
             catch (Exception ex)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
                     "LoadState failed to deserialize {0}: {1}", targetMapPath, ex.Message);
+                Debug.LogError($"LoadState: Deserialization exception: {ex.Message}");
                 return;
             }
 
             if (spawnerStates == null)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "LoadState could not deserialize state from {0}", targetMapPath);
+                Debug.LogError("LoadState: spawnerStates is null after deserialization");
                 return;
             }
 
@@ -226,13 +301,38 @@ public class GameSpawner : SpawnerBase
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
                     "LoadState failed: File {0} has no valid hex data. The file may be corrupted or in an incompatible format.",
                     targetMapPath);
+                Debug.LogError("LoadState: HexState or hexes is null");
                 return;
             }
+            
+            Debug.Log($"LoadState: Deserialized {spawnerStates.HexState.hexes.Count} columns of hexes");
         }
 
+        // Log landConfigs BEFORE assignment
+        Debug.Log($"LoadState: spawnerStates.GameState has {spawnerStates.GameState?.landConfigs?.Count ?? 0} landConfigs BEFORE assignment");
+
         State = spawnerStates.GameState ?? new GameSpawnerState();
+        
+        // Log landConfigs AFTER assignment
+        Debug.Log($"LoadState: State.landConfigs has {State.landConfigs?.Count ?? 0} entries AFTER assignment");
+        Debug.Log($"LoadState: GameState grid config: cols={State.hexGridConfig.cols}, rows={State.hexGridConfig.rows}");
+        
+        // Ensure loaded state has valid grid config
+        if (State.hexGridConfig.cols <= 0 || State.hexGridConfig.rows <= 0)
+        {
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
+                "LoadState: Invalid grid config in file, applying defaults (7x7)");
+            Debug.LogWarning("LoadState: Grid config invalid, applying 7x7 defaults");
+            State.hexGridConfig = HexGridConfig.CreateDefault();
+        }
+        
         HexGridConfig gridConfig = State.hexGridConfig;
+        Debug.Log($"LoadState: About to repair with grid {gridConfig.cols}x{gridConfig.rows}");
+        Debug.Log($"LoadState: HexState before repair has {spawnerStates.HexState?.hexes?.Count ?? 0} columns");
+        
         HexStateRepairReport repairReport = hexSpawner.RepairLoadedState(gridConfig, spawnerStates.HexState, CS);
+        Debug.Log($"LoadState: Repair report - HasChanges={repairReport.HasChanges}, CellsCreated={repairReport.CellsCreated}, HexTypesDefaulted={repairReport.HexTypesDefaulted}");
+        
         if (repairReport.HasChanges)
         {
             Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Warning,
@@ -245,14 +345,26 @@ public class GameSpawner : SpawnerBase
                 repairReport.HarbourRotationsFixed);
         }
 
+        Debug.Log($"LoadState: Assigning state to spawners...");
+        Debug.Log($"LoadState: spawnerStates.HexState has {spawnerStates.HexState?.hexes?.Count ?? 0} columns");
+        if (spawnerStates.HexState?.hexes != null && spawnerStates.HexState.hexes.Count > 0 && spawnerStates.HexState.hexes[0].Count > 0)
+        {
+            Debug.Log($"LoadState: First hex after repair: HexType='{spawnerStates.HexState.hexes[0][0]?.HexType ?? "NULL"}'");
+        }
+        
         hexSpawner.State = spawnerStates.HexState ?? new HexSpawner.HexSpawnerState();
         edgeSpawner.State = spawnerStates.EdgeState ?? new EdgeSpawner.EdgeSpawnerState();
         cornerSpawner.State = spawnerStates.CornerState ?? new CornerSpawner.CornerSpawnerState();
+        
+        Debug.Log($"LoadState: hexSpawner.State now has {hexSpawner.State?.hexes?.Count ?? 0} columns");
 
         Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState applying saved data from {0}", targetMapPath);
+        Debug.Log("LoadState: Calling BuildMe(true)...");
         BuildMe(true);
+        Debug.Log("LoadState: Calling hexSpawner.UpdateHexes()...");
         hexSpawner.UpdateHexes();
         Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState finished");
+        Debug.Log("=== LOADSTATE END ===");
     }
 
 
@@ -280,6 +392,46 @@ public class GameSpawner : SpawnerBase
         public GameSpawnerState()
         {
             hexGridConfig = HexGridConfig.CreateDefault();
+            landConfigs = CreateDefaultLandConfigs();
+            numConfigs = CreateDefaultNumConfigs();
+        }
+        
+        /// <summary>
+        /// Creates default land configurations for a standard 4-player Catan board.
+        /// </summary>
+        public static List<LandConfig> CreateDefaultLandConfigs()
+        {
+            return new List<LandConfig>
+            {
+                new LandConfig { landGroupID = "1", landCnt = 13, landType = "sea" },
+                new LandConfig { landGroupID = "1", landCnt = 4, landType = "forest" },
+                new LandConfig { landGroupID = "1", landCnt = 4, landType = "pasture" },
+                new LandConfig { landGroupID = "1", landCnt = 4, landType = "field" },
+                new LandConfig { landGroupID = "1", landCnt = 3, landType = "hill" },
+                new LandConfig { landGroupID = "1", landCnt = 3, landType = "mountain" },
+                new LandConfig { landGroupID = "1", landCnt = 1, landType = "desert" },
+                new LandConfig { landGroupID = "1", landCnt = 5, landType = "harbour" },
+            };
+        }
+        
+        /// <summary>
+        /// Creates default number configurations for a standard 4-player Catan board.
+        /// </summary>
+        public static List<NumConfig> CreateDefaultNumConfigs()
+        {
+            return new List<NumConfig>
+            {
+                new NumConfig { numGroupID = "1", numCnt = 1, numType = 2 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 3 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 4 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 5 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 6 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 8 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 9 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 10 },
+                new NumConfig { numGroupID = "1", numCnt = 2, numType = 11 },
+                new NumConfig { numGroupID = "1", numCnt = 1, numType = 12 },
+            };
         }
     }
 
