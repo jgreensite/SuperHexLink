@@ -292,13 +292,25 @@ public static class MapValidator
                 // Validate coordinates match position in array
                 if (hex.Col != col)
                 {
-                    result.AddWarning(ValidationCategory.HexState, 
+                    var issue = ValidationIssue.Warning(ValidationCategory.HexState, 
                         $"Hex.Col ({hex.Col}) doesn't match array position ({col})", col, row);
+                    issue.FixType = FixType.AutoFix;
+                    issue.FieldName = "Col";
+                    issue.CurrentValue = hex.Col.ToString();
+                    issue.FixValue = col.ToString();
+                    issue.SuggestedFix = $"Set Col to {col}";
+                    result.AddIssue(issue);
                 }
                 if (hex.Row != row)
                 {
-                    result.AddWarning(ValidationCategory.HexState, 
+                    var issue = ValidationIssue.Warning(ValidationCategory.HexState, 
                         $"Hex.Row ({hex.Row}) doesn't match array position ({row})", col, row);
+                    issue.FixType = FixType.AutoFix;
+                    issue.FieldName = "Row";
+                    issue.CurrentValue = hex.Row.ToString();
+                    issue.FixValue = row.ToString();
+                    issue.SuggestedFix = $"Set Row to {row}";
+                    result.AddIssue(issue);
                 }
 
                 // Validate hex type

@@ -7,9 +7,9 @@ using UnityEditor;
 using SuperHexLink.Validation;
 
 /// <summary>
-/// Editor window for validating map state and fixing issues.
+/// Editor window for editing and validating map state.
 /// </summary>
-public class MapValidationWindow : EditorWindow
+public class MapEditorWindow : EditorWindow
 {
     private MapValidationResult _validationResult;
     private Vector2 _scrollPosition;
@@ -32,6 +32,10 @@ public class MapValidationWindow : EditorWindow
     // Selection
     private ValidationIssue _selectedIssue;
     private Hex _selectedHex;
+    private Hex _hoveredHex;
+    
+    // Selection mode
+    private bool _hexSelectionMode = false;
     
     // Hex editing
     private string _newHexType;
@@ -60,11 +64,11 @@ public class MapValidationWindow : EditorWindow
         GameConstants.CAR_TYPE_NONE
     };
 
-    [MenuItem("SuperHexLink/Map Validation Tool")]
+    [MenuItem("SuperHexLink/Map Editor Tool")]
     public static void ShowWindow()
     {
-        var window = GetWindow<MapValidationWindow>("Map Validation");
-        window.minSize = new Vector2(500, 500);
+        var window = GetWindow<MapEditorWindow>("Map Editor");
+        window.minSize = new Vector2(550, 550);
         window.Show();
     }
 
@@ -72,12 +76,14 @@ public class MapValidationWindow : EditorWindow
     {
         FindReferences();
         SceneView.duringSceneGui += OnSceneGUI;
+        Selection.selectionChanged += OnSelectionChanged;
     }
 
     private void OnDisable()
     {
         SceneView.duringSceneGui -= OnSceneGUI;
-        ClearHexHighlight();
+        Selection.selectionChanged -= OnSelectionChanged;
+        ClearAllHighlights();
     }
 
     private void FindReferences()
@@ -145,6 +151,26 @@ public class MapValidationWindow : EditorWindow
             
             GUILayout.Space(5);
             _groupByFixType = GUILayout.Toggle(_groupByFixType, "Group", EditorStyles.toolbarButton, GUILayout.Width(50));
+            
+            GUILayout.Space(10);
+            
+            // Hex Selection Mode toggle
+            var oldColor = GUI.backgroundColor;
+            if (_hexSelectionMode)
+            {
+                GUI.backgroundColor = new Color(0.3f, 0.8f, 0.3f);
+            }
+            EditorGUI.BeginChangeCheck();
+            _hexSelectionMode = GUILayout.Toggle(_hexSelectionMode, "🎯 Pick Hex", EditorStyles.toolbarButton, GUILayout.Width(80));
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (!_hexSelectionMode)
+                {
+                    ClearHoverHighlight();
+                }
+                SceneView.RepaintAll();
+            }
+            GUI.backgroundColor = oldColor;
             
             GUILayout.FlexibleSpace();
             
@@ -307,15 +333,69 @@ public class MapValidationWindow : EditorWindow
                     applied = true;
                 }
                 break;
+                
+            case "Col":
+                if (int.TryParse(issue.FixValue, out int col))
+                {
+                    hexState.Col = col;
+                    applied = true;
+                }
+                break;
+                
+            case "Row":
+                if (int.TryParse(issue.FixValue, out int row))
+                {
+                    hexState.Row = row;
+                    applied = true;
+                }
+                break;
         }
         
         if (applied)
         {
             // Find and refresh the visual hex
             RefreshHexVisual(issue.Col, issue.Row);
+            
+            // Clear highlight if this was the selected/hovered hex
+            ClearHighlightIfMatches(issue.Col, issue.Row);
+            
+            // Remove issue from result if fixed
+            _validationResult?.Issues.Remove(issue);
+            
+            // Clear selection if this was the selected issue
+            if (_selectedIssue == issue)
+            {
+                _selectedIssue = null;
+            }
         }
         
         return applied;
+    }
+
+    private void ClearHighlightIfMatches(int col, int row)
+    {
+        // Clear hover highlight if it matches
+        if (_hoveredHex?.hexState != null && 
+            _hoveredHex.hexState.Col == col && _hoveredHex.hexState.Row == row)
+        {
+            ClearHoverHighlight();
+        }
+        
+        // Clear selection highlight if it matches
+        if (_selectedHex?.hexState != null && 
+            _selectedHex.hexState.Col == col && _selectedHex.hexState.Row == row)
+        {
+            ClearHexHighlight();
+            _selectedHex = null;
+        }
+    }
+    
+    private void ClearAllHighlights()
+    {
+        ClearHoverHighlight();
+        ClearHexHighlight();
+        _selectedHex = null;
+        _hoveredHex = null;
     }
 
     private void RefreshHexVisual(int col, int row)
@@ -337,6 +417,8 @@ public class MapValidationWindow : EditorWindow
                 hex.hexState.Rotation = masterState.Rotation;
                 hex.hexState.HexNum = masterState.HexNum;
                 hex.hexState.HexType = masterState.HexType;
+                hex.hexState.Col = masterState.Col;
+                hex.hexState.Row = masterState.Row;
             }
             
             _hexSpawner.RefreshHex(hex);
@@ -984,6 +1066,95 @@ public class MapValidationWindow : EditorWindow
         _selectedHex.hexState?.originalMaterialColors?.Clear();
     }
 
+    private void ClearHoverHighlight()
+    {
+        if (_hoveredHex == null || _hoveredHex == _selectedHex) return;
+        
+        // Restore original colors for hovered hex
+        var renderers = _hoveredHex.GetComponentsInChildren<Renderer>();
+        foreach (var renderer in renderers)
+        {
+            if (renderer.material != null && 
+                _hoveredHex.hexState?.originalMaterialColors != null &&
+                _hoveredHex.hexState.originalMaterialColors.TryGetValue(renderer.gameObject, out var originalColor))
+            {
+                renderer.material.color = originalColor;
+            }
+        }
+        
+        _hoveredHex.hexState?.originalMaterialColors?.Clear();
+        _hoveredHex = null;
+    }
+
+    private void HighlightHexForHover(Hex hex)
+    {
+        if (hex == null || hex == _selectedHex || hex == _hoveredHex) return;
+        
+        // Clear previous hover
+        ClearHoverHighlight();
+        
+        _hoveredHex = hex;
+        
+        // Store original colors and apply hover highlight (cyan tint)
+        var renderers = hex.GetComponentsInChildren<Renderer>();
+        foreach (var renderer in renderers)
+        {
+            if (renderer.material != null)
+            {
+                if (!hex.hexState.originalMaterialColors.ContainsKey(renderer.gameObject))
+                {
+                    hex.hexState.originalMaterialColors[renderer.gameObject] = renderer.material.color;
+                }
+                renderer.material.color = Color.Lerp(renderer.material.color, Color.cyan, 0.5f);
+            }
+        }
+    }
+
+    private Hex GetHexUnderMouse(SceneView sceneView)
+    {
+        if (_hexSpawner == null) return null;
+        
+        Event e = Event.current;
+        Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
+        
+        // Raycast to find hex
+        float closestDist = float.MaxValue;
+        Hex closestHex = null;
+        
+        var hexes = _hexSpawner.GetComponentsInChildren<Hex>();
+        foreach (var hex in hexes)
+        {
+            // Get collider or use bounds
+            var collider = hex.GetComponentInChildren<Collider>();
+            if (collider != null)
+            {
+                if (collider.Raycast(ray, out RaycastHit hit, 1000f))
+                {
+                    if (hit.distance < closestDist)
+                    {
+                        closestDist = hit.distance;
+                        closestHex = hex;
+                    }
+                }
+            }
+            else
+            {
+                // Use bounds-based check as fallback
+                var bounds = new Bounds(hex.transform.position, Vector3.one * 2f);
+                if (bounds.IntersectRay(ray, out float dist))
+                {
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        closestHex = hex;
+                    }
+                }
+            }
+        }
+        
+        return closestHex;
+    }
+
     private void RunValidation()
     {
         FindReferences();
@@ -1012,7 +1183,115 @@ public class MapValidationWindow : EditorWindow
 
     private void OnSceneGUI(SceneView sceneView)
     {
+        // Handle hex selection mode
+        if (_hexSelectionMode && _hexSpawner != null)
+        {
+            HandleHexSelectionMode(sceneView);
+        }
+        
         // Draw gizmos for hex issues
+        DrawIssueGizmos(sceneView);
+    }
+    
+    private void HandleHexSelectionMode(SceneView sceneView)
+    {
+        Event e = Event.current;
+        
+        // Change cursor to indicate selection mode
+        EditorGUIUtility.AddCursorRect(new Rect(0, 0, sceneView.position.width, sceneView.position.height), MouseCursor.Link);
+        
+        // Get hex under mouse
+        var hexUnderMouse = GetHexUnderMouse(sceneView);
+        
+        // Handle hover highlighting
+        if (hexUnderMouse != null && hexUnderMouse != _hoveredHex && hexUnderMouse != _selectedHex)
+        {
+            HighlightHexForHover(hexUnderMouse);
+            sceneView.Repaint();
+        }
+        else if (hexUnderMouse == null && _hoveredHex != null)
+        {
+            ClearHoverHighlight();
+            sceneView.Repaint();
+        }
+        
+        // Handle mouse events
+        if (e.type == EventType.MouseDown && e.button == 0)
+        {
+            if (hexUnderMouse != null)
+            {
+                // Clear hover highlight first
+                ClearHoverHighlight();
+                
+                // Clear previous selection highlight
+                ClearHexHighlight();
+                
+                // Select this hex
+                _selectedHex = hexUnderMouse;
+                Selection.activeGameObject = hexUnderMouse.gameObject;
+                
+                // Initialize editor values
+                ResetHexEditorValues();
+                
+                // Highlight the selected hex
+                HighlightHex(hexUnderMouse);
+                
+                // Look for related issues
+                _selectedIssue = _validationResult?.Issues.FirstOrDefault(i => 
+                    i.HasHexReference && i.Col == hexUnderMouse.hexState?.Col && i.Row == hexUnderMouse.hexState?.Row);
+                
+                // Repaint the editor window
+                Repaint();
+                
+                Debug.Log($"Selected hex at [{hexUnderMouse.hexState?.Col}, {hexUnderMouse.hexState?.Row}] - {hexUnderMouse.hexState?.Type}");
+                
+                e.Use();
+            }
+        }
+        
+        // Right-click to exit selection mode
+        if (e.type == EventType.MouseDown && e.button == 1)
+        {
+            _hexSelectionMode = false;
+            ClearHoverHighlight();
+            Repaint();
+            e.Use();
+        }
+        
+        // ESC to exit selection mode
+        if (e.type == EventType.KeyDown && e.keyCode == KeyCode.Escape)
+        {
+            _hexSelectionMode = false;
+            ClearHoverHighlight();
+            Repaint();
+            e.Use();
+        }
+        
+        // Draw selection mode indicator
+        Handles.BeginGUI();
+        
+        var indicatorStyle = new GUIStyle(EditorStyles.helpBox)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            fontSize = 14,
+            fontStyle = FontStyle.Bold
+        };
+        GUI.backgroundColor = new Color(0.3f, 0.8f, 0.3f, 0.8f);
+        GUI.Box(new Rect(10, 10, 200, 30), "🎯 Hex Selection Mode", indicatorStyle);
+        
+        // Show hex info under cursor
+        if (hexUnderMouse != null)
+        {
+            var hexInfo = $"[{hexUnderMouse.hexState?.Col}, {hexUnderMouse.hexState?.Row}] {hexUnderMouse.hexState?.Type}";
+            GUI.Box(new Rect(10, 45, 200, 25), hexInfo, indicatorStyle);
+        }
+        
+        GUI.backgroundColor = Color.white;
+        Handles.EndGUI();
+    }
+    
+    private void DrawIssueGizmos(SceneView sceneView)
+    {
         if (_validationResult == null || !_showInfo) return;
         
         var hexIssues = _validationResult.Issues.Where(i => i.HasHexReference && 
