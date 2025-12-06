@@ -1030,60 +1030,22 @@ public class MapEditorWindow : EditorWindow
 
     private void HighlightHex(Hex hex)
     {
-        if (hex == null) return;
-        
-        // Store original colors and apply highlight
-        var renderers = hex.GetComponentsInChildren<Renderer>();
-        foreach (var renderer in renderers)
-        {
-            if (renderer.material != null)
-            {
-                if (!hex.hexState.originalMaterialColors.ContainsKey(renderer.gameObject))
-                {
-                    hex.hexState.originalMaterialColors[renderer.gameObject] = renderer.material.color;
-                }
-                renderer.material.color = Color.Lerp(renderer.material.color, Color.yellow, 0.5f);
-            }
-        }
+        // Highlighting is now done via Handles in OnSceneGUI - just mark the hex as selected
+        // The actual visual highlight will be drawn each frame
+        SceneView.RepaintAll();
     }
 
     private void ClearHexHighlight()
     {
-        if (_selectedHex == null) return;
-        
-        // Restore original colors
-        var renderers = _selectedHex.GetComponentsInChildren<Renderer>();
-        foreach (var renderer in renderers)
-        {
-            if (renderer.material != null && 
-                _selectedHex.hexState?.originalMaterialColors != null &&
-                _selectedHex.hexState.originalMaterialColors.TryGetValue(renderer.gameObject, out var originalColor))
-            {
-                renderer.material.color = originalColor;
-            }
-        }
-        
-        _selectedHex.hexState?.originalMaterialColors?.Clear();
+        // Highlighting is now done via Handles - just repaint
+        SceneView.RepaintAll();
     }
 
     private void ClearHoverHighlight()
     {
         if (_hoveredHex == null || _hoveredHex == _selectedHex) return;
-        
-        // Restore original colors for hovered hex
-        var renderers = _hoveredHex.GetComponentsInChildren<Renderer>();
-        foreach (var renderer in renderers)
-        {
-            if (renderer.material != null && 
-                _hoveredHex.hexState?.originalMaterialColors != null &&
-                _hoveredHex.hexState.originalMaterialColors.TryGetValue(renderer.gameObject, out var originalColor))
-            {
-                renderer.material.color = originalColor;
-            }
-        }
-        
-        _hoveredHex.hexState?.originalMaterialColors?.Clear();
         _hoveredHex = null;
+        SceneView.RepaintAll();
     }
 
     private void HighlightHexForHover(Hex hex)
@@ -1094,20 +1056,7 @@ public class MapEditorWindow : EditorWindow
         ClearHoverHighlight();
         
         _hoveredHex = hex;
-        
-        // Store original colors and apply hover highlight (cyan tint)
-        var renderers = hex.GetComponentsInChildren<Renderer>();
-        foreach (var renderer in renderers)
-        {
-            if (renderer.material != null)
-            {
-                if (!hex.hexState.originalMaterialColors.ContainsKey(renderer.gameObject))
-                {
-                    hex.hexState.originalMaterialColors[renderer.gameObject] = renderer.material.color;
-                }
-                renderer.material.color = Color.Lerp(renderer.material.color, Color.cyan, 0.5f);
-            }
-        }
+        // Highlighting is done via Handles in OnSceneGUI
     }
 
     private Hex GetHexUnderMouse(SceneView sceneView)
@@ -1188,6 +1137,9 @@ public class MapEditorWindow : EditorWindow
         {
             HandleHexSelectionMode(sceneView);
         }
+        
+        // Draw hex highlights (selected and hovered)
+        DrawHexHighlights(sceneView);
         
         // Draw gizmos for hex issues
         DrawIssueGizmos(sceneView);
@@ -1288,6 +1240,39 @@ public class MapEditorWindow : EditorWindow
         
         GUI.backgroundColor = Color.white;
         Handles.EndGUI();
+    }
+    
+    private void DrawHexHighlights(SceneView sceneView)
+    {
+        // Draw selected hex highlight (yellow)
+        if (_selectedHex != null)
+        {
+            DrawHexOutline(_selectedHex, Color.yellow, 3f);
+        }
+        
+        // Draw hovered hex highlight (cyan)
+        if (_hoveredHex != null && _hoveredHex != _selectedHex)
+        {
+            DrawHexOutline(_hoveredHex, Color.cyan, 2f);
+        }
+    }
+    
+    private void DrawHexOutline(Hex hex, Color color, float thickness)
+    {
+        if (hex == null) return;
+        
+        var pos = hex.transform.position;
+        var size = 1.5f; // Approximate hex size
+        
+        // Draw a circle/disc around the hex
+        Handles.color = color;
+        Handles.DrawWireDisc(pos + Vector3.up * 0.1f, Vector3.up, size, thickness);
+        
+        // Draw vertical lines at corners for visibility
+        var oldColor = Handles.color;
+        Handles.color = new Color(color.r, color.g, color.b, 0.5f);
+        Handles.DrawSolidDisc(pos + Vector3.up * 0.1f, Vector3.up, size * 0.3f);
+        Handles.color = oldColor;
     }
     
     private void DrawIssueGizmos(SceneView sceneView)
