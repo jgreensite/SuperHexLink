@@ -360,16 +360,27 @@ public static class MapValidator
             // Only warn if this is a land hex that should have been assigned from configs
             if (!IsOffBoardType(hex.HexType))
             {
-                result.AddWarning(ValidationCategory.GroupID, 
+                var issue = ValidationIssue.Warning(ValidationCategory.GroupID, 
                     $"GroupID is empty (will default to '1' during refresh)", col, row);
+                issue.FixType = FixType.AutoFix;
+                issue.FixValue = "1";
+                issue.SuggestedFix = "Set GroupID to '1'";
+                issue.FieldName = "GroupID";
+                issue.CurrentValue = "(empty)";
+                result.AddIssue(issue);
             }
             return;
         }
 
         if (validGroupIds.Count > 0 && !validGroupIds.Contains(hex.GroupID))
         {
-            result.AddWarning(ValidationCategory.GroupID, 
+            var issue = ValidationIssue.Warning(ValidationCategory.GroupID, 
                 $"GroupID '{hex.GroupID}' not found in landConfigs", col, row);
+            issue.FixType = FixType.ManualEdit;
+            issue.FieldName = "GroupID";
+            issue.CurrentValue = hex.GroupID;
+            issue.SuggestedFix = $"Change to one of: {string.Join(", ", validGroupIds)}";
+            result.AddIssue(issue);
         }
     }
 
@@ -378,16 +389,29 @@ public static class MapValidator
         // Rotation should be 0-359, and typically a multiple of 60 for hex grids
         if (hex.Rotation < 0 || hex.Rotation >= 360)
         {
-            result.AddWarning(ValidationCategory.HexState, 
+            int normalizedRotation = ((hex.Rotation % 360) + 360) % 360;
+            var issue = ValidationIssue.Warning(ValidationCategory.HexState, 
                 $"Rotation {hex.Rotation} is out of normal range (0-359)", col, row);
+            issue.FixType = FixType.AutoFix;
+            issue.FixValue = normalizedRotation.ToString();
+            issue.FieldName = "Rotation";
+            issue.CurrentValue = hex.Rotation.ToString();
+            issue.SuggestedFix = $"Normalize to {normalizedRotation}°";
+            result.AddIssue(issue);
         }
         else if (hex.Rotation % 60 != 0)
         {
             // Non-standard rotation - only warn for types where rotation matters
             if (string.Equals(hex.HexType, GameConstants.CAR_TYPE_HARBOUR, StringComparison.OrdinalIgnoreCase))
             {
-                result.AddWarning(ValidationCategory.HexState, 
+                int snappedRotation = Mathf.RoundToInt(hex.Rotation / 60f) * 60;
+                var issue = ValidationIssue.Warning(ValidationCategory.HexState, 
                     $"Harbour rotation {hex.Rotation} is not a multiple of 60°", col, row);
+                issue.FixType = FixType.SaveAndReload;
+                issue.FieldName = "Rotation";
+                issue.CurrentValue = hex.Rotation.ToString();
+                issue.SuggestedFix = $"Save & Reload will auto-fix harbour rotation to face valid land";
+                result.AddIssue(issue);
             }
         }
     }
@@ -399,13 +423,24 @@ public static class MapValidator
 
         if (shouldHaveNumber && !hasNumber)
         {
-            result.AddWarning(ValidationCategory.HexState, 
+            var issue = ValidationIssue.Warning(ValidationCategory.HexState, 
                 $"Land type '{hex.HexType}' should have a number but doesn't", col, row);
+            issue.FixType = FixType.SaveAndReload;
+            issue.FieldName = "HexNum";
+            issue.CurrentValue = "(none)";
+            issue.SuggestedFix = "Save & Reload will assign a number from numConfigs";
+            result.AddIssue(issue);
         }
         else if (!shouldHaveNumber && hasNumber)
         {
-            result.AddInfo(ValidationCategory.HexState, 
+            var issue = ValidationIssue.Info(ValidationCategory.HexState, 
                 $"Land type '{hex.HexType}' has number {hex.HexNum} but shouldn't", col, row);
+            issue.FixType = FixType.AutoFix;
+            issue.FixValue = null; // Clear the number
+            issue.FieldName = "HexNum";
+            issue.CurrentValue = hex.HexNum.ToString();
+            issue.SuggestedFix = "Remove number token";
+            result.AddIssue(issue);
         }
 
         if (hasNumber)

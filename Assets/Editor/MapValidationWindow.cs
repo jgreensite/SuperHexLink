@@ -19,6 +19,7 @@ public class MapValidationWindow : EditorWindow
     private bool _showErrors = true;
     private bool _showWarnings = true;
     private bool _showInfo = false;
+    private bool _showAutoFixableOnly = false;
     private ValidationCategory? _filterCategory = null;
     
     // Selection
@@ -56,7 +57,7 @@ public class MapValidationWindow : EditorWindow
     public static void ShowWindow()
     {
         var window = GetWindow<MapValidationWindow>("Map Validation");
-        window.minSize = new Vector2(450, 400);
+        window.minSize = new Vector2(500, 500);
         window.Show();
     }
 
@@ -93,6 +94,11 @@ public class MapValidationWindow : EditorWindow
     private void OnGUI()
     {
         DrawToolbar();
+        
+        EditorGUILayout.Space(5);
+        
+        // Summary and quick actions bar
+        DrawSummaryBar();
         
         EditorGUILayout.Space(5);
         
@@ -158,6 +164,176 @@ public class MapValidationWindow : EditorWindow
         }
     }
 
+    private void DrawSummaryBar()
+    {
+        if (_validationResult == null || !_validationResult.HasIssues) return;
+        
+        // Count fixable issues
+        int autoFixCount = _validationResult.Issues.Count(i => i.CanAutoFix);
+        int saveReloadFixCount = _validationResult.Issues.Count(i => i.FixedBySaveReload);
+        
+        using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+        {
+            EditorGUILayout.LabelField("Quick Actions", EditorStyles.boldLabel);
+            
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                // Auto-fix button
+                GUI.enabled = autoFixCount > 0;
+                if (GUILayout.Button($"🔧 Apply {autoFixCount} Auto-Fixes", GUILayout.Height(25)))
+                {
+                    ApplyAllAutoFixes();
+                }
+                GUI.enabled = true;
+                
+                // Save & Reload info
+                if (saveReloadFixCount > 0)
+                {
+                    var oldColor = GUI.color;
+                    GUI.color = new Color(0.8f, 0.9f, 1f);
+                    EditorGUILayout.HelpBox($"💾 {saveReloadFixCount} issue(s) will be fixed by Save & Reload", MessageType.None);
+                    GUI.color = oldColor;
+                }
+            }
+            
+            // Save & Reload buttons
+            if (saveReloadFixCount > 0)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    if (GUILayout.Button("💾 Save Map", GUILayout.Height(25)))
+                    {
+                        if (_gameSpawner != null)
+                        {
+                            _gameSpawner.SaveToConfiguredPath();
+                            Debug.Log("Map saved. Reload to apply default fixes.");
+                        }
+                    }
+                    
+                    if (GUILayout.Button("🔄 Reload Map", GUILayout.Height(25)))
+                    {
+                        if (_gameSpawner != null)
+                        {
+                            _gameSpawner.LoadFromConfiguredPath();
+                            RunValidation();
+                        }
+                    }
+                    
+                    if (GUILayout.Button("💾🔄 Save & Reload", GUILayout.Height(25)))
+                    {
+                        if (_gameSpawner != null)
+                        {
+                            _gameSpawner.SaveToConfiguredPath();
+                            _gameSpawner.LoadFromConfiguredPath();
+                            RunValidation();
+                            Debug.Log("Map saved and reloaded - default fixes applied.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void ApplyAllAutoFixes()
+    {
+        if (_validationResult == null || _hexSpawner == null) return;
+        
+        var autoFixIssues = _validationResult.Issues.Where(i => i.CanAutoFix).ToList();
+        int fixedCount = 0;
+        
+        foreach (var issue in autoFixIssues)
+        {
+            if (ApplyFix(issue))
+            {
+                fixedCount++;
+            }
+        }
+        
+        if (fixedCount > 0)
+        {
+            Debug.Log($"Applied {fixedCount} auto-fixes. Re-validating...");
+            RunValidation();
+        }
+    }
+
+    private bool ApplyFix(ValidationIssue issue)
+    {
+        if (!issue.CanAutoFix || _hexSpawner?.State?.hexes == null) return false;
+        
+        // Get the hex state from the master array
+        if (issue.Col < 0 || issue.Col >= _hexSpawner.State.hexes.Count) return false;
+        var column = _hexSpawner.State.hexes[issue.Col];
+        if (issue.Row < 0 || issue.Row >= column.Count) return false;
+        
+        var hexState = column[issue.Row];
+        if (hexState == null) return false;
+        
+        bool applied = false;
+        
+        switch (issue.FieldName)
+        {
+            case "GroupID":
+                hexState.GroupID = issue.FixValue ?? "1";
+                applied = true;
+                break;
+                
+            case "Rotation":
+                if (int.TryParse(issue.FixValue, out int rotation))
+                {
+                    hexState.Rotation = rotation;
+                    applied = true;
+                }
+                break;
+                
+            case "HexNum":
+                if (string.IsNullOrEmpty(issue.FixValue))
+                {
+                    hexState.HexNum = null;
+                    applied = true;
+                }
+                else if (int.TryParse(issue.FixValue, out int num))
+                {
+                    hexState.HexNum = num;
+                    applied = true;
+                }
+                break;
+        }
+        
+        if (applied)
+        {
+            // Find and refresh the visual hex
+            RefreshHexVisual(issue.Col, issue.Row);
+        }
+        
+        return applied;
+    }
+
+    private void RefreshHexVisual(int col, int row)
+    {
+        if (_hexSpawner == null) return;
+        
+        var hexes = _hexSpawner.GetComponentsInChildren<Hex>();
+        var hex = hexes.FirstOrDefault(h => h.hexState?.Col == col && h.hexState?.Row == row);
+        
+        if (hex != null)
+        {
+            // Sync the visual hex's state from master array
+            if (_hexSpawner.State?.hexes != null && 
+                col < _hexSpawner.State.hexes.Count && 
+                row < _hexSpawner.State.hexes[col].Count)
+            {
+                var masterState = _hexSpawner.State.hexes[col][row];
+                hex.hexState.GroupID = masterState.GroupID;
+                hex.hexState.Rotation = masterState.Rotation;
+                hex.hexState.HexNum = masterState.HexNum;
+                hex.hexState.HexType = masterState.HexType;
+            }
+            
+            _hexSpawner.RefreshHex(hex);
+            EditorUtility.SetDirty(hex);
+        }
+    }
+
     private void DrawIssueList()
     {
         EditorGUILayout.LabelField("Issues", EditorStyles.boldLabel);
@@ -212,6 +388,16 @@ public class MapValidationWindow : EditorWindow
             GUILayout.Label(GetSeverityIcon(issue.Severity), GUILayout.Width(20));
             GUI.color = oldColor;
             
+            // Fix type indicator
+            string fixIndicator = issue.FixType switch
+            {
+                FixType.AutoFix => "🔧",
+                FixType.SaveAndReload => "💾",
+                FixType.ManualEdit => "✏️",
+                _ => ""
+            };
+            GUILayout.Label(fixIndicator, GUILayout.Width(20));
+            
             // Location
             if (issue.HasHexReference)
             {
@@ -226,8 +412,24 @@ public class MapValidationWindow : EditorWindow
                 GUILayout.Label("", GUILayout.Width(50));
             }
             
-            // Message
-            if (GUILayout.Button(issue.Message, EditorStyles.label))
+            // Message (shortened to make room for fix button)
+            GUILayout.Label(issue.Message, EditorStyles.label, GUILayout.ExpandWidth(true));
+            
+            // Quick fix button for auto-fixable issues
+            if (issue.CanAutoFix)
+            {
+                if (GUILayout.Button("Fix", EditorStyles.miniButton, GUILayout.Width(35)))
+                {
+                    if (ApplyFix(issue))
+                    {
+                        Debug.Log($"Applied fix to [{issue.Col},{issue.Row}]: {issue.SuggestedFix}");
+                        RunValidation();
+                    }
+                }
+            }
+            
+            // Select button
+            if (GUILayout.Button("→", EditorStyles.miniButton, GUILayout.Width(25)))
             {
                 SelectIssue(issue);
             }
@@ -405,49 +607,67 @@ public class MapValidationWindow : EditorWindow
     {
         if (_selectedHex == null || _selectedHex.hexState == null) return;
         
-        Undo.RecordObject(_selectedHex, "Modify Hex");
-        
         var hexState = _selectedHex.hexState;
-        bool changed = false;
+        int col = hexState.Col;
+        int row = hexState.Row;
         
-        if (!string.IsNullOrEmpty(_newHexType) && _newHexType != hexState.HexType)
+        // First, update the MASTER state array (this is what gets saved and what SetLand reads from)
+        if (_hexSpawner?.State?.hexes != null && 
+            col >= 0 && col < _hexSpawner.State.hexes.Count &&
+            row >= 0 && row < _hexSpawner.State.hexes[col].Count)
         {
-            hexState.HexType = _newHexType;
-            changed = true;
-        }
-        
-        if (_newRotation != hexState.Rotation)
-        {
-            hexState.Rotation = _newRotation;
-            changed = true;
-        }
-        
-        if (_newHexNum != hexState.HexNum)
-        {
-            hexState.HexNum = _newHexNum;
-            changed = true;
-        }
-        
-        if (_newGroupID != hexState.GroupID)
-        {
-            hexState.GroupID = _newGroupID;
-            changed = true;
-        }
-        
-        if (changed)
-        {
-            // Update the visual representation
-            if (_hexSpawner != null)
+            var masterState = _hexSpawner.State.hexes[col][row];
+            if (masterState != null)
             {
-                // Trigger a refresh of just this hex
-                _hexSpawner.SendMessage("RefreshHex", _selectedHex, SendMessageOptions.DontRequireReceiver);
+                Undo.RecordObject(_hexSpawner, "Modify Hex State");
+                
+                bool changed = false;
+                
+                if (!string.IsNullOrEmpty(_newHexType) && _newHexType != masterState.HexType)
+                {
+                    masterState.HexType = _newHexType;
+                    hexState.HexType = _newHexType;
+                    changed = true;
+                }
+                
+                if (_newRotation != masterState.Rotation)
+                {
+                    masterState.Rotation = _newRotation;
+                    hexState.Rotation = _newRotation;
+                    changed = true;
+                }
+                
+                if (_newHexNum != masterState.HexNum)
+                {
+                    masterState.HexNum = _newHexNum;
+                    hexState.HexNum = _newHexNum;
+                    changed = true;
+                }
+                
+                if (_newGroupID != masterState.GroupID)
+                {
+                    masterState.GroupID = _newGroupID;
+                    hexState.GroupID = _newGroupID;
+                    changed = true;
+                }
+                
+                if (changed)
+                {
+                    // Refresh the visual representation
+                    _hexSpawner.RefreshHex(_selectedHex);
+                    
+                    EditorUtility.SetDirty(_hexSpawner);
+                    EditorUtility.SetDirty(_selectedHex);
+                    Debug.Log($"Applied changes to hex [{col}, {row}]: Type={masterState.HexType}, Rot={masterState.Rotation}, Num={masterState.HexNum}, Group={masterState.GroupID}");
+                    
+                    // Re-validate to update the issue list
+                    RunValidation();
+                }
             }
-            
-            EditorUtility.SetDirty(_selectedHex);
-            Debug.Log($"Applied changes to hex [{hexState.Col}, {hexState.Row}]");
-            
-            // Re-validate to update the issue list
-            RunValidation();
+        }
+        else
+        {
+            Debug.LogError($"Cannot apply changes: hex [{col}, {row}] not found in master state array");
         }
     }
 

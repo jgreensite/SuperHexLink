@@ -39,6 +39,21 @@ namespace SuperHexLink.Validation
     }
 
     /// <summary>
+    /// Type of automatic fix available for an issue.
+    /// </summary>
+    public enum FixType
+    {
+        /// <summary>No automatic fix available.</summary>
+        None,
+        /// <summary>Can be fixed by saving and reloading the map (applies defaults on load).</summary>
+        SaveAndReload,
+        /// <summary>Can be fixed immediately by clicking Apply Fix.</summary>
+        AutoFix,
+        /// <summary>Requires manual intervention in the Hex Editor.</summary>
+        ManualEdit
+    }
+
+    /// <summary>
     /// Represents a single validation issue found in the map.
     /// </summary>
     [Serializable]
@@ -62,8 +77,18 @@ namespace SuperHexLink.Validation
         
         /// <summary>Suggested fix or expected value.</summary>
         public string SuggestedFix;
+        
+        /// <summary>Type of fix available for this issue.</summary>
+        public FixType FixType = FixType.None;
+        
+        /// <summary>Value to apply when auto-fixing.</summary>
+        public string FixValue;
 
         public bool HasHexReference => Col >= 0 && Row >= 0;
+        
+        public bool CanAutoFix => FixType == FixType.AutoFix && HasHexReference;
+        
+        public bool FixedBySaveReload => FixType == FixType.SaveAndReload;
 
         public string LocationString => HasHexReference ? $"[{Col},{Row}]" : "[N/A]";
 
