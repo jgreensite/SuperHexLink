@@ -169,41 +169,118 @@
         "$type": "8|HexSpawner+HexSpawnerState, Assembly-CSharp",
         "hexes": {
             "$id": 24,
-            "$type": "9|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+BaseHexState, Assembly-CSharp]], mscorlib]], mscorlib",
+            "$type": "9|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+HexState, Assembly-CSharp]], mscorlib]], mscorlib",
             "$rlength": 7,
             "$rcontent": [
                 {
                     "$id": 25,
-                    "$type": "10|System.Collections.Generic.List`1[[Hex+BaseHexState, Assembly-CSharp]], mscorlib",
+                    "$type": "10|System.Collections.Generic.List`1[[Hex+HexState, Assembly-CSharp]], mscorlib",
                     "$rlength": 7,
                     "$rcontent": [
                         {
                             "$id": 26,
-                            "$type": "11|Hex+BaseHexState, Assembly-CSharp"
+                            "$type": "11|Hex+HexState, Assembly-CSharp",
+                            "Col": 0,
+                            "Row": 0,
+                            "HexType": "field",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": "12|System.Nullable`1[[System.Int32, mscorlib]], mscorlib",
+                                9
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 27,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 0,
+                            "Row": 1,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 28,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 0,
+                            "Row": 2,
+                            "HexType": "mountain",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                6
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 29,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 0,
+                            "Row": 3,
+                            "HexType": "mountain",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                8
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 30,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 0,
+                            "Row": 4,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 31,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 0,
+                            "Row": 5,
+                            "HexType": "hill",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                9
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 32,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 0,
+                            "Row": 6,
+                            "HexType": "hill",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                8
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -214,31 +291,108 @@
                     "$rcontent": [
                         {
                             "$id": 34,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 0,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 35,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 1,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 180,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 36,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 2,
+                            "HexType": "field",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                11
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 37,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 3,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 38,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 4,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 39,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 5,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 40,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 1,
+                            "Row": 6,
+                            "HexType": "forest",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -249,31 +403,108 @@
                     "$rcontent": [
                         {
                             "$id": 42,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 0,
+                            "HexType": "pasture",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                2
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 43,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 1,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 44,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 2,
+                            "HexType": "harbour",
+                            "HexSubType": "",
+                            "Rotation": 180,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 45,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 3,
+                            "HexType": "forest",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 46,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 4,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 47,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 5,
+                            "HexType": "hill",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                10
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 48,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 2,
+                            "Row": 6,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -284,31 +515,108 @@
                     "$rcontent": [
                         {
                             "$id": 50,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 0,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 51,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 1,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 52,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 2,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 53,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 3,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 54,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 4,
+                            "HexType": "forest",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                4
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 55,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 5,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 56,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 3,
+                            "Row": 6,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -319,31 +627,108 @@
                     "$rcontent": [
                         {
                             "$id": 58,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 0,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 59,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 1,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 60,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 2,
+                            "HexType": "desert",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 61,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 3,
+                            "HexType": "pasture",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                12
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 62,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 4,
+                            "HexType": "pasture",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                3
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 63,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 5,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 64,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 4,
+                            "Row": 6,
+                            "HexType": "pasture",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                6
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -354,31 +739,108 @@
                     "$rcontent": [
                         {
                             "$id": 66,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 0,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 67,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 1,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 68,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 2,
+                            "HexType": "field",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                5
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 69,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 3,
+                            "HexType": "field",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                10
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 70,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 4,
+                            "HexType": "sea",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 71,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 5,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 72,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 5,
+                            "Row": 6,
+                            "HexType": "forest",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                3
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 },
@@ -389,31 +851,108 @@
                     "$rcontent": [
                         {
                             "$id": 74,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 0,
+                            "HexType": "mountain",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                11
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 75,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 1,
+                            "HexType": "none",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 76,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 2,
+                            "HexType": "null",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 77,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 3,
+                            "HexType": "null",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 78,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 4,
+                            "HexType": "null",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 79,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 5,
+                            "HexType": "null",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         },
                         {
                             "$id": 80,
-                            "$type": 11
+                            "$type": 11,
+                            "Col": 6,
+                            "Row": 6,
+                            "HexType": "null",
+                            "HexSubType": "",
+                            "Rotation": 0,
+                            "HexNum": {
+                                "$type": 12,
+                                null
+                            },
+                            "GroupID": "1",
+                            "Selected": false
                         }
                     ]
                 }
@@ -422,12 +961,12 @@
     },
     "EdgeState": {
         "$id": 81,
-        "$type": "12|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp",
+        "$type": "13|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp",
         "myState": "MyEdgeState"
     },
     "CornerState": {
         "$id": 82,
-        "$type": "13|CornerSpawner+CornerSpawnerState, Assembly-CSharp",
+        "$type": "14|CornerSpawner+CornerSpawnerState, Assembly-CSharp",
         "myState": "MyCornerState"
     }
 }

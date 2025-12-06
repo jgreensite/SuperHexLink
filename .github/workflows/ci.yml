@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, feature/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  static-checks:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Repo csproj build guard
+        shell: powershell
+        run: |
+          Write-Host "Running repo-wide csproj build guard"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.cmd'
+          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          & $script
+
+      - name: Build CoreLogic
+        shell: powershell
+        run: |
+          Write-Host "Building CoreLogic library"
+          dotnet build CoreLogic\src\CoreLogic\CoreLogic.csproj --configuration Debug --verbosity minimal
+
+      - name: Run CoreLogic dotnet tests
+        shell: powershell
+        run: |
+          Write-Host "Running CoreLogic dotnet tests"
+          dotnet test CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
+
+      - name: Upload CoreLogic test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corelogic-test-results
+          path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
+      - name: Install .NET Framework Developer Pack (if needed)
+        run: |
+          echo "On CI, make sure the runner has .NET Framework 4.7.1 targeting pack. If missing, the job will fail and an administrator must add it."
+      - name: Run script-lint (placeholder)
+        run: echo "No-op lint — add project-specific lint commands here"
+
+  unity-tests:
+    runs-on: windows-latest
+    needs: static-checks
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Unity
+        run: echo "This job expects Unity to be installed on the runner or use a hosted Unity action. Configure Unity version and run tests accordingly."
+      - name: Run EditMode Tests (placeholder)
+        run: echo "Skipping full Unity run in CI by default; enable Unity Test Runner step when environment is available"

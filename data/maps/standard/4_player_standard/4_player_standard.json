@@ -1,0 +1,26 @@
+{
+    "$id": 0,
+    "$type": "0|GameSpawner+CombinedSpawnerState, Assembly-CSharp",
+    "GameState": null,
+    "HexState": {
+        "$id": 1,
+        "$type": "1|HexSpawner+HexSpawnerState, Assembly-CSharp",
+        "hexes": {
+            "$id": 2,
+            "$type": "2|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+HexState, Assembly-CSharp]], mscorlib]], mscorlib",
+            "$rlength": 0,
+            "$rcontent": [
+            ]
+        }
+    },
+    "EdgeState": {
+        "$id": 3,
+        "$type": "3|EdgeSpawner+EdgeSpawnerState, Assembly-CSharp",
+        "myState": "MyEdgeState"
+    },
+    "CornerState": {
+        "$id": 4,
+        "$type": "4|CornerSpawner+CornerSpawnerState, Assembly-CSharp",
+        "myState": "MyCornerState"
+    }
+}

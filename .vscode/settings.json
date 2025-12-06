@@ -52,5 +52,9 @@
         "Temp/": true
     },
     "dotnet.defaultSolution": "SuperHexLink.sln",
-    "CodeGPT.apiKey": "Ollama"
+    "CodeGPT.apiKey": "Ollama",
+    "dotnet.preferCSharpExtension": true,
+    // Prefer Unity's Mono runtime for OmniSharp to reduce dependency on local .NET Framework targeting packs
+    "omnisharp.useModernNet": false,
+    "omnisharp.useGlobalMono": "always"
 }

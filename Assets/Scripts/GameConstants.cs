@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -24,6 +25,33 @@ public class GameConstants : ScriptableObject
     // Define a mapping of HexType values to materials
     [ShowInInspector]
     public Dictionary<string, Material> materialMap { get; private set; }
+
+    [TableList(ShowIndexLabels = true)]
+    [Tooltip("Land types a harbour may face when choosing its orientation.")]
+    public List<string> harbourFacingLandTypes = new()
+    {
+        CAR_TYPE_FOREST,
+        CAR_TYPE_PASTURE,
+        CAR_TYPE_FIELD,
+        CAR_TYPE_HILL,
+        CAR_TYPE_MOUNTAIN,
+        CAR_TYPE_MINE,
+        CAR_TYPE_GOLD,
+        CAR_TYPE_DESERT
+    };
+
+    [TableList(ShowIndexLabels = true)]
+    public List<HexPlacementRuleConfig> hexPlacementRules = new();
+
+    public HexPlacementRuleConfig GetPlacementRule(string hexType)
+    {
+        if (string.IsNullOrEmpty(hexType) || hexPlacementRules == null)
+        {
+            return null;
+        }
+
+        return hexPlacementRules.FirstOrDefault(rule => rule.Matches(hexType));
+    }
 
     //Player Defaults
     public static string NO_CLIENT_ID = "No Client ID";
@@ -219,11 +247,87 @@ public class GameConstants : ScriptableObject
             {CAR_TYPE_DESERT, desertMaterial},
             {CAR_TYPE_GOLD, goldMaterial},
         };
+        EnsurePlacementRules();
+        EnsureHarbourFacingLandTypes();
     }
+
     private void Start()
     {
 
     }
 
+    private void EnsurePlacementRules()
+    {
+        if (hexPlacementRules == null)
+        {
+            hexPlacementRules = new List<HexPlacementRuleConfig>();
+        }
 
+        if (hexPlacementRules.Count == 0)
+        {
+            hexPlacementRules.Add(new HexPlacementRuleConfig
+            {
+                ruleName = "HarbourAdjacency",
+                applicableHexTypes = new List<string> {CAR_TYPE_HARBOUR},
+                fallbackHexType = CAR_TYPE_SEA,
+                maxAttemptsBeforeFallback = 30,
+                ruleTypes = new List<HexPlacementRuleType> {HexPlacementRuleType.NeedsAdjacentLand}
+            });
+        }
+    }
+
+    private void EnsureHarbourFacingLandTypes()
+    {
+        if (harbourFacingLandTypes == null)
+        {
+            harbourFacingLandTypes = new List<string>();
+        }
+
+        if (harbourFacingLandTypes.Count == 0)
+        {
+            harbourFacingLandTypes.AddRange(new[]
+            {
+                CAR_TYPE_FOREST,
+                CAR_TYPE_PASTURE,
+                CAR_TYPE_FIELD,
+                CAR_TYPE_HILL,
+                CAR_TYPE_MOUNTAIN,
+                CAR_TYPE_MINE,
+                CAR_TYPE_GOLD,
+                CAR_TYPE_DESERT
+            });
+        }
+    }
+
+    public bool IsHarbourFacingLandType(string hexType)
+    {
+        return !string.IsNullOrEmpty(hexType) && (harbourFacingLandTypes?.Contains(hexType) ?? false);
+    }
+}
+
+public enum HexPlacementRuleType
+{
+    NeedsAdjacentLand,
+    RetryWithDifferentLand,
+    Custom
+}
+
+[Serializable]
+public class HexPlacementRuleConfig
+{
+    public string ruleName;
+    public List<string> applicableHexTypes = new List<string>();
+    public List<HexPlacementRuleType> ruleTypes = new List<HexPlacementRuleType>();
+    public string fallbackHexType = GameConstants.CAR_TYPE_SEA;
+    public int maxAttemptsBeforeFallback = 30;
+
+    public bool Matches(string hexType)
+    {
+        if (string.IsNullOrEmpty(hexType))
+        {
+            return false;
+        }
+
+        return applicableHexTypes?.Contains(hexType) ?? false;
+    }
 }

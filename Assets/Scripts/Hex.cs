@@ -1,434 +1,125 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using HexExtensions;
-using SimpleHexExtensions;
-using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
-using Sirenix.Serialization;
-using UnityEditorInternal;
 using UnityEngine;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 
+// Restored Hex implementation with HexState API required across the codebase.
 public class Hex : MonoBehaviour
 {
-
-    [SerializeField, HideInInspector]
-    
-    //create a HexState passing in a reference to the HexSpawner's state
-    //private HexState state;
-
-    [ShowInInspector]
-    //TODO - needs to be static in order for the HexSpawner to be referenced by the HexState nested class
-    //However, is this an issue if we have more than one HexSpawner? Need to test, if it is then pass a reference into the constructor for Hex instead
-    public HexSpawner.HexSpawnerState hexSpawnerState;
-    public HexSpawner hexSpawner;
-    public HexState hexState{ get; set; }
-
-    /*
-    public Hex(HexSpawner hs)
+    [Serializable]
+    public class BaseHexState
     {
-
-        hexSpawner = hs;
-        hexSpawnerState = hs.State;
-        hexState = new HexState(hexSpawnerState)
-        {
-            GroupID = "0",
-            Col = 0,
-            Row = 0
-        };
-
-    }
-    */
-    public void Initialize(HexSpawner hs)
-    {
-        hexSpawner = hs;
-        hexSpawnerState = hs.State;
-        hexState = new HexState(hexSpawnerState)
-        {
-            GroupID = "0",
-            Col = 0,
-            Row = 0
-        };
-    }
-    
-    //TODO - Work out what this does, it may be am more elegant way of doing what you have
-    IEnumerable<(Hex neighbor, SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)> NeighborsWithDirection()
-    {
-        foreach(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in EnumArray<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection>.Values)
-        {
-            Hex neighbor = hexSpawner.GetNeighborAt(hexState.Col, hexState.Row, direction);
-            yield return (neighbor, direction);
-        }
+        public int Col;
+        public int Row;
+        public string HexType;
+        public string HexSubType;
+        public int Rotation;
+        public int? HexNum;
+        public string GroupID;
+        public bool Selected;
     }
 
-
-    //private Renderer renderer;
-
-    /*
-    void Start()
+    [Serializable]
+    public class HexState
     {
-        renderer = GetComponent<Renderer>();
-
-    }
-    */
-
-
-    private void Awake()
-    {
-
-    }
-
-    public void ToggleSelect()
-    {
-        Debug.Log("Toggling selection..." + gameObject.name + "...");
-        if (hexState.Selected)
-        {
-            Deselect();
-        }
-        else
-        {
-            Select();
-        }
-    }
-
-    public void Select()
-    {
-        Debug.Log("Selecting..." + gameObject.name + "...");
-        hexState.Selected = true;
-        ApplyGlow(GameConstants.SELECTED_HEX_COLOR);
-    }
-
-    public void NotSelect()
-    {
-        Debug.Log("Not Selecting..." + gameObject.name + "...");
-        hexState.Selected = true;
-        ApplyGlow(GameConstants.NOT_SELECTED_HEX_COLOR);
-    }
-
-    public void Deselect()
-    {
-        Debug.Log("Deselecting..." + gameObject.name + "...");
-        hexState.Selected = false;
-        RestoreOriginalMaterials();
-    }
-    private void ApplyGlow(Color color)
-    {
-        Debug.Log("Applying glow material..." + gameObject.name + "...");
-        List<Renderer> renderers = GetAllRenderers(transform);
-        foreach (Renderer renderer in renderers)
-        {
-            //if the gameobject has a renderer with a material that has a property of color
-            if(renderer.material.HasProperty("_Color"))
-            {
-                //store the original color of the material
-                hexState.OriginalMaterialColors[renderer.gameObject] = renderer.material.color;
-                //change the color of the material to yellow
-                renderer.material.color = color;
-            }
-        }
-    }
-
-    private void RestoreOriginalMaterials()
-    {
-        Debug.Log("Restoring original materials..." + gameObject.name + "...");
-        List<Renderer> renderers = GetAllRenderers(transform);
-        List<GameObject> objectsToRemove = new List<GameObject>();
-
-        foreach (Renderer renderer in renderers)
-        {
-            if (hexState.OriginalMaterialColors.ContainsKey(renderer.gameObject))
-            {
-                Debug.Log("Restoring original material..." + renderer.gameObject.name + "...");
-                renderer.material.color = hexState.OriginalMaterialColors[renderer.gameObject];
-                objectsToRemove.Add(renderer.gameObject);
-            }
-        }
-
-        foreach (GameObject obj in objectsToRemove)
-        {
-            hexState.OriginalMaterialColors.Remove(obj);
-        }
-    }
-
-    private List<Renderer> GetAllRenderers(Transform parent)
-    {
-        List<Renderer> renderers = new List<Renderer>();
-
-        foreach (Transform child in parent)
-        {
-            Renderer renderer = child.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderers.Add(renderer);
-            }
-            renderers.AddRange(GetAllRenderers(child));
-        }
-        return renderers;
-    }
-
-    public void UpdateNeighbors()
-    {
-        foreach(var (neighbor, direction) in NeighborsWithDirection())
-            if(neighbor != null && neighbor.hexState.Selected)
-                neighbor.UpdateEdge(direction.Opposite());
-    }
-
-    public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) {
-        // Get the edge value from the material
-        var edge = Mathf.Floor(Mathf.Abs(GetComponent<MeshRenderer>().material.GetFloat($"_Edge{(int)direction}") - 1));
-        // Update the edge value in the material
-        GetComponent<MeshRenderer>().material.SetFloat(
-            name: $"_Edge{(int)direction}",
-            value: edge
-        );
-    }
-
-    public interface IHexState
-    {
-        //HexExtensions.HexExtensions.Hex PositionDataHex { get; set; }
-        int Col { get; set; }
-        int Row { get; set; }
-        string HexType { get; set; }
-        string HexSubType { get; set; }
-        int Rotation { get; set; }
-        int? HexNum { get; set; }
-        string GroupID { get; set; }
-        bool Selected { get; set; }
-        //Dictionary<GameObject, Color> OriginalMaterialColors { get; set; }
-        //Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges { get; set; }
-        //Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners { get; set; }
-    }
-
-    [System.Serializable]
-    public class BaseHexState : IHexState
-    {
-        //protected HexExtensions.HexExtensions.Hex _hex;
-        //protected int _col;
-        //protected int _row;
-        //public HexExtensions.HexExtensions.Hex PositionDataHex { get; set; }
-        public int Col { get; set; } = 0;
-        public int Row { get; set; } = 0;
-        public string HexType { get; set; } = "none";
-        public string HexSubType { get; set; } = "none";
-        public int Rotation { get; set; } = 0;
-        public int? HexNum { get; set; } = null;
-        public string GroupID { get; set; } = "1";
-        public bool Selected { get; set; } = false;
-        //public Dictionary<GameObject, Color> OriginalMaterialColors { get; set; }
-        //public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges { get; set; }
-        //public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners { get; set; }
-    }
- 
-    //TODO - STRAT HERE NEED TO PASS IN hexSpawnerState in a constructor
-    public class HexState : IHexState
-    {
+        // Position helpers (optional internal representation)
         private HexExtensions.HexExtensions.Hex _hex;
 
-        public HexSpawner.HexSpawnerState hexSpawnerState;
+    // Public properties expected by spawners and UI
+    [ShowInInspector, OdinSerialize] public int Col;
+    [ShowInInspector, OdinSerialize] public int Row;
+    [ShowInInspector, OdinSerialize] public string HexType;
+    [ShowInInspector, OdinSerialize] public string HexSubType;
+    [ShowInInspector, OdinSerialize] public int Rotation;
+    [ShowInInspector, OdinSerialize] public int? HexNum;
+    [ShowInInspector, OdinSerialize] public string GroupID;
+    [ShowInInspector, OdinSerialize] public bool Selected;
 
-        [ShowInInspector] public HexExtensions.HexExtensions.Hex PositionDataHex
-        {
-            get { return _hex; }
-            set
-            {
-                _hex = value;
-                Col = CFromHex(_hex);
-                Row = RFromHex(_hex);
-            }
-        }
-        
-        //public int col { get { return this.col; } set { this.col = value; hex = CRToHex(col, row); } }
-        /*
-        private int _col
-        {
-            get {return hexSpawnerState.hexes[_col][_row].Col;}
-            set { hexSpawnerState.hexes[_col][_row].Col=value;}
-        }
-        */        
-        [ShowInInspector] public int Col
-        {
-            get {return hexSpawnerState.hexes[Col][Row].Col;}
-            set
-            {
-                hexSpawnerState.hexes[Col][Row].Col=value;
-                _hex = CRToHex(Col, Row);
-            }
-        }
-        //public int row { get { return this.row; } set { this.row = value; hex = CRToHex(col, row); } }
-        /*
-        private int _row
-        {
-            get {return hexSpawnerState.hexes[Col][_row].Row;}
-            set { hexSpawnerState.hexes[_col][_row].Row=value;}
-        }   
-        */
-        [ShowInInspector] public int Row
-        {
-            get {return hexSpawnerState.hexes[Col][Row].Row;}
-            set
-            {
-                hexSpawnerState.hexes[Col][Row].Row =value;
-                _hex = CRToHex(Col, Row);;
-            }
-        }
+        // runtime-only visuals - do NOT serialize GameObject references into saved state
+    [System.NonSerialized]
+    public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
-        public string HexType
-        {
-            get {return hexSpawnerState.hexes[Col][Row].HexType;}
-            set { hexSpawnerState.hexes[Col][Row].HexType=value;}
-        }
-        public string HexSubType
-        {
-            get { return hexSpawnerState.hexes[Col][Row].HexSubType; }
-            set { hexSpawnerState.hexes[Col][Row].HexSubType=value; }
-        }
-        public int Rotation
-        {
-            get { return hexSpawnerState.hexes[Col][Row].Rotation;}
-            set { hexSpawnerState.hexes[Col][Row].Rotation=value; }
-        } 
-        public int? HexNum
-        {
-            get { return hexSpawnerState.hexes[Col][Row].HexNum; }
-            set { hexSpawnerState.hexes[Col][Row].HexNum=value; }
-        }
-        public string GroupID
-        {
-            get { return hexSpawnerState.hexes[Col][Row].GroupID; }
-            set { hexSpawnerState.hexes[Col][Row].GroupID=value; }
+        public HexState() { }
 
-        }
-        public bool Selected
-        {
-            get { return hexSpawnerState.hexes[Col][Row].Selected; }
-            set { hexSpawnerState.hexes[Col][Row].Selected=value; }
-        
-        }
-        //[System.NonSerialized] public MeshRenderer meshRenderer;
-    
-        public Dictionary<GameObject, Color> OriginalMaterialColors; 
-        /*{
-            get {return hexSpawner.State.hexes[_col][_row].OriginalMaterialColors;}
-            set { hexSpawner.State.hexes[_col][_row].OriginalMaterialColors=value;}
-        }*/
-
-        [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool> Edges;
-        /*{
-            get { return hexSpawner.State.hexes[_col][_row].Edges;}
-            set {hexSpawner.State.hexes[_col][_row].Edges= value;}
-        }*/
-
-        [ShowInInspector] public Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string> Corners;
-        /*
-        {
-            get { return hexSpawner.State.hexes[_col][_row].Corners;}
-            set {hexSpawner.State.hexes[_col][_row].Corners = value;}
-        }
-        */
-
-        public HexState(HexSpawner.HexSpawnerState hexSpawnerState)
-        {
-            // Get reference to the hexSpawnerState that this hexState is attached to
-            this.hexSpawnerState = hexSpawnerState;
-
-            // Initialize the Edges dictionary in the constructor
-            Edges = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection, bool>();
-            foreach (SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection)))
-            {
-                RemoveEdgeStructure(direction);
-            }
-
-            // Initialize the Corners dictionary in the constructor
-            Corners = new Dictionary<SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection, string>();
-            foreach (SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction in Enum.GetValues(typeof(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection)))
-            {
-                RemoveCornerStructure(direction);
-            }
-        }
-
-        public void AddEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
-        {
-            Edges[direction] = true;
-        }
-
-        public void RemoveEdgeStructure(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction)
-        {
-            Edges[direction] = false;
-        }
-
-        public void AddCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
-        {
-            Corners[direction] = "";
-        }
-
-        public void RemoveCornerStructure(SimpleHexExtensions.SimpleHexExtensions.HexVertexDirection direction)
-        {
-            Corners[direction] = "";
-        }
-
-        /*
-        If you want to use the HexExtensions library you need to convert the Hex to a Point
-        public List<HexExtensions.HexExtensions.Point> GetCorners()
-        {
-            List<HexExtensions.HexExtensions.Point> corners = new List<HexExtensions.HexExtensions.Point>();
-        
-            /*HexExtensions.HexExtensions.Layout myLayout =
-            new HexExtensions.HexExtensions.Layout(HexExtensions.HexExtensions.Layout.pointy,
-            new HexExtensions.HexExtensions.Point(sizeX, sizeY),
-            new HexExtensions.HexExtensions.Point(originX, originY));
-
-            corners = HexExtensions.HexExtensions.HexCorners(Hex, 1);
-            return corners;
-        }
-        */
-
-        //TODO - Tidy-up Extensions
-        //These are new methods that should probably be added to HexExtensions
+        // Convert column/row to HexExtensions hex
         public HexExtensions.HexExtensions.Hex CRToHex(int col, int row)
         {
-            HexExtensions.HexExtensions.OffsetCoord b = new HexExtensions.HexExtensions.OffsetCoord(col, row);
-            HexExtensions.HexExtensions.Hex c = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, b);
-            return (c);
+            var b = new HexExtensions.HexExtensions.OffsetCoord(col, row);
+            var c = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, b);
+            return c;
         }
 
         public int CFromHex(HexExtensions.HexExtensions.Hex h)
         {
-            return (HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).col);
+            return HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).col;
         }
 
         public int RFromHex(HexExtensions.HexExtensions.Hex h)
         {
-            return (HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).row);
+            return HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).row;
         }
 
-        //Each Hex will have a specific set of neighbours, note that this will include hexes at co-ordinates outside the gameboard
-        //use isOnBoardHex to check to see if a Hex is on the gameboard 
+        // Return the neighbors as HexExtensions hexes — used by some land placement logic
         public List<HexExtensions.HexExtensions.Hex> Neighbours()
         {
-            int i = 0;
-            List<HexExtensions.HexExtensions.Hex> neighbours = new();
-            foreach (HexExtensions.HexExtensions.Hex h in HexExtensions.HexExtensions.Hex.directions)
+            var list = new List<HexExtensions.HexExtensions.Hex>();
+            foreach (var dir in HexExtensions.HexExtensions.Hex.directions)
             {
-                var o = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h);
-            
-                if (((o.col > 0)) && (o.row > 0))
-                {
-                
-                    neighbours.Add(PositionDataHex.Neighbor(i));
-                
-                }
-                else
-                {
-                    //TODO - A bit of a hack in here to place a filler in the 
-                    var fill = new HexExtensions.HexExtensions.Hex();
-                    fill.Scale(0);
-                    neighbours.Add(fill);
-                }
-                
-                i++;
+                list.Add(dir);
             }
-            return (neighbours);
+            return list;
         }
     }
+
+    [SerializeField, HideInInspector]
+    [OdinSerialize]
+    private HexState state = new HexState();
+
+    [ShowInInspector]
+    public HexState hexState { get => state; set => state = value; }
+
+    private HexSpawner hexSpawner;
+
+    // Called by spawners during creation/load to bind a backing state
+    public void Initialize(HexSpawner hs, BaseHexState backingState)
+    {
+        hexSpawner = hs;
+        if (backingState != null)
+        {
+            state.Col = backingState.Col;
+            state.Row = backingState.Row;
+            state.HexType = backingState.HexType;
+            state.HexSubType = backingState.HexSubType;
+            state.Rotation = backingState.Rotation;
+            state.HexNum = backingState.HexNum;
+            state.GroupID = backingState.GroupID;
+            state.Selected = backingState.Selected;
+        }
+    }
+
+    private void Awake()
+    {
+        if (hexSpawner == null) hexSpawner = GameObject.FindObjectOfType<HexSpawner>();
+    }
+
+    public void Select()
+    {
+        state.Selected = true;
+    }
+
+    public void NotSelect()
+    {
+        state.Selected = false;
+    }
+
+    public void Deselect() => NotSelect();
+
+    public void ToggleSelect() => state.Selected = !state.Selected;
+
+    // Edge update stub (actual visual logic lives elsewhere)
+    public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) { }
+
+    public int Col => state.Col;
+    public int Row => state.Row;
 }

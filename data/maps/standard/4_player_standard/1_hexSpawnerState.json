@@ -1,0 +1,11 @@
+{
+    "$id": 0,
+    "$type": "0|HexSpawner+HexSpawnerState, Assembly-CSharp",
+    "hexes": {
+        "$id": 1,
+        "$type": "1|System.Collections.Generic.List`1[[System.Collections.Generic.List`1[[Hex+HexState, Assembly-CSharp]], mscorlib]], mscorlib",
+        "$rlength": 0,
+        "$rcontent": [
+        ]
+    }
+}

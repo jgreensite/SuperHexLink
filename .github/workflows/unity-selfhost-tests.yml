@@ -1,0 +1,63 @@
+name: Unity EditMode tests (self-hosted)
+
+on:
+  push:
+    branches: [ main, 'feature/*' ]
+  pull_request:
+
+jobs:
+  unity-tests:
+    runs-on: [self-hosted, windows, unity]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Repo csproj build guard
+        shell: powershell
+        run: |
+          Write-Host "Running repo-wide csproj build guard"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.cmd'
+          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          & $script
+
+      - name: Build CoreLogic
+        shell: powershell
+        run: |
+          Write-Host "Building CoreLogic library"
+          dotnet build CoreLogic\src\CoreLogic\CoreLogic.csproj --configuration Debug --verbosity minimal
+
+      - name: Run CoreLogic dotnet tests
+        shell: powershell
+        run: |
+          Write-Host "Running CoreLogic dotnet tests"
+          dotnet test CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
+
+      - name: Upload CoreLogic test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corelogic-test-results
+          path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
+
+      - name: Dotnet build (fast sanity)
+        shell: powershell
+        run: |
+          Write-Host "Searching for Assembly-CSharp.csproj under $env:GITHUB_WORKSPACE"
+          $proj = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter 'Assembly-CSharp.csproj' -File -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $proj) { Write-Error "Assembly-CSharp.csproj not found in workspace ($env:GITHUB_WORKSPACE)"; exit 2 }
+          Write-Host "Found project: $($proj.FullName)"
+          dotnet build "${proj.FullName}" /property:GenerateFullPaths=true
+
+      - name: Run Unity EditMode tests (batch)
+        shell: powershell
+        run: |
+          $unityPath = "C:\\Program Files\\Unity\\Hub\\Editor\\2021.3.18f1\\Editor\\Unity.exe"
+          if (-not (Test-Path $unityPath)) { Write-Error "Unity executable not found at $unityPath"; exit 2 }
+          New-Item -ItemType Directory -Path "$env:GITHUB_WORKSPACE\TestResults" -Force | Out-Null
+          & $unityPath -batchmode -projectPath "$env:GITHUB_WORKSPACE" -runTests -testPlatform EditMode -testResults "$env:GITHUB_WORKSPACE\TestResults\editmode-results.xml" -logFile "$env:GITHUB_WORKSPACE\TestResults\unity-batch-log.txt" -quit
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: unity-test-results
+          path: TestResults/
