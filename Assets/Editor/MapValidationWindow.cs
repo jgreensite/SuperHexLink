@@ -72,6 +72,13 @@ public class MapEditorWindow : EditorWindow
         window.Show();
     }
 
+    [MenuItem("SuperHexLink/Toggle Hex Selection Mode %#h")]
+    public static void ToggleHexSelectionModeMenu()
+    {
+        var window = GetWindow<MapEditorWindow>("Map Editor");
+        window.ToggleHexSelectionMode();
+    }
+
     private void OnEnable()
     {
         FindReferences();
@@ -107,6 +114,17 @@ public class MapEditorWindow : EditorWindow
         ResetHexEditorValues();
         SceneView.lastActiveSceneView?.FrameSelected();
         HighlightHex(hex);
+        Repaint();
+    }
+
+    public void ToggleHexSelectionMode()
+    {
+        _hexSelectionMode = !_hexSelectionMode;
+        if (!_hexSelectionMode)
+        {
+            ClearHoverHighlight();
+        }
+        SceneView.RepaintAll();
         Repaint();
     }
 
