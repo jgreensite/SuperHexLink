@@ -21,3 +21,41 @@ If you prefer to run the build guard manually, execute:
 ```
 
 This is the same script used by CI and will catch compile errors across projects.
+
+## Changed-only build guard and test harness
+
+The repository includes a changed-only build guard to speed up local checks and CI for pull requests. By default it runs quietly; add `-Verbose` if you want to see debug output.
+
+- Run the changed-only guard against staged changes (local):
+
+```powershell
+.\scripts\check-csproj-builds.ps1 -ChangedOnly
+```
+
+- If you want to run it against a Git diff reference (useful in PR checks):
+
+```powershell
+.\scripts\check-csproj-builds.ps1 -ChangedOnly -DiffRef main
+```
+
+- Enable verbose output to see path mappings and diagnostics:
+
+```powershell
+.\scripts\check-csproj-builds.ps1 -ChangedOnly -Verbose
+```
+
+- Test harness for the changed-only guard:
+
+```powershell
+.\scripts\test-check-changedonly.ps1
+# Or target a specific file to verify the mapping & build:
+.\scripts\test-check-changedonly.ps1 -TargetFile Assets/Editor/MapValidationWindow.cs
+```
+
+- Install the pre-commit hook to use changed-only checks automatically on commit:
+
+```powershell
+.\scripts\install-git-hooks.ps1
+```
+
+If you need the hook to run in verbose mode for debugging, edit the pre-commit hook or call the script manually with `-Verbose`.
