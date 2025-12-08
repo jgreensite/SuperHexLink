@@ -22,7 +22,9 @@ if ($ChangedOnly)
         Write-Verbose "Using diff ref: $DiffRef to identify changed files"
         # Try using origin/$DiffRef if available; otherwise attempt to fetch it
         $remoteRef = "origin/$DiffRef"
-        $refExists = (git show-ref --verify --quiet "refs/remotes/$remoteRef"; if ($LASTEXITCODE -eq 0) { $true } else { $false })
+        $refExists = $false
+        git show-ref --verify --quiet "refs/remotes/$remoteRef" 2>$null
+        if ($LASTEXITCODE -eq 0) { $refExists = $true }
         if (-not $refExists) {
             Write-Verbose "Attempting to fetch origin/$DiffRef so we can diff against it"
             try {
@@ -91,7 +93,9 @@ if ($ChangedOnly)
     # Persist the detected projects so CI workflows can read them (e.g., for conditional steps)
     try {
         $changedFile = Join-Path $root 'changed-csprojs.txt'
-        $csprojs | Set-Content -Path $changedFile -Encoding UTF8
+        # Normalize to repository-root relative paths with forward slashes so CI can match against parts
+        $relativePaths = $csprojs | ForEach-Object { $_.Substring($root.Length).TrimStart('\','/') -replace '\\','/' }
+        $relativePaths | Set-Content -Path $changedFile -Encoding UTF8
         Write-Verbose "Wrote changed project list to $changedFile"
     } catch {
         Write-Verbose "Failed to write changed project list: $($_.Exception.Message)"

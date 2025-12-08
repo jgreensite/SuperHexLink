@@ -60,6 +60,24 @@ jobs:
           } else {
               Add-Content -Path $env:GITHUB_OUTPUT -Value "$name="
           }
+          # Export a boolean for presence of changed projects for easier conditional checks
+          $hasChanges = 'false'
+          if ((Test-Path $changedFile) -and ((Get-Content $changedFile -Raw).Trim() -ne '')) { $hasChanges = 'true' }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "has_changes=$hasChanges"
+
+      - name: Build changed projects
+        if: steps.set_changed_projects.outputs.has_changes == 'true'
+        shell: powershell
+        run: |
+          $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
+          if (-not (Test-Path $changedFile)) { Write-Host "No changed-csprojs.txt found; skipping builds"; exit 0 }
+          $projects = Get-Content $changedFile | Where-Object { $_ -ne '' }
+          foreach ($p in $projects) {
+              $projPath = (Join-Path $env:GITHUB_WORKSPACE ($p -replace '/', '\\'))
+              if (-not (Test-Path $projPath)) { Write-Host "Project path not found: $projPath"; exit 1 }
+              Write-Host "Building changed project: $p"
+              dotnet build $projPath --configuration Debug --verbosity minimal
+          }
 
       - name: Build CoreLogic
         shell: powershell
