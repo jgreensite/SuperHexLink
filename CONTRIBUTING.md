@@ -64,4 +64,14 @@ If you want to install the pre-commit hook in DryRun mode (so it only prints det
 .\scripts\install-git-hooks.ps1 -DryRun
 ```
 
+DryRun quick verification
+-------------------------
+To quickly list (and validate) the changed projects from a PR or a staged change without performing any builds, run:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\check-csproj-builds.ps1 -ChangedOnly -DiffRef main -DryRun
+```
+
+This writes `changed-csprojs.txt` and (in CI) `changed-csprojs-dryrun.txt` for debugging.
+
 If you need the hook to run in verbose mode for debugging, edit the pre-commit hook or call the script manually with `-Verbose`.

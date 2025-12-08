@@ -81,6 +81,10 @@ function Run-Guard {
         [bool]$IsCli,
         [switch]$Dry
     )
+    function ScriptSupportsDryRun {
+        param([string]$p)
+        try { return (Select-String -Path $p -Pattern 'DryRun' -SimpleMatch -Quiet) } catch { return $false }
+    }
     if ($IsCli) {
         $guardArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$ScriptPath,'-ChangedOnly')
         if ($Dry) { $guardArgs += '-DryRun' }
@@ -89,7 +93,16 @@ function Run-Guard {
         $proc = Start-Process -FilePath $exe -ArgumentList $guardArgs -NoNewWindow -Wait -PassThru
         return $proc.ExitCode
     } else {
-        if ($Dry) {
+        $supportsDry = ScriptSupportsDryRun -p $ScriptPath
+        if ($Dry -and $supportsDry) {
+            Write-Host "Wrapper detected and supports DryRun; invoking wrapper with -DryRun" -ForegroundColor Yellow
+            if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
+            $args = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$ScriptPath,'-ChangedOnly')
+            if ($Dry) { $args += '-DryRun' }
+            $proc = Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
+            return $proc.ExitCode
+        }
+        elseif ($Dry) {
             Write-Host "Wrapper detected but DryRun enabled; computing changed csproj list locally instead of running wrapper." -ForegroundColor Yellow
             $detected = Get-ChangedCsprojsLocal
             Write-Host "DryRun detected changed projects:" -ForegroundColor Cyan

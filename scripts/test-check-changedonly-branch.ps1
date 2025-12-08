@@ -39,15 +39,24 @@ function Get-GuardInvoker {
 
 function ScriptSupportsDryRun {
     param([string]$p)
-    try { return (Select-String -Path $p -Pattern '\bDryRun\b' -SimpleMatch -Quiet) } catch { return $false }
+    try { return (Select-String -Path $p -Pattern 'DryRun' -SimpleMatch -Quiet) } catch { return $false }
 }
 
 function Run-Guard {
     param([string]$GuardPath, [bool]$IsCli, [switch]$Dry)
-    $args = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$GuardPath,'-ChangedOnly')
-    if ($Dry -and (ScriptSupportsDryRun -p $GuardPath)) { $args += '-DryRun' }
+    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$GuardPath,'-ChangedOnly','-DiffRef',$BaseRef)
+    $supportsDry = ScriptSupportsDryRun -p $GuardPath
+    if ($env:CHECK_CS_PROJ_DEBUG) {
+        Write-Host "[HARNESS-DEBUG] Guard path: $GuardPath" -ForegroundColor Cyan
+        Write-Host "[HARNESS-DEBUG] Guard path supports DryRun: $supportsDry" -ForegroundColor Cyan
+        Write-Host "[HARNESS-DEBUG] Harness passed DryRun: $Dry" -ForegroundColor Cyan
+    }
+    if ($Dry -and $supportsDry) { $argList += '-DryRun' }
     if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
-    $proc = Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
+    if ($env:CHECK_CS_PROJ_DEBUG) { Write-Host "[HARNESS-DEBUG] Invoking guard: $exe with args: $($argList -join ' ')" -ForegroundColor Cyan }
+    $oldDebug = $env:CHECK_CS_PROJ_DEBUG
+    $proc = Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -Wait -PassThru
+    try { if ($oldDebug) { $env:CHECK_CS_PROJ_DEBUG = $oldDebug } else { Remove-Item Env:CHECK_CS_PROJ_DEBUG -ErrorAction SilentlyContinue } } catch { }
     return $proc.ExitCode
 }
 
@@ -76,6 +85,8 @@ try {
         $stashRes = & git stash push -u -m "harness-stash-$guid" 2>$null
         if (-not $stashRes) { Write-Warning 'Could not stash; aborting'; exit 2 }
         git checkout -b $tempBranch
+        # Apply the stash to temp branch so changes are present in the commit
+        try { & git stash pop 2>$null } catch { try { & git stash apply 2>$null } catch { Write-Warning 'Failed to apply stash to temp branch' } }
         git commit -m "Harness temp commit $guid" --no-verify > $null 2>&1
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }

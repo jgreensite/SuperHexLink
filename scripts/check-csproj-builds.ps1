@@ -2,7 +2,6 @@
 Runs `dotnet build` for every .csproj under the repository and returns non-zero if any build fails.
 This is a lightweight guard that CI and local pre-push hooks can call to catch compile errors quickly.
 #>
-[CmdletBinding()]
 [CmdletBinding(SupportsShouldProcess=$true)]
 Param(
     [switch]$ChangedOnly,
@@ -118,8 +117,16 @@ if (-not $csprojs) {
     exit 0
 }
 
+## Debug and normalize DryRun detection
 $failed = @()
-if ($DryRun) {
+$isDryRun = $false
+# Treat -WhatIf the same as DryRun so the script prints what it would build but does not execute
+if ($PSBoundParameters.ContainsKey('DryRun') -or $DryRun -or $PSBoundParameters.ContainsKey('WhatIf')) { $isDryRun = $true }
+if ($env:CHECK_CS_PROJ_DEBUG) {
+    Write-Host "[DEBUG] PSBoundParameters: $($PSBoundParameters.Keys -join ', ')"
+    Write-Host "[DEBUG] Detected DryRun: $isDryRun"
+}
+if ($isDryRun) {
     Write-Host "(DryRun) Would build the following projects:" -ForegroundColor Cyan
     foreach ($proj in $csprojs) { Write-Host " - $proj" }
 } else {

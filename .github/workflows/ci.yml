@@ -89,6 +89,38 @@ jobs:
           name: changed-csprojs-dryrun
           path: changed-csprojs-dryrun.txt
 
+      - name: Assert DryRun detection parity
+        if: always()
+        shell: powershell
+        run: |
+          Write-Host "Comparing DryRun vs normal changed-csprojs detection..."
+          $dryFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs-dryrun.txt'
+          $file = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
+          $dry = ''
+          $f = ''
+          if (Test-Path $dryFile) { $dry = (Get-Content $dryFile -Raw).Trim() }
+          if (Test-Path $file) { $f = (Get-Content $file -Raw).Trim() }
+          if ($dry -eq '' -and $f -eq '') { Write-Host 'Both empty - nothing to build'; exit 0 }
+          if (($dry -eq '' -and $f -ne '') -or ($dry -ne '' -and $f -eq '')) { Write-Error 'DryRun and normal detection differ: one is empty and the other is not'; exit 1 }
+          $a = $dry -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } | Sort-Object
+          $b = $f -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } | Sort-Object
+          $diff = Compare-Object -ReferenceObject $a -DifferenceObject $b
+          if ($diff) { Write-Error "DryRun and normal detection results differ:`n$($diff | Out-String)"; exit 1 }
+          Write-Host 'DryRun and normal detection are consistent.' -ForegroundColor Green
+
+      - name: Run branch harness in DryRun (additional validation)
+        shell: powershell
+        run: |
+          Write-Host "Running branch harness (DryRun) for diagnostics"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\test-check-changedonly-branch.ps1 -BaseRef $baseRef -DryRun
+          if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-branch-harness.txt -Force }
+      - name: Upload changed-csprojs-branch-harness.txt for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-csprojs-branch-harness
+          path: changed-csprojs-branch-harness.txt
+
       - name: Build changed projects
         if: steps.set_changed_projects.outputs.has_changes == 'true'
         shell: powershell
