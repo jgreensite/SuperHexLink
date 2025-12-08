@@ -86,6 +86,30 @@ public class MapEditorWindow : EditorWindow
         ClearAllHighlights();
     }
 
+    private void OnSelectionChanged()
+    {
+        var active = Selection.activeGameObject;
+        if (active == null)
+        {
+            return;
+        }
+        var hex = active.GetComponent<Hex>();
+        if (hex == null)
+        {
+            return;
+        }
+        // Clear previous selection highlight
+        if (_selectedHex != null && _selectedHex != hex)
+        {
+            ClearHexHighlight();
+        }
+        _selectedHex = hex;
+        ResetHexEditorValues();
+        SceneView.lastActiveSceneView?.FrameSelected();
+        HighlightHex(hex);
+        Repaint();
+    }
+
     private void FindReferences()
     {
         _gameSpawner = FindObjectOfType<GameSpawner>();
@@ -1195,7 +1219,7 @@ public class MapEditorWindow : EditorWindow
                 // Repaint the editor window
                 Repaint();
                 
-                Debug.Log($"Selected hex at [{hexUnderMouse.hexState?.Col}, {hexUnderMouse.hexState?.Row}] - {hexUnderMouse.hexState?.Type}");
+                Debug.Log($"Selected hex at [{hexUnderMouse.hexState?.Col}, {hexUnderMouse.hexState?.Row}] - {hexUnderMouse.hexState?.HexType}");
                 
                 e.Use();
             }
@@ -1234,7 +1258,7 @@ public class MapEditorWindow : EditorWindow
         // Show hex info under cursor
         if (hexUnderMouse != null)
         {
-            var hexInfo = $"[{hexUnderMouse.hexState?.Col}, {hexUnderMouse.hexState?.Row}] {hexUnderMouse.hexState?.Type}";
+            var hexInfo = $"[{hexUnderMouse.hexState?.Col}, {hexUnderMouse.hexState?.Row}] {hexUnderMouse.hexState?.HexType}";
             GUI.Box(new Rect(10, 45, 200, 25), hexInfo, indicatorStyle);
         }
         
