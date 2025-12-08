@@ -43,19 +43,37 @@ jobs:
           # `github.base_ref` contains the base branch for the PR (e.g., 'main')
           $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
           Write-Host "Diff base ref: $baseRef"
+          # Ensure base ref is available locally for diffs
+          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
           pwsh -NoProfile -ExecutionPolicy Bypass -File $script -ChangedOnly -DiffRef $baseRef
+          # Write changelist output to stdout for debugging; the script writes changed-csprojs.txt to GITHUB_WORKSPACE
+
+      - name: Set changed-projects output
+        id: set_changed_projects
+        shell: powershell
+        run: |
+          $name = 'changed_projects'
+          $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
+          if (Test-Path $changedFile) {
+              $value = (Get-Content $changedFile -Raw).Trim()
+              if ($value -eq '') { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=" } else { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=$value" }
+          } else {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value "$name="
+          }
 
       - name: Build CoreLogic
         shell: powershell
+        if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
         run: |
           Write-Host "Building CoreLogic library"
-          dotnet build CoreLogic\src\CoreLogic\CoreLogic.csproj --configuration Debug --verbosity minimal
+          dotnet build "$env:GITHUB_WORKSPACE\CoreLogic\src\CoreLogic\CoreLogic.csproj" --configuration Debug --verbosity minimal
 
       - name: Run CoreLogic dotnet tests
+        if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
         shell: powershell
         run: |
           Write-Host "Running CoreLogic dotnet tests"
-          dotnet test CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
+          dotnet test "$env:GITHUB_WORKSPACE\CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj" --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
 
       - name: Upload CoreLogic test results
         if: always()

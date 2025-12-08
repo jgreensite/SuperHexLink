@@ -20,7 +20,23 @@ if ($ChangedOnly)
     # Find staged files or use diff ref
     if ($DiffRef) {
         Write-Verbose "Using diff ref: $DiffRef to identify changed files"
-        $staged = git diff --name-only $DiffRef..HEAD 2>$null
+        # Try using origin/$DiffRef if available; otherwise attempt to fetch it
+        $remoteRef = "origin/$DiffRef"
+        $refExists = (git show-ref --verify --quiet "refs/remotes/$remoteRef"; if ($LASTEXITCODE -eq 0) { $true } else { $false })
+        if (-not $refExists) {
+            Write-Verbose "Attempting to fetch origin/$DiffRef so we can diff against it"
+            try {
+                git fetch origin $DiffRef --depth=1 2>$null
+            } catch {
+                Write-Verbose "Failed to fetch origin/$DiffRef - proceeding with local ref if available"
+            }
+        }
+        # Prefer origin/$DiffRef to ensure PR base ref resolution
+        $staged = git diff --name-only origin/$DiffRef..HEAD 2>$null
+        if (-not $staged) {
+            # Last-resort fallback to local ref
+            $staged = git diff --name-only $DiffRef..HEAD 2>$null
+        }
     }
     else {
         # staged changes in the index
@@ -64,10 +80,22 @@ if ($ChangedOnly)
 
     if ($projSet.Count -eq 0) {
         Write-Host "No project files discovered for staged changes; nothing to build." -ForegroundColor Yellow
+        # Create/clear the changed-csprojs.txt output so CI steps downstream can rely on its presence
+        $changedFile = Join-Path $root 'changed-csprojs.txt'
+        if (Test-Path $changedFile) { Remove-Item $changedFile -Force }
+        New-Item -Path $changedFile -ItemType File -Force | Out-Null
         exit 0
     }
 
     $csprojs = @($projSet) | Select-Object -Unique
+    # Persist the detected projects so CI workflows can read them (e.g., for conditional steps)
+    try {
+        $changedFile = Join-Path $root 'changed-csprojs.txt'
+        $csprojs | Set-Content -Path $changedFile -Encoding UTF8
+        Write-Verbose "Wrote changed project list to $changedFile"
+    } catch {
+        Write-Verbose "Failed to write changed project list: $($_.Exception.Message)"
+    }
 } else {
     $csprojs = Get-ChildItem -Path $root -Recurse -Filter *.csproj -ErrorAction SilentlyContinue | 
     Where-Object { 
