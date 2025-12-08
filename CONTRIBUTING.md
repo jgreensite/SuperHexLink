@@ -10,7 +10,7 @@ Run this in PowerShell from the repository root:
 .\scripts\install-git-hooks.ps1
 ```
 
-This installs a pre-commit hook that runs `scripts/check-csproj-builds.ps1` to perform a `dotnet build` on every .csproj. It will block the commit if any project fails to build.
+This installs a pre-commit hook that runs `scripts/check-csproj-builds.ps1 -ChangedOnly` to perform a `dotnet build` only for the projects affected by files staged for the commit. This keeps the pre-commit fast while still catching compile errors before a commit. CI still runs a full build guard.
 
 ## Local build guard (manual)
 
