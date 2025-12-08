@@ -1,3 +1,14 @@
+## DryRun & WhatIf
+
+The `check-csproj-builds.ps1` wrapper now supports a `-DryRun` switch which prints the detected changed projects and skips running `dotnet build`.
+
+Use the CLI `check-csproj-builds-cli.ps1` if available for `-WhatIf` behavior via PowerShell `ShouldProcess` support; otherwise the wrapper will forward arguments.
+
+You can install a pre-commit hook in DryRun mode for testing by running:
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/install-git-hooks.ps1 -DryRun
+```
+
 # Build and Development Scripts
 
 This directory contains automation scripts for building, testing, and managing the SuperHexLink project.

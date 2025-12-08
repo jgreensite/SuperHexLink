@@ -1,4 +1,6 @@
-Param()
+Param(
+    [switch]$DryRun
+)
 
 $repoRoot = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
 $gitHooksDir = Join-Path $repoRoot '.git\hooks'
@@ -11,12 +13,14 @@ if (-not (Test-Path $gitHooksDir)) {
 
 $script = Join-Path $repoRoot 'scripts\check-csproj-builds.ps1'
 
+if ($DryRun) { $installFlags = ' -ChangedOnly -DryRun' } else { $installFlags = ' -ChangedOnly' }
+
 $hookContent = @"
 #!/bin/sh
 # Pre-commit hook installed by scripts/install-git-hooks.ps1
 # This guard runs the standard dotnet build guard script and prevents commit if any csproj fails to build.
 if [ -x "/usr/bin/pwsh" ]; then
-    pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly || exit 1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "$script"$installFlags || exit 1
 elif [ -x "/usr/bin/powershell" ]; then
     powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly || exit 1
 else
@@ -38,9 +42,9 @@ if (Test-Path $preCommitPath) {
         $appendBlock = @"
 # Begin csproj build guard (added by scripts/install-git-hooks.ps1)
 if [ -x "/usr/bin/pwsh" ]; then
-    pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly || exit 1
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "$script"$installFlags || exit 1
 elif [ -x "/usr/bin/powershell" ]; then
-    powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly || exit 1
+    powershell -NoProfile -ExecutionPolicy Bypass -File "$script"$installFlags || exit 1
 else
     echo "PowerShell not found. Skipping csproj build guard."
 fi

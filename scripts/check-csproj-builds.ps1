@@ -3,9 +3,11 @@ Runs `dotnet build` for every .csproj under the repository and returns non-zero 
 This is a lightweight guard that CI and local pre-push hooks can call to catch compile errors quickly.
 #>
 [CmdletBinding()]
+[CmdletBinding(SupportsShouldProcess=$true)]
 Param(
     [switch]$ChangedOnly,
-    [string]$DiffRef
+    [string]$DiffRef,
+    [switch]$DryRun
 )
 
 Set-StrictMode -Version Latest
@@ -117,14 +119,24 @@ if (-not $csprojs) {
 }
 
 $failed = @()
-foreach ($proj in $csprojs) {
-    Write-Host "Building: $proj"
-    $proc = Start-Process -FilePath 'dotnet' -ArgumentList @('build', $proj, '/property:GenerateFullPaths=true', '/consoleloggerparameters:NoSummary') -Wait -PassThru -NoNewWindow
-    if ($proc.ExitCode -ne 0) {
-        Write-Host "Build failed: $proj (exit $($proc.ExitCode))" -ForegroundColor Red
-        $failed += $proj
-    } else {
-        Write-Host "Build succeeded: $proj" -ForegroundColor Green
+if ($DryRun) {
+    Write-Host "(DryRun) Would build the following projects:" -ForegroundColor Cyan
+    foreach ($proj in $csprojs) { Write-Host " - $proj" }
+} else {
+    foreach ($proj in $csprojs) {
+        Write-Host "Building: $proj"
+        # Respect ShouldProcess / -WhatIf by wrapping the actual build call.
+        if ($PSCmdlet -and $PSCmdlet.ShouldProcess($proj, 'Build')) {
+            $proc = Start-Process -FilePath 'dotnet' -ArgumentList @('build', $proj, '/property:GenerateFullPaths=true', '/consoleloggerparameters:NoSummary') -Wait -PassThru -NoNewWindow
+            if ($proc.ExitCode -ne 0) {
+                Write-Host "Build failed: $proj (exit $($proc.ExitCode))" -ForegroundColor Red
+                $failed += $proj
+            } else {
+                Write-Host "Build succeeded: $proj" -ForegroundColor Green
+            }
+        } else {
+            Write-Host "Skipping build due to -WhatIf or ShouldProcess for: $proj" -ForegroundColor Yellow
+        }
     }
 }
 

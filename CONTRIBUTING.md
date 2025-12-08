@@ -58,4 +58,10 @@ The repository includes a changed-only build guard to speed up local checks and 
 .\scripts\install-git-hooks.ps1
 ```
 
+If you want to install the pre-commit hook in DryRun mode (so it only prints detected projects and doesn't run builds), do:
+
+```powershell
+.\scripts\install-git-hooks.ps1 -DryRun
+```
+
 If you need the hook to run in verbose mode for debugging, edit the pre-commit hook or call the script manually with `-Verbose`.
