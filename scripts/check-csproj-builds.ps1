@@ -2,21 +2,30 @@
 Runs `dotnet build` for every .csproj under the repository and returns non-zero if any build fails.
 This is a lightweight guard that CI and local pre-push hooks can call to catch compile errors quickly.
 #>
+[CmdletBinding()]
 Param(
-    [switch]$ChangedOnly
+    [switch]$ChangedOnly,
+    [string]$DiffRef
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
-Write-Host "Repository root: $root"
+Write-Verbose "Repository root: $root"
 
 if ($ChangedOnly)
 {
     Write-Host "Running in ChangedOnly mode; building only projects impacted by staged changes."
-    # Find staged files
-    $staged = git diff --cached --name-only 2>$null
+    # Find staged files or use diff ref
+    if ($DiffRef) {
+        Write-Verbose "Using diff ref: $DiffRef to identify changed files"
+        $staged = git diff --name-only $DiffRef..HEAD 2>$null
+    }
+    else {
+        # staged changes in the index
+        $staged = git diff --cached --name-only 2>$null
+    }
     if (-not $staged) {
         Write-Host "No staged changes detected; no projects to build." -ForegroundColor Yellow
         exit 0
@@ -27,13 +36,24 @@ if ($ChangedOnly)
     foreach ($file in $changedFiles)
     {
         if (-not (Test-Path $file)) { continue }
+        # Map common Unity assembly layout: Assets/Editor -> Assembly-CSharp-Editor.csproj; Assets/* -> Assembly-CSharp.csproj
+        $rel = [System.IO.Path]::GetFullPath($file).Substring($root.Length).TrimStart('\','/')
+        Write-Verbose "Changed file relative path: $rel"
+        if ($rel -match '^Assets[\\\/]+Editor[\\\/]+') {
+            $editorProj = Join-Path $root 'Assembly-CSharp-Editor.csproj'
+            if (Test-Path $editorProj) { $projSet.Add($editorProj) | Out-Null; continue }
+        }
+        elseif ($rel -match '^Assets[\\\/]') {
+            $runtimeProj = Join-Path $root 'Assembly-CSharp.csproj'
+            if (Test-Path $runtimeProj) { $projSet.Add($runtimeProj) | Out-Null; continue }
+        }
         # If this is a csproj, add it directly
         if ($file -like '*.csproj') { $projSet.Add($file) | Out-Null; continue }
         $dir = Split-Path -Path $file -Parent
-        while ($dir -and ($dir -ne $root) -and ($dir -like "*\\*")) {
+        while ($dir -and ($dir -ne $root)) {
             $candidates = Get-ChildItem -Path $dir -Filter *.csproj -File -ErrorAction SilentlyContinue
-            if ($candidates -and $candidates.Count -gt 0) {
-                foreach ($c in $candidates) { $projSet.Add($c.FullName) | Out-Null }
+                if ($candidates) {
+                foreach ($c in @($candidates)) { $projSet.Add($c.FullName) | Out-Null }
                 break
             }
             $parent = Split-Path -Path $dir -Parent
@@ -47,7 +67,7 @@ if ($ChangedOnly)
         exit 0
     }
 
-    $csprojs = $projSet.ToArray()
+    $csprojs = @($projSet) | Select-Object -Unique
 } else {
     $csprojs = Get-ChildItem -Path $root -Recurse -Filter *.csproj -ErrorAction SilentlyContinue | 
     Where-Object { 

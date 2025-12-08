@@ -23,6 +23,28 @@ jobs:
           if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
           & $script
 
+  changed-only-checks:
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run changed-only csproj build guard (PR)
+        shell: powershell
+        run: |
+          Write-Host "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.ps1'
+          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          # `github.base_ref` contains the base branch for the PR (e.g., 'main')
+          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
+          Write-Host "Diff base ref: $baseRef"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -ChangedOnly -DiffRef $baseRef
+
       - name: Build CoreLogic
         shell: powershell
         run: |

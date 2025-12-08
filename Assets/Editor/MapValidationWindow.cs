@@ -198,7 +198,7 @@ public class MapEditorWindow : EditorWindow
             
             // Hex Selection Mode toggle
             var oldColor = GUI.backgroundColor;
-            if (_hexSelectionMode)
+ 
             {
                 GUI.backgroundColor = new Color(0.3f, 0.8f, 0.3f);
             }
@@ -1359,3 +1359,5 @@ public class MapEditorWindow : EditorWindow
     }
 }
 #endif
+
+
