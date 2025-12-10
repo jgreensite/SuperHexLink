@@ -23,17 +23,131 @@ jobs:
           if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
           & $script
 
-      - name: Build CoreLogic
+  changed-only-checks:
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run changed-only csproj build guard (PR)
         shell: powershell
         run: |
+          Write-Host "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.ps1'
+          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          # `github.base_ref` contains the base branch for the PR (e.g., 'main')
+          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
+          Write-Host "Diff base ref: $baseRef"
+          # Ensure base ref is available locally for diffs
+          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+      - name: Run changed-only csproj build guard (PR - DryRun)
+        shell: powershell
+        run: |
+          Write-Host "DryRun: Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.ps1'
+          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
+          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -ChangedOnly -DiffRef $baseRef -DryRun
+          # copy the output artifact with a distinct name and upload for debugging
+          if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-dryrun.txt -Force }
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -ChangedOnly -DiffRef $baseRef
+          # Write changelist output to stdout for debugging; the script writes changed-csprojs.txt to GITHUB_WORKSPACE
+
+      - name: Set changed-projects output
+        id: set_changed_projects
+        shell: powershell
+        run: |
+          $name = 'changed_projects'
+          $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
+          if (Test-Path $changedFile) {
+              $value = (Get-Content $changedFile -Raw).Trim()
+              if ($value -eq '') { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=" } else { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=$value" }
+          } else {
+              Add-Content -Path $env:GITHUB_OUTPUT -Value "$name="
+          }
+          # Export a boolean for presence of changed projects for easier conditional checks
+          $hasChanges = 'false'
+          if ((Test-Path $changedFile) -and ((Get-Content $changedFile -Raw).Trim() -ne '')) { $hasChanges = 'true' }
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "has_changes=$hasChanges"
+
+      - name: Upload changed-csprojs.txt for debugging
+        if: steps.set_changed_projects.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-csprojs
+          path: changed-csprojs.txt
+      - name: Upload changed-csprojs-dryrun.txt for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-csprojs-dryrun
+          path: changed-csprojs-dryrun.txt
+
+      - name: Assert DryRun detection parity
+        if: always()
+        shell: powershell
+        run: |
+          Write-Host "Comparing DryRun vs normal changed-csprojs detection..."
+          $dryFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs-dryrun.txt'
+          $file = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
+          $dry = ''
+          $f = ''
+          if (Test-Path $dryFile) { $dry = (Get-Content $dryFile -Raw).Trim() }
+          if (Test-Path $file) { $f = (Get-Content $file -Raw).Trim() }
+          if ($dry -eq '' -and $f -eq '') { Write-Host 'Both empty - nothing to build'; exit 0 }
+          if (($dry -eq '' -and $f -ne '') -or ($dry -ne '' -and $f -eq '')) { Write-Error 'DryRun and normal detection differ: one is empty and the other is not'; exit 1 }
+          $a = $dry -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } | Sort-Object
+          $b = $f -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } | Sort-Object
+          $diff = Compare-Object -ReferenceObject $a -DifferenceObject $b
+          if ($diff) { Write-Error "DryRun and normal detection results differ:`n$($diff | Out-String)"; exit 1 }
+          Write-Host 'DryRun and normal detection are consistent.' -ForegroundColor Green
+
+      - name: Run branch harness in DryRun (additional validation)
+        shell: powershell
+        run: |
+          Write-Host "Running branch harness (DryRun) for diagnostics"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\test-check-changedonly-branch.ps1 -BaseRef $baseRef -DryRun
+          if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-branch-harness.txt -Force }
+      - name: Upload changed-csprojs-branch-harness.txt for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-csprojs-branch-harness
+          path: changed-csprojs-branch-harness.txt
+
+      - name: Build changed projects
+        if: steps.set_changed_projects.outputs.has_changes == 'true'
+        shell: powershell
+        run: |
+          $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
+          if (-not (Test-Path $changedFile)) { Write-Host "No changed-csprojs.txt found; skipping builds"; exit 0 }
+          $projects = Get-Content $changedFile | Where-Object { $_ -ne '' }
+          foreach ($p in $projects) {
+              $projPath = (Join-Path $env:GITHUB_WORKSPACE ($p -replace '/', '\\'))
+              if (-not (Test-Path $projPath)) { Write-Host "Project path not found: $projPath"; exit 1 }
+              Write-Host "Building changed project: $p"
+              dotnet build $projPath --configuration Debug --verbosity minimal
+          }
+
+      - name: Build CoreLogic
+        shell: powershell
+        if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
+        run: |
           Write-Host "Building CoreLogic library"
-          dotnet build CoreLogic\src\CoreLogic\CoreLogic.csproj --configuration Debug --verbosity minimal
+          dotnet build "$env:GITHUB_WORKSPACE\CoreLogic\src\CoreLogic\CoreLogic.csproj" --configuration Debug --verbosity minimal
 
       - name: Run CoreLogic dotnet tests
+        if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
         shell: powershell
         run: |
           Write-Host "Running CoreLogic dotnet tests"
-          dotnet test CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
+          dotnet test "$env:GITHUB_WORKSPACE\CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj" --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
 
       - name: Upload CoreLogic test results
         if: always()
@@ -46,6 +160,33 @@ jobs:
           echo "On CI, make sure the runner has .NET Framework 4.7.1 targeting pack. If missing, the job will fail and an administrator must add it."
       - name: Run script-lint (placeholder)
         run: echo "No-op lint — add project-specific lint commands here"
+
+  harness-checks:
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run branch harness (DryRun)
+        shell: powershell
+        run: |
+          Write-Host "Running branch harness (DryRun) for diagnostics"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\test-check-changedonly-branch.ps1'
+          if (-not (Test-Path $script)) { Write-Error "Harness script not found at $script"; exit 2 }
+          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
+          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -BaseRef $baseRef -DryRun
+      - name: Upload changed-csprojs-branch-harness.txt for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-csprojs-branch-harness
+          path: changed-csprojs-branch-harness.txt
 
   unity-tests:
     runs-on: windows-latest

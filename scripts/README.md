@@ -1,3 +1,33 @@
+DryRun / WhatIf
+----------------
+You can run the guard script in "dry-run" mode to list which projects would be built without running any builds. This is useful for quickly validating changed-only detection locally or in CI:
+
+    pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\check-csproj-builds.ps1 -ChangedOnly -DryRun
+
+If you install the git hook using `scripts/install-git-hooks.ps1 -DryRun`, the installer will only preview the hook content and not write to `.git/hooks`.
+
+Harnesses
+---------
+Two harness scripts are provided:
+
+- `scripts/test-check-changedonly.ps1` (minimal) — quick DryRun that stages a single file change and prints the detected changed projects.
+- `scripts/test-check-changedonly-branch.ps1` (robust) — creates a temp branch (or stash+branch), commits a small change, runs the guard in DryRun by default and cleans up. This harness is suitable for more realistic end-to-end testing.
+
+If you find `install-git-hooks.ps1` behaves unexpectedly, rerun the installer with `-DryRun` to preview modifications before writing changes.
+
+For debugging harness behavior (forwarding `-DryRun` to the guard), set the environment variable `CHECK_CS_PROJ_DEBUG=1` to get more output from the scripts.
+
+## DryRun & WhatIf
+
+The `check-csproj-builds.ps1` wrapper now supports a `-DryRun` switch which prints the detected changed projects and skips running `dotnet build`.
+
+Use the CLI `check-csproj-builds-cli.ps1` if available for `-WhatIf` behavior via PowerShell `ShouldProcess` support; otherwise the wrapper will forward arguments.
+
+You can install a pre-commit hook in DryRun mode for testing by running:
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/install-git-hooks.ps1 -DryRun
+```
+
 # Build and Development Scripts
 
 This directory contains automation scripts for building, testing, and managing the SuperHexLink project.
