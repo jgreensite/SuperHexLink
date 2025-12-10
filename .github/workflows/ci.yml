@@ -161,6 +161,33 @@ jobs:
       - name: Run script-lint (placeholder)
         run: echo "No-op lint — add project-specific lint commands here"
 
+  harness-checks:
+    runs-on: windows-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Run branch harness (DryRun)
+        shell: powershell
+        run: |
+          Write-Host "Running branch harness (DryRun) for diagnostics"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\test-check-changedonly-branch.ps1'
+          if (-not (Test-Path $script)) { Write-Error "Harness script not found at $script"; exit 2 }
+          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
+          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -BaseRef $baseRef -DryRun
+      - name: Upload changed-csprojs-branch-harness.txt for debugging
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-csprojs-branch-harness
+          path: changed-csprojs-branch-harness.txt
+
   unity-tests:
     runs-on: windows-latest
     needs: static-checks
