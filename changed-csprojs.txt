@@ -1,1 +1,0 @@
-﻿CoreLogic/src/CoreLogic/CoreLogic.csproj
