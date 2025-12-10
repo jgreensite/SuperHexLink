@@ -18,13 +18,22 @@ jobs:
       - name: Repo csproj build guard
         shell: powershell
         run: |
-          Write-Host "Running repo-wide csproj build guard"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.cmd'
-          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
-          & $script
+          Write-Host "Running repo-wide csproj build guard (CLI)"
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
+          if (-not (Test-Path $script)) { Write-Error "Build guard CLI script not found at $script"; exit 2 }
+          powershell -NoProfile -ExecutionPolicy Bypass -File $script
 
   changed-only-checks:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        include:
+          - platform: windows-latest
+            shell: 'powershell'
+          - platform: windows-latest
+            shell: 'pwsh'
+          - platform: ubuntu-latest
+            shell: 'pwsh'
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -35,10 +44,10 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Run changed-only csproj build guard (PR)
-        shell: powershell
+        shell: bash
         run: |
           Write-Host "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.ps1'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
           if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
           # `github.base_ref` contains the base branch for the PR (e.g., 'main')
           $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
@@ -46,17 +55,17 @@ jobs:
           # Ensure base ref is available locally for diffs
           git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
       - name: Run changed-only csproj build guard (PR - DryRun)
-        shell: powershell
+        shell: bash
         run: |
           Write-Host "DryRun: Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds.ps1'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
           if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
           $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
           git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
-          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -ChangedOnly -DiffRef $baseRef -DryRun
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef" -DryRun; fi
           # copy the output artifact with a distinct name and upload for debugging
-          if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-dryrun.txt -Force }
-          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -ChangedOnly -DiffRef $baseRef
+          if [ -f changed-csprojs.txt ]; then cp changed-csprojs.txt changed-csprojs-dryrun.txt; fi
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef"; fi
           # Write changelist output to stdout for debugging; the script writes changed-csprojs.txt to GITHUB_WORKSPACE
 
       - name: Set changed-projects output
@@ -109,10 +118,10 @@ jobs:
           Write-Host 'DryRun and normal detection are consistent.' -ForegroundColor Green
 
       - name: Run branch harness in DryRun (additional validation)
-        shell: powershell
+        shell: bash
         run: |
           Write-Host "Running branch harness (DryRun) for diagnostics"
-          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\test-check-changedonly-branch.ps1 -BaseRef $baseRef -DryRun
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun; fi
           if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-branch-harness.txt -Force }
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
@@ -162,7 +171,16 @@ jobs:
         run: echo "No-op lint — add project-specific lint commands here"
 
   harness-checks:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        include:
+          - platform: windows-latest
+            shell: 'powershell'
+          - platform: windows-latest
+            shell: 'pwsh'
+          - platform: ubuntu-latest
+            shell: 'pwsh'
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -173,14 +191,22 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Run branch harness (DryRun)
-        shell: powershell
+        shell: bash
         run: |
           Write-Host "Running branch harness (DryRun) for diagnostics"
           $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\test-check-changedonly-branch.ps1'
           if (-not (Test-Path $script)) { Write-Error "Harness script not found at $script"; exit 2 }
           $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
           git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
-          pwsh -NoProfile -ExecutionPolicy Bypass -File $script -BaseRef $baseRef -DryRun
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -BaseRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -BaseRef "$baseRef" -DryRun; fi
+      - name: Run harness parity tests
+        shell: bash
+        run: |
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-parity.ps1 -BaseRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-parity.ps1 -BaseRef "$baseRef"; fi
+      - name: Run branch harness flow test
+        shell: bash
+        run: |
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"; fi
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
