@@ -22,6 +22,14 @@ For debugging harness behavior (forwarding `-DryRun` to the guard), set the envi
 The `check-csproj-builds.ps1` wrapper now supports a `-DryRun` switch which prints the detected changed projects and skips running `dotnet build`.
 
 Use the CLI `check-csproj-builds-cli.ps1` if available for `-WhatIf` behavior via PowerShell `ShouldProcess` support; otherwise the wrapper will forward arguments.
+CLI usage example:
+```powershell
+# DryRun: list changed projects that would be built
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\check-csproj-builds-cli.ps1 -ChangedOnly -DiffRef main -DryRun
+
+# Non-dry run: will perform the build(s)
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\check-csproj-builds-cli.ps1 -ChangedOnly -DiffRef main
+```
 
 You can install a pre-commit hook in DryRun mode for testing by running:
 ```powershell
