@@ -13,22 +13,31 @@ Param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
-$wrapper = Join-Path $repoRoot 'scripts\check-csproj-builds.ps1'
-if (-not (Test-Path $wrapper)) { Write-Host "Wrapper not found at $wrapper" -ForegroundColor Red; exit 2 }
+function Invoke-CheckCsprojBuildsCli {
+    param(
+        [switch]$ChangedOnly,
+        [string]$DiffRef,
+        [switch]$DryRun
+    )
 
-# Evaluate ShouldProcess semantics here as the top-level CLI
-if ($PSCmdlet -and $PSCmdlet.ShouldProcess('Build guard', 'Evaluate/Run')) {
-    $args = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$wrapper)
-    if ($ChangedOnly) { $args += '-ChangedOnly' }
-    if ($DiffRef) { $args += @('-DiffRef',$DiffRef) }
-    if ($DryRun -or $PSBoundParameters.ContainsKey('WhatIf')) { $args += '-DryRun' }
+    $repoRoot = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
+    $wrapper = Join-Path $repoRoot 'scripts\check-csproj-builds.ps1'
+    if (-not (Test-Path $wrapper)) { Write-Host "Wrapper not found at $wrapper" -ForegroundColor Red; return 2 }
 
-    # Prefer pwsh if available, fallback to powershell.exe
-    if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
-    $proc = Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
-    exit $proc.ExitCode
+    if ($PSCmdlet -and $PSCmdlet.ShouldProcess('Build guard', 'Evaluate/Run')) {
+        $args = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$wrapper)
+        if ($ChangedOnly) { $args += '-ChangedOnly' }
+        if ($DiffRef) { $args += @('-DiffRef',$DiffRef) }
+        if ($DryRun -or $PSBoundParameters.ContainsKey('WhatIf')) { $args += '-DryRun' }
+
+        if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
+        $proc = Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
+        return $proc.ExitCode
+    }
+
+    Write-Host 'Aborted by ShouldProcess/WhatIf.' -ForegroundColor Yellow
+    return 0
 }
 
-Write-Host 'Aborted by ShouldProcess/WhatIf.' -ForegroundColor Yellow
-exit 0
+# If script invoked directly, call the function with parameters
+if ($MyInvocation.InvocationName -ne '.') { exit (Invoke-CheckCsprojBuildsCli -ChangedOnly:$ChangedOnly -DiffRef $DiffRef -DryRun:$DryRun) }
