@@ -62,11 +62,13 @@ jobs:
       - name: Run changed-only csproj build guard (PR - DryRun)
         shell: bash
         run: |
-          Write-Host "DryRun: Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
-          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
-          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
-          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          echo "DryRun: Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          script="${GITHUB_WORKSPACE}/scripts/check-csproj-builds-cli.ps1"
+          if [ ! -f "$script" ]; then echo "Build guard script not found at $script"; exit 2; fi
+          baseRef=${{ toJSON(github.base_ref) }}
+          baseRef=${baseRef#\"}
+          baseRef=${baseRef%\"}
+          git fetch origin $baseRef --depth=1 || echo "git fetch origin $baseRef failed (possibly already present)"
           if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef" -DryRun; fi
           # copy the output artifact with a distinct name and upload for debugging
           if [ -f changed-csprojs.txt ]; then cp changed-csprojs.txt changed-csprojs-dryrun.txt; fi
@@ -200,11 +202,13 @@ jobs:
       - name: Run branch harness (DryRun)
         shell: bash
         run: |
-          Write-Host "Running branch harness (DryRun) for diagnostics"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\test-check-changedonly-branch.ps1'
-          if (-not (Test-Path $script)) { Write-Error "Harness script not found at $script"; exit 2 }
-          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
-          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          echo "Running branch harness (DryRun) for diagnostics"
+          script="${GITHUB_WORKSPACE}/scripts/test-check-changedonly-branch.ps1"
+          if [ ! -f "$script" ]; then echo "Harness script not found at $script"; exit 2; fi
+          baseRef=${{ toJSON(github.base_ref) }}
+          baseRef=${baseRef#\"}
+          baseRef=${baseRef%\"}
+          git fetch origin $baseRef --depth=1 || echo "git fetch origin $baseRef failed (possibly already present)"
           if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -BaseRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -BaseRef "$baseRef" -DryRun; fi
       - name: Run harness parity tests
         shell: bash
