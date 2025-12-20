@@ -20,7 +20,9 @@ if (-not (Test-Path 'scripts\check-csproj-builds-cli.ps1')) { Write-Error 'CLI g
 Write-Host "Running harness parity test against base: $BaseRef"
 
 # Run DryRun
-$dryArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly','-DiffRef',$BaseRef,'-DryRun')
+$dryArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly')
+if ($BaseRef -and $BaseRef.Trim() -ne '') { $dryArgs += @('-DiffRef',$BaseRef) }
+$dryArgs += '-DryRun'
 if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
 Write-Host "Invoking DryRun: $exe $($dryArgs -join ' ')" -ForegroundColor Cyan
 $rawOut = & $exe @dryArgs 2>&1
@@ -33,7 +35,8 @@ if (Test-Path 'changed-csprojs.txt') {
 }
 
 # Run normal detection
-$args = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly','-DiffRef',$BaseRef)
+$args = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly')
+if ($BaseRef -and $BaseRef.Trim() -ne '') { $args += @('-DiffRef',$BaseRef) }
 Write-Host "Invoking normal detection: $exe $($args -join ' ')" -ForegroundColor Cyan
 $rawOut = & $exe @args 2>&1
 $rc = $LASTEXITCODE

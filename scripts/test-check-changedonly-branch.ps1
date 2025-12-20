@@ -44,7 +44,8 @@ function ScriptSupportsDryRun {
 
 function Run-Guard {
     param([string]$GuardPath, [bool]$IsCli, [switch]$Dry)
-    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$GuardPath,'-ChangedOnly','-DiffRef',$BaseRef)
+    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$GuardPath,'-ChangedOnly')
+    if ($BaseRef -and $BaseRef.Trim() -ne '') { $argList += @('-DiffRef',$BaseRef) }
     $supportsDry = ScriptSupportsDryRun -p $GuardPath
     if ($env:CHECK_CS_PROJ_DEBUG) {
         Write-Host "[HARNESS-DEBUG] Guard path: $GuardPath" -ForegroundColor Cyan
