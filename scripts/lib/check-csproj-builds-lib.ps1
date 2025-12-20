@@ -1,3 +1,22 @@
+function Invoke-CheckCsprojBuildsCli {
+    [CmdletBinding()]
+    param(
+        [switch]$ChangedOnly,
+        [string]$DiffRef,
+        [switch]$DryRun
+    )
+
+    $root = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
+    $wrapper = Join-Path $root 'scripts\check-csproj-builds.ps1'
+    $args = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$wrapper)
+    if ($ChangedOnly) { $args += '-ChangedOnly' }
+    if ($DiffRef) { $args += @('-DiffRef',$DiffRef) }
+    if ($DryRun) { $args += '-DryRun' }
+    if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
+    return Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
+}
+
+Export-ModuleMember -Function Invoke-CheckCsprojBuildsCli
 <#
 Library helpers for check-csproj-builds.ps1.
 Provides functions for mapping changed files to .csproj files so unit tests can validate mapping logic.
