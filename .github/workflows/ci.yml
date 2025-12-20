@@ -261,12 +261,22 @@ jobs:
         run: |
           Write-Host 'Running Pester unit tests'
           pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester -Script ./scripts/tests/Unit -EnableExit -OutputFormat NUnitXml -OutputFile pester-results.xml"
+      - name: List test output (debug)
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host '--- Listing test output files for debug ---'
+          if (Test-Path pester-results.xml) { Write-Host "Found pester-results.xml at: $(Resolve-Path pester-results.xml)" } else { Write-Host 'pester-results.xml not found' }
+          Write-Host '--- Workspace top-level files ---'
+          Get-ChildItem -Path . -Force | Sort-Object Name | ForEach-Object { Write-Host $_.Name }
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pester-results-${{ matrix.platform }}-${{ matrix.shell }}
-          path: scripts/tests/Unit
+          path: |
+            pester-results.xml
+            scripts/tests/Unit
           overwrite: true
       - name: Publish Pester test report (GitHub UI)
         if: always()
