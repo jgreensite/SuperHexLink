@@ -56,7 +56,7 @@ Describe 'CheckCsprojMapping' {
 Describe 'CLI wrapper' {
     It 'forwards -DryRun and -ChangedOnly to underlying wrapper via Start-Process' {
         # Mock Start-Process to write the captured argument list to a temp file
-        $mockArgsFile = Join-Path $tempRoot 'pester-startproc-args.txt'
+        $mockArgsFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), 'pester-startproc-args.txt')
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
         Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList) Set-Content -Path $mockArgsFile -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
 
@@ -127,9 +127,9 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
 Describe 'CLI wrapper' {
     BeforeAll { . "$PSScriptRoot\..\..\check-csproj-builds-cli.ps1" }
     It 'Forwards -DryRun and -ChangedOnly to inner wrapper via Start-Process' {
-        $mockArgsFile = Join-Path $tempRoot 'pester-startproc-args.txt'
+        $mockArgsFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), 'pester-startproc-args.txt')
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
-        Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path (Join-Path $tempRoot 'pester-startproc-args.txt') -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
+        Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path $mockArgsFile -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
         Invoke-CheckCsprojBuildsCli -ChangedOnly:$true -DiffRef 'main' -DryRun:$true | Out-Null
         Assert-MockCalled -CommandName Start-Process -Times 1 -Exactly -Scope It
         $raw = Get-Content $mockArgsFile -ErrorAction SilentlyContinue
