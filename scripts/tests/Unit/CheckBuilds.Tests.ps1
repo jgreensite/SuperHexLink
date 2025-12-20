@@ -2,47 +2,51 @@
 
 Describe 'CheckCsprojMapping' {
     It 'maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj when Assembly-CSharp exists' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Scripts') -ItemType Directory -Force | Out-Null
-            $player = New-Item -Path (Join-Path $tmp.FullName 'Assets\Scripts\Player.cs') -ItemType File -Force
-            New-Item -Path (Join-Path $tmp.FullName 'Assembly-CSharp.csproj') -ItemType File -Force | Out-Null
-            $res = MapFileToProjects -FilePath 'Assets/Scripts/Player.cs' -RepoRoot $tmp.FullName
-            ($res -contains (Join-Path $tmp.FullName 'Assembly-CSharp.csproj')) | Should Be $true
-        } finally { Remove-Item -Recurse -Force $tmp }
+            New-Item -Path (Join-Path $tmpPath 'Assets\Scripts') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Scripts\Player.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assembly-CSharp.csproj') -ItemType File -Force | Out-Null
+            $res = MapFileToProjects -FilePath 'Assets/Scripts/Player.cs' -RepoRoot $tmpPath
+            ($res -contains (Join-Path $tmpPath 'Assembly-CSharp.csproj')) | Should Be $true
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 
     It 'maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when it exists' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Editor') -ItemType Directory -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Editor\Tool.cs') -ItemType File -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'Assembly-CSharp-Editor.csproj') -ItemType File -Force | Out-Null
-            $res = MapFileToProjects -FilePath 'Assets/Editor/Tool.cs' -RepoRoot $tmp.FullName
-            ($res -contains (Join-Path $tmp.FullName 'Assembly-CSharp-Editor.csproj')) | Should Be $true
-        } finally { Remove-Item -Recurse -Force $tmp }
+            New-Item -Path (Join-Path $tmpPath 'Assets\Editor') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Editor\Tool.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assembly-CSharp-Editor.csproj') -ItemType File -Force | Out-Null
+            $res = MapFileToProjects -FilePath 'Assets/Editor/Tool.cs' -RepoRoot $tmpPath
+            ($res -contains (Join-Path $tmpPath 'Assembly-CSharp-Editor.csproj')) | Should Be $true
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 
     It 'maps CoreLogic/src/Class1.cs to CoreLogic csproj' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'CoreLogic\src') -ItemType Directory -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'CoreLogic\src\Class1.cs') -ItemType File -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'CoreLogic\CoreLogic.csproj') -ItemType File -Force | Out-Null
-            $res = MapFileToProjects -FilePath 'CoreLogic/src/Class1.cs' -RepoRoot $tmp.FullName
-            ($res -contains (Join-Path $tmp.FullName 'CoreLogic\CoreLogic.csproj')) | Should Be $true
-        } finally { Remove-Item -Recurse -Force $tmp }
+            New-Item -Path (Join-Path $tmpPath 'CoreLogic\src') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'CoreLogic\src\Class1.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'CoreLogic\CoreLogic.csproj') -ItemType File -Force | Out-Null
+            $res = MapFileToProjects -FilePath 'CoreLogic/src/Class1.cs' -RepoRoot $tmpPath
+            ($res -contains (Join-Path $tmpPath 'CoreLogic\CoreLogic.csproj')) | Should Be $true
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 
     It 'ignores projects under Assets/Plugins/Sirenix and actions-runner' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Plugins\Sirenix') -ItemType Directory -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Plugins\Sirenix\Some.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Plugins\Sirenix') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Plugins\Sirenix\Some.cs') -ItemType File -Force | Out-Null
             # When no projects exist, mapping returns empty
-            $res = MapFileToProjects -FilePath 'Assets/Plugins/Sirenix/Some.cs' -RepoRoot $tmp.FullName
+            $res = MapFileToProjects -FilePath 'Assets/Plugins/Sirenix/Some.cs' -RepoRoot $tmpPath
             $res.Count | Should Be 0
-        } finally { Remove-Item -Recurse -Force $tmp }
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 }
 
