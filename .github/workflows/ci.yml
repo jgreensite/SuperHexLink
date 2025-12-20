@@ -214,6 +214,38 @@ jobs:
           name: changed-csprojs-branch-harness
           path: changed-csprojs-branch-harness.txt
 
+  unit-tests:
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      matrix:
+        include:
+          - platform: windows-latest
+            shell: 'powershell'
+          - platform: windows-latest
+            shell: 'pwsh'
+          - platform: ubuntu-latest
+            shell: 'pwsh'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PowerShell
+        if: matrix.shell == 'pwsh'
+        uses: PowerShell/PowerShell@v2
+      - name: Install Pester
+        shell: bash
+        run: |
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -Command "Install-Module Pester -Force -Scope CurrentUser"; else pwsh -NoProfile -ExecutionPolicy Bypass -Command "Install-Module Pester -Force -Scope CurrentUser"; fi
+      - name: Run unit tests (Pester)
+        shell: bash
+        run: |
+          Write-Host "Running Pester unit tests"
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module Pester -ErrorAction Stop; Invoke-Pester -Script './scripts/tests/Unit' -OutputFormat NUnitXml -OutputFile pester-results.xml"; else pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module Pester -ErrorAction Stop; Invoke-Pester -Script './scripts/tests/Unit' -OutputFormat NUnitXml -OutputFile pester-results.xml"; fi
+      - name: Upload Pester results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pester-results
+          path: pester-results.xml
   unity-tests:
     runs-on: windows-latest
     needs: static-checks
