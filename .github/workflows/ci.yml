@@ -276,16 +276,31 @@ jobs:
           name: pester-results-${{ matrix.platform }}-${{ matrix.shell }}
           path: |
             pester-results.xml
+            pester-results-junit.xml
             scripts/tests/Unit
           overwrite: true
+      - name: Convert Pester results to JUnit
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host 'Converting pester-results.xml to JUnit format (pester-results-junit.xml)'
+          if (Test-Path pester-results.xml) {
+              # Ensure python is available; try 'python' then 'python3'
+              try { python --version > $null 2>&1 } catch { }
+              if ($LASTEXITCODE -ne 0) { try { python3 --version > $null 2>&1 } catch { } }
+              if ($LASTEXITCODE -ne 0) { Write-Host 'Python not found in PATH; skipping conversion.' } else { python scripts/tools/pester_nunit2_to_junit.py pester-results.xml pester-results-junit.xml }
+              Write-Host 'Conversion step finished.'
+          } else {
+              Write-Host 'pester-results.xml not found; skipping conversion.'
+          }
       - name: Publish Pester test report (GitHub UI)
         if: always()
-        # Use v2 of the test-reporter and the dotnet-nunit reporter format
+        # Use v2 of the test-reporter and publish the JUnit converted file
         uses: dorny/test-reporter@v2
         continue-on-error: true
         with:
           name: pester
-          path: pester-results.xml
-          reporter: dotnet-nunit
+          path: pester-results-junit.xml
+          reporter: java-junit
           fail-on-error: false
           fail-on-empty: false
