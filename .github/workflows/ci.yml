@@ -48,14 +48,17 @@ jobs:
       - name: Run changed-only csproj build guard (PR)
         shell: bash
         run: |
-          Write-Host "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
-          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          echo "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          script="${GITHUB_WORKSPACE}/scripts/check-csproj-builds-cli.ps1"
+          if [ ! -f "$script" ]; then echo "Build guard script not found at $script"; exit 2; fi
           # `github.base_ref` contains the base branch for the PR (e.g., 'main')
-          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
-          Write-Host "Diff base ref: $baseRef"
+          baseRef=${{ toJSON(github.base_ref) }}
+          baseRef=${baseRef#\"}
+          baseRef=${baseRef%\"}
+          echo "Diff base ref: $baseRef"
           # Ensure base ref is available locally for diffs
-          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          git fetch origin $baseRef --depth=1 || echo "git fetch origin $baseRef failed (possibly already present)"
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef"; fi
       - name: Run changed-only csproj build guard (PR - DryRun)
         shell: bash
         run: |
