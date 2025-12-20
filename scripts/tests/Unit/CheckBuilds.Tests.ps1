@@ -1,8 +1,11 @@
 . (Join-Path $PSScriptRoot '..\..\lib\CheckCsprojMapping.ps1')
 
+# Use system temp path in a portable way across OS runners
+$tempRoot = [System.IO.Path]::GetTempPath()
+
 Describe 'CheckCsprojMapping' {
     It 'maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj when Assembly-CSharp exists' {
-        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        $tmpPath = Join-Path $tempRoot "test_repo_$([Guid]::NewGuid().ToString('N'))"
         New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
             New-Item -Path (Join-Path $tmpPath 'Assets\Scripts') -ItemType Directory -Force | Out-Null
@@ -14,7 +17,7 @@ Describe 'CheckCsprojMapping' {
     }
 
     It 'maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when it exists' {
-        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        $tmpPath = Join-Path $tempRoot "test_repo_$([Guid]::NewGuid().ToString('N'))"
         New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
             New-Item -Path (Join-Path $tmpPath 'Assets\Editor') -ItemType Directory -Force | Out-Null
@@ -26,7 +29,7 @@ Describe 'CheckCsprojMapping' {
     }
 
     It 'maps CoreLogic/src/Class1.cs to CoreLogic csproj' {
-        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        $tmpPath = Join-Path $tempRoot "test_repo_$([Guid]::NewGuid().ToString('N'))"
         New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
             New-Item -Path (Join-Path $tmpPath 'CoreLogic\src') -ItemType Directory -Force | Out-Null
@@ -38,7 +41,7 @@ Describe 'CheckCsprojMapping' {
     }
 
     It 'ignores projects under Assets/Plugins/Sirenix and actions-runner' {
-        $tmpPath = Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        $tmpPath = Join-Path $tempRoot "test_repo_$([Guid]::NewGuid().ToString('N'))"
         New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
             New-Item -Path (Join-Path $tmpPath 'Assets\Plugins\Sirenix') -ItemType Directory -Force | Out-Null
@@ -53,7 +56,7 @@ Describe 'CheckCsprojMapping' {
 Describe 'CLI wrapper' {
     It 'forwards -DryRun and -ChangedOnly to underlying wrapper via Start-Process' {
         # Mock Start-Process to write the captured argument list to a temp file
-        $mockArgsFile = Join-Path $env:TEMP 'pester-startproc-args.txt'
+        $mockArgsFile = Join-Path $tempRoot 'pester-startproc-args.txt'
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
         Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList) Set-Content -Path $mockArgsFile -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
 
@@ -72,7 +75,7 @@ Import-Module Pester -ErrorAction SilentlyContinue
 Describe 'Get-ProjectsFromChangedFiles mapping' {
     BeforeAll {
         # Create an isolated temp area for tests
-        $global:TestDrive = Join-Path $env:TEMP "pester-test-$(Get-Random)"
+        $global:TestDrive = Join-Path $tempRoot "pester-test-$(Get-Random)"
         New-Item -ItemType Directory -Path $TestDrive -Force | Out-Null
         # Dot-source the library from scripts/lib
         . "$PSScriptRoot\..\..\lib\check-csproj-builds-lib.ps1"
@@ -124,9 +127,9 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
 Describe 'CLI wrapper' {
     BeforeAll { . "$PSScriptRoot\..\..\check-csproj-builds-cli.ps1" }
     It 'Forwards -DryRun and -ChangedOnly to inner wrapper via Start-Process' {
-        $mockArgsFile = Join-Path $env:TEMP 'pester-startproc-args.txt'
+        $mockArgsFile = Join-Path $tempRoot 'pester-startproc-args.txt'
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
-        Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path $env:TEMP\'pester-startproc-args.txt' -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
+        Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path (Join-Path $tempRoot 'pester-startproc-args.txt') -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
         Invoke-CheckCsprojBuildsCli -ChangedOnly:$true -DiffRef 'main' -DryRun:$true | Out-Null
         Assert-MockCalled -CommandName Start-Process -Times 1 -Exactly -Scope It
         $raw = Get-Content $mockArgsFile -ErrorAction SilentlyContinue
