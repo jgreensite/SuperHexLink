@@ -270,10 +270,11 @@ jobs:
           overwrite: true
       - name: Publish Pester test report (GitHub UI)
         if: always()
-        uses: dorny/test-reporter@v1
+        # Use v2 of the test-reporter and the dotnet-nunit reporter format
+        uses: dorny/test-reporter@v2
         with:
           name: pester
           path: pester-results.xml
-          reporter: nunit
+          reporter: dotnet-nunit
           fail-on-error: false
           fail-on-empty: false
