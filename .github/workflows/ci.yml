@@ -265,8 +265,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pester-results
+          name: pester-results-${{ matrix.platform }}-${{ matrix.shell }}
           path: scripts/tests/Unit
+          overwrite: true
       - name: Publish Pester test report (GitHub UI)
         if: always()
         uses: dorny/test-reporter@v1
