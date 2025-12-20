@@ -15,6 +15,10 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
 Write-Verbose "Repository root: $root"
 
+# Load mapping helpers if present
+$lib = Join-Path $root 'scripts\lib\check-csproj-builds-lib.ps1'
+if (Test-Path $lib) { . $lib } else { Write-Verbose "Mapping lib not found: $lib" }
+
 if ($ChangedOnly)
 {
     Write-Host "Running in ChangedOnly mode; building only projects impacted by staged changes."
@@ -51,34 +55,28 @@ if ($ChangedOnly)
     }
 
     $changedFiles = $staged | Where-Object { $_ -ne '' } | ForEach-Object { (Join-Path $root $_) }
-    $projSet = [System.Collections.Generic.HashSet[string]]::new()
-    foreach ($file in $changedFiles)
-    {
-        if (-not (Test-Path $file)) { continue }
-        # Map common Unity assembly layout: Assets/Editor -> Assembly-CSharp-Editor.csproj; Assets/* -> Assembly-CSharp.csproj
-        $rel = [System.IO.Path]::GetFullPath($file).Substring($root.Length).TrimStart('\','/')
-        Write-Verbose "Changed file relative path: $rel"
-        if ($rel -match '^Assets[\\\/]+Editor[\\\/]+') {
-            $editorProj = Join-Path $root 'Assembly-CSharp-Editor.csproj'
-            if (Test-Path $editorProj) { $projSet.Add($editorProj) | Out-Null; continue }
-        }
-        elseif ($rel -match '^Assets[\\\/]') {
-            $runtimeProj = Join-Path $root 'Assembly-CSharp.csproj'
-            if (Test-Path $runtimeProj) { $projSet.Add($runtimeProj) | Out-Null; continue }
-        }
-        # If this is a csproj, add it directly
-        if ($file -like '*.csproj') { $projSet.Add($file) | Out-Null; continue }
-        $dir = Split-Path -Path $file -Parent
-        while ($dir -and ($dir -ne $root)) {
-            $candidates = Get-ChildItem -Path $dir -Filter *.csproj -File -ErrorAction SilentlyContinue
+    if (Get-Command Get-ProjectsFromChangedFiles -ErrorAction SilentlyContinue) {
+        $csprojCandidates = Get-ProjectsFromChangedFiles -RepoRoot $root -ChangedFiles $changedFiles
+        $projSet = [System.Collections.Generic.HashSet[string]]::new()
+        foreach ($p in $csprojCandidates) { $projSet.Add($p) | Out-Null }
+    } else {
+        # Fallback to prior inline behavior if helper not available
+        $projSet = [System.Collections.Generic.HashSet[string]]::new()
+        foreach ($file in $changedFiles) {
+            if (-not (Test-Path $file)) { continue }
+            $dir = Split-Path -Path $file -Parent
+            while ($dir -and ($dir -ne $root)) {
+                $candidates = Get-ChildItem -Path $dir -Filter *.csproj -File -ErrorAction SilentlyContinue
                 if ($candidates) {
-                foreach ($c in @($candidates)) { $projSet.Add($c.FullName) | Out-Null }
-                break
+                    foreach ($c in @($candidates)) { $projSet.Add($c.FullName) | Out-Null }
+                    break
+                }
+                $parent = Split-Path -Path $dir -Parent
+                if ($parent -eq $dir) { break }
+                $dir = $parent
             }
-            $parent = Split-Path -Path $dir -Parent
-            if ($parent -eq $dir) { break }
-            $dir = $parent
         }
+    }
     }
 
     if ($projSet.Count -eq 0) {
