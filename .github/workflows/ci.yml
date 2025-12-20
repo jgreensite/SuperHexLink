@@ -128,7 +128,20 @@ jobs:
         shell: bash
         run: |
           Write-Host "Running branch harness (DryRun) for diagnostics"
-          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun; fi
+          # Only pass -BaseRef when a non-empty baseRef is available to avoid leaving an empty parameter token
+          if [ "${{ matrix.shell }}" = "powershell" ]; then
+            if [ -n "$baseRef" ]; then
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun
+            else
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -DryRun
+            fi
+          else
+            if [ -n "$baseRef" ]; then
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun
+            else
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -DryRun
+            fi
+          fi
           if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-branch-harness.txt -Force }
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
