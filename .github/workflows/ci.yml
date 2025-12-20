@@ -274,5 +274,6 @@ jobs:
         with:
           name: pester
           path: pester-results.xml
-          reporter: junit
+          reporter: nunit
           fail-on-error: false
+          fail-on-empty: false
