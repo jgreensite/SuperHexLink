@@ -76,8 +76,7 @@ if ($ChangedOnly)
                 $dir = $parent
             }
         }
-    }
-    }
+        }
 
     if ($projSet.Count -eq 0) {
         Write-Host "No project files discovered for staged changes; nothing to build." -ForegroundColor Yellow
