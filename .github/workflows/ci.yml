@@ -282,6 +282,7 @@ jobs:
         if: always()
         # Use v2 of the test-reporter and the dotnet-nunit reporter format
         uses: dorny/test-reporter@v2
+        continue-on-error: true
         with:
           name: pester
           path: pester-results.xml
