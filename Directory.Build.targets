@@ -1,0 +1,11 @@
+<Project>
+  <!-- Remove ProjectReference items that point to missing project files to avoid editor warnings
+       This is a non-invasive, local-machine friendly fix that avoids editing generated Unity csproj files.
+  -->
+  <Target Name="RemoveMissingProjectReferences" BeforeTargets="ResolveProjectReferences">
+    <ItemGroup>
+      <!-- Remove any ProjectReference whose Identity does not exist on disk -->
+      <ProjectReference Remove="@(ProjectReference)" Condition="!Exists('%(ProjectReference.Identity)')" />
+    </ItemGroup>
+  </Target>
+</Project>
