@@ -9,8 +9,9 @@ function MapFileToProjects {
     $fp = $fp.TrimStart('\','/')
 
     # Ignore certain plugin or runner folders
-    if ($fp -match '^Assets[\\/]Plugins[\\/]Sirenix[\\/]') { return @() }
-    if ($fp -match '^scripts[\\/]actions-runner') { return @() }
+    $parts = $fp -split '[\\/]+'
+    if ($parts.Count -ge 3 -and $parts[0] -ieq 'Assets' -and $parts[1] -ieq 'Plugins' -and $parts[2] -ieq 'Sirenix') { return @() }
+    if ($parts.Count -ge 2 -and $parts[0] -ieq 'scripts' -and $parts[1] -ieq 'actions-runner') { return @() }
 
     $results = [System.Collections.Generic.HashSet[string]]::new()
 
@@ -67,7 +68,7 @@ function Get-ProjectsFromChangedFiles {
     return $projSet | Sort-Object
 }
 
-Export-ModuleMember -Function MapFileToProjects, Get-ProjectsFromChangedFiles
+
 <#
 Utility functions for mapping changed files to csproj files in the repository.
 This module is intentionally small and pure to make it easy to unit test with Pester.

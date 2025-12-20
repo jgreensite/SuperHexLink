@@ -16,7 +16,7 @@ function Invoke-CheckCsprojBuildsCli {
     return Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
 }
 
-Export-ModuleMember -Function Invoke-CheckCsprojBuildsCli
+
 <#
 Library helpers for check-csproj-builds.ps1.
 Provides functions for mapping changed files to .csproj files so unit tests can validate mapping logic.
@@ -37,8 +37,9 @@ function Resolve-ProjectForFile {
     $rel = [System.IO.Path]::GetFullPath($full).Substring($RepoRoot.Length).TrimStart('\','/')
 
     # Ignore files under third-party plugins that shouldn't trigger builds
-    if ($rel -match 'Assets[\/]+Plugins[\/]?Sirenix') { return $null }
-    if ($rel -match 'actions-runner') { return $null }
+    $parts = $rel -split '[\\/]+'
+    if ($parts.Count -ge 3 -and $parts[0] -ieq 'Assets' -and $parts[1] -ieq 'Plugins' -and $parts[2] -ieq 'Sirenix') { return $null }
+    if ($rel -match 'actions-runner' -or ($parts.Count -ge 2 -and $parts[0] -ieq 'scripts' -and $parts[1] -ieq 'actions-runner')) { return $null }
 
     # Editor files prefer editor csproj
     if ($rel -match '^Assets[\\\/]+Editor[\\\/]') {
