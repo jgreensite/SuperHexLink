@@ -54,10 +54,18 @@ function Run-Guard {
     if ($Dry -and $supportsDry) { $argList += '-DryRun' }
     if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
     if ($env:CHECK_CS_PROJ_DEBUG) { Write-Host "[HARNESS-DEBUG] Invoking guard: $exe with args: $($argList -join ' ')" -ForegroundColor Cyan }
+    # Use direct invocation to surface stdout/stderr in harness logs (Start-Process hides them)
     $oldDebug = $env:CHECK_CS_PROJ_DEBUG
-    $proc = Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -Wait -PassThru
+    try {
+        $output = & $exe @argList 2>&1
+        $rc = $LASTEXITCODE
+        if ($env:CHECK_CS_PROJ_DEBUG) { Write-Host "[HARNESS-DEBUG] Guard output:`n$output" -ForegroundColor Cyan }
+    } catch {
+        Write-Host "[HARNESS-DEBUG] Guard invocation threw: $($_.Exception.Message)" -ForegroundColor Red
+        $rc = 100
+    }
     try { if ($oldDebug) { $env:CHECK_CS_PROJ_DEBUG = $oldDebug } else { Remove-Item Env:CHECK_CS_PROJ_DEBUG -ErrorAction SilentlyContinue } } catch { }
-    return $proc.ExitCode
+    return $rc
 }
 
 try {
