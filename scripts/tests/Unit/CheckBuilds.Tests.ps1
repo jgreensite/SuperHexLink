@@ -3,6 +3,7 @@
 # Avoid storing temp path in a top-level variable (runspace scoping can differ in CI)
 
 Describe 'CheckCsprojMapping' {
+    BeforeAll { . (Join-Path $PSScriptRoot '..\..\lib\CheckCsprojMapping.ps1') }
     It 'maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj when Assembly-CSharp exists' {
         $tmpPath = Join-Path ([System.IO.Path]::GetTempPath()) "test_repo_$([Guid]::NewGuid().ToString('N'))"
         New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
@@ -124,12 +125,15 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
 }
 
 Describe 'CLI wrapper' {
-    BeforeAll { . "$PSScriptRoot\..\..\check-csproj-builds-cli.ps1" }
     It 'Forwards -DryRun and -ChangedOnly to inner wrapper via Start-Process' {
+        # Call the CLI script directly (don't rely on $PSCmdlet being available in the function scope)
         $mockArgsFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), 'pester-startproc-args.txt')
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
         Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path $mockArgsFile -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
-        Invoke-CheckCsprojBuildsCli -ChangedOnly:$true -DiffRef 'main' -DryRun:$true | Out-Null
+
+        $script = Join-Path $PSScriptRoot '..\..\check-csproj-builds-cli.ps1'
+        & $script -ChangedOnly -DiffRef 'main' -DryRun
+
         Assert-MockCalled -CommandName Start-Process -Times 1 -Exactly -Scope It
         $raw = Get-Content $mockArgsFile -ErrorAction SilentlyContinue
         $raw | Should -Match '-ChangedOnly'
