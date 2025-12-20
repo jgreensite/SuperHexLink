@@ -34,6 +34,8 @@ jobs:
             shell: 'pwsh'
           - platform: ubuntu-latest
             shell: 'pwsh'
+          - platform: macos-latest
+            shell: 'pwsh'
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -181,6 +183,8 @@ jobs:
             shell: 'pwsh'
           - platform: ubuntu-latest
             shell: 'pwsh'
+          - platform: macos-latest
+            shell: 'pwsh'
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -246,6 +250,12 @@ jobs:
         with:
           name: pester-results
           path: pester-results.xml
+      - name: Upload Pester test report to GitHub
+        if: always()
+        uses: actions/upload-test-report@v1
+        with:
+          report-type: junit
+          path: pester-results.xml
   unity-tests:
     runs-on: windows-latest
     needs: static-checks
@@ -267,6 +277,8 @@ jobs:
             shell: 'pwsh'
           - platform: ubuntu-latest
             shell: 'pwsh'
+          - platform: macos-latest
+            shell: 'pwsh'
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
@@ -285,10 +297,16 @@ jobs:
         shell: pwsh
         run: |
           Write-Host 'Running Pester unit tests'
-          pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester -Script ./scripts/tests/Unit -EnableExit -Output Detailed"
+          pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester -Script ./scripts/tests/Unit -EnableExit -OutputFormat NUnitXml -OutputFile pester-results.xml"
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pester-results
           path: scripts/tests/Unit
+      - name: Upload Pester test report to GitHub
+        if: always()
+        uses: actions/upload-test-report@v1
+        with:
+          report-type: junit
+          path: pester-results.xml
