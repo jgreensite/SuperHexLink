@@ -230,7 +230,20 @@ jobs:
       - name: Run branch harness flow test
         shell: bash
         run: |
-          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"; fi
+          # Only pass -BaseRef when a non-empty baseRef is available to avoid leaving an empty parameter token
+          if [ "${{ matrix.shell }}" = "powershell" ]; then
+            if [ -n "$baseRef" ]; then
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"
+            else
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1
+            fi
+          else
+            if [ -n "$baseRef" ]; then
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"
+            else
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1
+            fi
+          fi
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4

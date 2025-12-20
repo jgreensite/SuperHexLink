@@ -84,6 +84,11 @@ try {
     if (-not $status) {
         Write-Host 'Working tree clean: using temp branch' -ForegroundColor Green
         git checkout -b $tempBranch
+        # Ensure git author identity is configured in CI runners so commits succeed
+        try {
+            if (-not (& git config user.email)) { & git config user.email "ci@example.com" }
+            if (-not (& git config user.name))  { & git config user.name  "CI Harness" }
+        } catch { }
         git commit -m "Harness temp commit $guid" --no-verify > $null 2>&1
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }
@@ -96,6 +101,10 @@ try {
         git checkout -b $tempBranch
         # Apply the stash to temp branch so changes are present in the commit
         try { & git stash pop 2>$null } catch { try { & git stash apply 2>$null } catch { Write-Warning 'Failed to apply stash to temp branch' } }
+        try {
+            if (-not (& git config user.email)) { & git config user.email "ci@example.com" }
+            if (-not (& git config user.name))  { & git config user.name  "CI Harness" }
+        } catch { }
         git commit -m "Harness temp commit $guid" --no-verify > $null 2>&1
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }
