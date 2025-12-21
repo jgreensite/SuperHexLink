@@ -29,6 +29,7 @@ SuperHexLink/
 
 ### Running Tests
 - **CoreLogic tests** (fast): `dotnet test CoreLogic/tests/CoreLogic.Tests/CoreLogic.Tests.csproj`
+- **Unit tests** (Pester): `.\scripts\run-local-pester.ps1`
 - **Unity EditMode tests**: See [docs/TESTING.md](docs/TESTING.md)
 - **Pre-push checks**: `.\scripts\check-csproj-builds.cmd`
 

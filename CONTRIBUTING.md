@@ -52,26 +52,47 @@ The repository includes a changed-only build guard to speed up local checks and 
 .\scripts\test-check-changedonly.ps1 -TargetFile Assets/Editor/MapValidationWindow.cs
 ```
 
-- Install the pre-commit hook to use changed-only checks automatically on commit:
+## Git Workflow
 
-```powershell
-.\scripts\install-git-hooks.ps1
-```
+We use a **Feature Branch** workflow. Direct commits to `main` are discouraged.
 
-If you want to install the pre-commit hook in DryRun mode (so it only prints detected projects and doesn't run builds), do:
+### Branching Strategy
+- `main` - Stable, production-ready code. Protected by CI.
+- `feature/*` - New features (e.g., `feature/hex-state-refactor`)
+- `bugfix/*` - Bug fixes
+- `hotfix/*` - Urgent production fixes
 
-```powershell
-.\scripts\install-git-hooks.ps1 -DryRun
-```
+### Pull Request Process
 
-DryRun quick verification
--------------------------
-To quickly list (and validate) the changed projects from a PR or a staged change without performing any builds, run:
+1. **Create a feature branch** from `main`:
+   ```powershell
+   git checkout -b feature/your-feature-name
+   ```
 
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File scripts\check-csproj-builds.ps1 -ChangedOnly -DiffRef main -DryRun
-```
+2. **Make your changes** following code style guidelines.
 
-This writes `changed-csprojs.txt` and (in CI) `changed-csprojs-dryrun.txt` for debugging.
+3. **Run Tests Locally** (Required):
+   ```powershell
+   # Run all unit tests (Pester)
+   .\scripts\run-local-pester.ps1
 
-If you need the hook to run in verbose mode for debugging, edit the pre-commit hook or call the script manually with `-Verbose`.
+   # Run build guard (All projects)
+   .\scripts\check-csproj-builds.cmd
+   ```
+
+4. **Commit changes**:
+   - Follow Conventional Commits (e.g., `feat(ui): add new menu`).
+
+5. **Push and Open PR**:
+   ```powershell
+   git push origin feature/your-feature-name
+   ```
+   - CI will run `changed-only-checks` on your PR.
+   - CI will run `static-checks` (full guard) on push to `feature/*`.
+
+### PR Review Checklist
+- [ ] Code follows style guidelines
+- [ ] Tests added for new functionality
+- [ ] All tests pass (CoreLogic + Unity + Pester)
+- [ ] Documentation updated if needed
+- [ ] No new compiler warnings

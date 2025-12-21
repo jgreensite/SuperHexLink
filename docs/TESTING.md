@@ -30,6 +30,14 @@ Validate all .csproj files build:
 .\scripts\check-csproj-builds.cmd
 ```
 
+### Pipeline Unit Tests (Pester)
+
+Validate the build scripts and pipeline logic:
+
+```powershell
+.\scripts\run-local-pester.ps1
+```
+
 ## Local Testing
 
 ### Installing Pre-Push Hook
