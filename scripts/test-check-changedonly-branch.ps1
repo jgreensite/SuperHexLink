@@ -93,7 +93,11 @@ try {
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }
         git checkout $origBranch
-        git branch -D $tempBranch > $null 2>&1
+        try {
+            git branch -D $tempBranch > $null 2>&1
+        } catch {
+            Write-Warning "Could not delete temp branch '$tempBranch' (may be in use by worktree); leaving it in place for manual cleanup."
+        }
     } else {
         Write-Host 'Working tree dirty: stash + temp branch' -ForegroundColor Yellow
         $stashRes = & git stash push -u -m "harness-stash-$guid" 2>$null
@@ -109,7 +113,11 @@ try {
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }
         git checkout $origBranch
-        git branch -D $tempBranch > $null 2>&1
+        try {
+            git branch -D $tempBranch > $null 2>&1
+        } catch {
+            Write-Warning "Could not delete temp branch '$tempBranch' (may be in use by worktree); leaving it in place for manual cleanup."
+        }
         try { & git stash pop 2>$null } catch { try { & git stash apply 2>$null } catch { } }
     }
 } finally {
