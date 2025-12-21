@@ -92,16 +92,16 @@ jobs:
       - name: Upload changed-csprojs.txt for debugging
         if: steps.set_changed_projects.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v4
-        with:
-          # Include matrix OS so multiple jobs can upload similar artifacts without name conflicts
-          name: changed-csprojs-${{ matrix.os }}
-          path: changed-csprojs.txt
+          with:
+            # Include the job name to make artifact names unique across jobs
+            name: changed-csprojs-${{ github.job }}
+            path: changed-csprojs.txt
       - name: Upload changed-csprojs-dryrun.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
-        with:
-          name: changed-csprojs-dryrun-${{ matrix.os }}
-          path: changed-csprojs-dryrun.txt
+          with:
+            name: changed-csprojs-dryrun-${{ github.job }}
+            path: changed-csprojs-dryrun.txt
 
       - name: Assert DryRun detection parity
         if: always()
@@ -125,7 +125,7 @@ jobs:
       - name: Run branch harness in DryRun (additional validation)
         shell: bash
         run: |
-          Write-Host "Running branch harness (DryRun) for diagnostics"
+          echo "Running branch harness (DryRun) for diagnostics"
           # Only pass -BaseRef when a non-empty baseRef is available to avoid leaving an empty parameter token
           if [ "${{ matrix.shell }}" = "powershell" ]; then
             if [ -n "$baseRef" ]; then
@@ -145,7 +145,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: changed-csprojs-branch-harness-${{ matrix.os }}
+          # Include the job name to make artifact names unique across jobs
+          name: changed-csprojs-branch-harness-${{ github.job }}
           path: changed-csprojs-branch-harness.txt
 
       - name: Build changed projects
