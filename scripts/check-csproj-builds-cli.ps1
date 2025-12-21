@@ -20,7 +20,9 @@ function Invoke-CheckCsprojBuildsCli {
         [switch]$DryRun
     )
 
-    $repoRoot = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent | Split-Path -Parent
+    # Derive the script location robustly so function works when dot-sourced in tests
+    $scriptPath = if ($PSCommandPath) { $PSCommandPath } elseif ($MyInvocation.MyCommand.Definition) { $MyInvocation.MyCommand.Definition } else { $null }
+    $repoRoot = if ($scriptPath) { Split-Path -Path $scriptPath -Parent | Split-Path -Parent } else { Write-Verbose 'Unable to determine script path'; $null }
     $wrapper = Join-Path $repoRoot 'scripts\check-csproj-builds.ps1'
     if (-not (Test-Path $wrapper)) { Write-Host "Wrapper not found at $wrapper" -ForegroundColor Red; return 2 }
 

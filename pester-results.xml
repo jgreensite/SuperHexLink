@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="10" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2025-12-20" time="06:31:06">
+  <environment user="joelg" machine-name="GAMINGPC" cwd="D:\dev\SuperHexLink" user-domain="GAMINGPC" platform="Microsoft Windows 11 Pro|C:\WINDOWS|\Device\Harddisk0\Partition3" nunit-version="2.5.8.0" os-version="10.0.26100" clr-version="4.0.30319.42000" />
+  <culture-info current-culture="en-GB" current-uiculture="en-GB" />
+  <test-suite type="Powershell" name="Pester" executed="True" result="Success" success="True" time="1.1926" asserts="0">
+    <results>
+      <test-suite type="TestFixture" name="CheckCsprojMapping" executed="True" result="Success" success="True" time="0.4715" asserts="0" description="CheckCsprojMapping">
+        <results>
+          <test-case description="maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj when Assembly-CSharp exists" name="CheckCsprojMapping.maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj when Assembly-CSharp exists" time="0.3606" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when it exists" name="CheckCsprojMapping.maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when it exists" time="0.0638" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="maps CoreLogic/src/Class1.cs to CoreLogic csproj" name="CheckCsprojMapping.maps CoreLogic/src/Class1.cs to CoreLogic csproj" time="0.0235" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="ignores projects under Assets/Plugins/Sirenix and actions-runner" name="CheckCsprojMapping.ignores projects under Assets/Plugins/Sirenix and actions-runner" time="0.0235" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="CLI wrapper" executed="True" result="Success" success="True" time="0.5325" asserts="0" description="CLI wrapper">
+        <results>
+          <test-case description="forwards -DryRun and -ChangedOnly to underlying wrapper via Start-Process" name="CLI wrapper.forwards -DryRun and -ChangedOnly to underlying wrapper via Start-Process" time="0.3553" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Forwards -DryRun and -ChangedOnly to inner wrapper via Start-Process" name="CLI wrapper.Forwards -DryRun and -ChangedOnly to inner wrapper via Start-Process" time="0.1772" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Get-ProjectsFromChangedFiles mapping" executed="True" result="Success" success="True" time="0.1886" asserts="0" description="Get-ProjectsFromChangedFiles mapping">
+        <results>
+          <test-case description="Maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj" name="Get-ProjectsFromChangedFiles mapping.Maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj" time="0.1467" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when present" name="Get-ProjectsFromChangedFiles mapping.Maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when present" time="0.0132" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Maps CoreLogic/src/Class1.cs to CoreLogic project" name="Get-ProjectsFromChangedFiles mapping.Maps CoreLogic/src/Class1.cs to CoreLogic project" time="0.016" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Ignores projects under Assets/Plugins/Sirenix and actions-runner" name="Get-ProjectsFromChangedFiles mapping.Ignores projects under Assets/Plugins/Sirenix and actions-runner" time="0.0127" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

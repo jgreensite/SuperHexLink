@@ -1,55 +1,62 @@
 . (Join-Path $PSScriptRoot '..\..\lib\CheckCsprojMapping.ps1')
 
+# Avoid storing temp path in a top-level variable (runspace scoping can differ in CI)
+
 Describe 'CheckCsprojMapping' {
+    BeforeAll { . (Join-Path $PSScriptRoot '..\..\lib\CheckCsprojMapping.ps1') }
     It 'maps Assets/Scripts/Player.cs to Assembly-CSharp.csproj when Assembly-CSharp exists' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path ([System.IO.Path]::GetTempPath()) "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Scripts') -ItemType Directory -Force | Out-Null
-            $player = New-Item -Path (Join-Path $tmp.FullName 'Assets\Scripts\Player.cs') -ItemType File -Force
-            New-Item -Path (Join-Path $tmp.FullName 'Assembly-CSharp.csproj') -ItemType File -Force | Out-Null
-            $res = MapFileToProjects -FilePath 'Assets/Scripts/Player.cs' -RepoRoot $tmp.FullName
-            ($res -contains (Join-Path $tmp.FullName 'Assembly-CSharp.csproj')) | Should Be $true
-        } finally { Remove-Item -Recurse -Force $tmp }
+            New-Item -Path (Join-Path $tmpPath 'Assets\Scripts') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Scripts\Player.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assembly-CSharp.csproj') -ItemType File -Force | Out-Null
+            $res = MapFileToProjects -FilePath 'Assets/Scripts/Player.cs' -RepoRoot $tmpPath
+            $res | Should -Contain (Join-Path $tmpPath 'Assembly-CSharp.csproj')
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 
     It 'maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when it exists' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path ([System.IO.Path]::GetTempPath()) "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Editor') -ItemType Directory -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Editor\Tool.cs') -ItemType File -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'Assembly-CSharp-Editor.csproj') -ItemType File -Force | Out-Null
-            $res = MapFileToProjects -FilePath 'Assets/Editor/Tool.cs' -RepoRoot $tmp.FullName
-            ($res -contains (Join-Path $tmp.FullName 'Assembly-CSharp-Editor.csproj')) | Should Be $true
-        } finally { Remove-Item -Recurse -Force $tmp }
+            New-Item -Path (Join-Path $tmpPath 'Assets\Editor') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Editor\Tool.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assembly-CSharp-Editor.csproj') -ItemType File -Force | Out-Null
+            $res = MapFileToProjects -FilePath 'Assets/Editor/Tool.cs' -RepoRoot $tmpPath
+            $res | Should -Contain (Join-Path $tmpPath 'Assembly-CSharp-Editor.csproj')
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 
     It 'maps CoreLogic/src/Class1.cs to CoreLogic csproj' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path ([System.IO.Path]::GetTempPath()) "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'CoreLogic\src') -ItemType Directory -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'CoreLogic\src\Class1.cs') -ItemType File -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'CoreLogic\CoreLogic.csproj') -ItemType File -Force | Out-Null
-            $res = MapFileToProjects -FilePath 'CoreLogic/src/Class1.cs' -RepoRoot $tmp.FullName
-            ($res -contains (Join-Path $tmp.FullName 'CoreLogic\CoreLogic.csproj')) | Should Be $true
-        } finally { Remove-Item -Recurse -Force $tmp }
+            New-Item -Path (Join-Path $tmpPath 'CoreLogic\src') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'CoreLogic\src\Class1.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'CoreLogic\CoreLogic.csproj') -ItemType File -Force | Out-Null
+            $res = MapFileToProjects -FilePath 'CoreLogic/src/Class1.cs' -RepoRoot $tmpPath
+            $res | Should -Contain (Join-Path $tmpPath 'CoreLogic\CoreLogic.csproj')
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 
     It 'ignores projects under Assets/Plugins/Sirenix and actions-runner' {
-        $tmp = New-Item -ItemType Directory -Path (Join-Path $env:TEMP "test_repo_$([Guid]::NewGuid().ToString('N'))")
+        $tmpPath = Join-Path ([System.IO.Path]::GetTempPath()) "test_repo_$([Guid]::NewGuid().ToString('N'))"
+        New-Item -ItemType Directory -Path $tmpPath -Force | Out-Null
         try {
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Plugins\Sirenix') -ItemType Directory -Force | Out-Null
-            New-Item -Path (Join-Path $tmp.FullName 'Assets\Plugins\Sirenix\Some.cs') -ItemType File -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Plugins\Sirenix') -ItemType Directory -Force | Out-Null
+            New-Item -Path (Join-Path $tmpPath 'Assets\Plugins\Sirenix\Some.cs') -ItemType File -Force | Out-Null
             # When no projects exist, mapping returns empty
-            $res = MapFileToProjects -FilePath 'Assets/Plugins/Sirenix/Some.cs' -RepoRoot $tmp.FullName
-            $res.Count | Should Be 0
-        } finally { Remove-Item -Recurse -Force $tmp }
+            $res = MapFileToProjects -FilePath 'Assets/Plugins/Sirenix/Some.cs' -RepoRoot $tmpPath
+            $res.Count | Should -Be 0
+        } finally { Remove-Item -Recurse -Force -Path $tmpPath }
     }
 }
 
 Describe 'CLI wrapper' {
     It 'forwards -DryRun and -ChangedOnly to underlying wrapper via Start-Process' {
         # Mock Start-Process to write the captured argument list to a temp file
-        $mockArgsFile = Join-Path $env:TEMP 'pester-startproc-args.txt'
+        $mockArgsFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), 'pester-startproc-args.txt')
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
         Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList) Set-Content -Path $mockArgsFile -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
 
@@ -57,19 +64,19 @@ Describe 'CLI wrapper' {
         $script = Join-Path $PSScriptRoot '..\..\check-csproj-builds-cli.ps1'
         & $script -ChangedOnly -DiffRef 'main' -DryRun
 
-        (Test-Path $mockArgsFile) | Should Be $true
+        (Test-Path $mockArgsFile) | Should -Be $true
         $raw = Get-Content $mockArgsFile -ErrorAction SilentlyContinue
-        ($raw -match '-DryRun') | Should Be $true
-        ($raw -match '-ChangedOnly') | Should Be $true
+        $raw | Should -Match '-DryRun'
+        $raw | Should -Match '-ChangedOnly'
     }
 }
 Import-Module Pester -ErrorAction SilentlyContinue
 
 Describe 'Get-ProjectsFromChangedFiles mapping' {
     BeforeAll {
-        # Create an isolated temp area for tests
-        $global:TestDrive = Join-Path $env:TEMP "pester-test-$(Get-Random)"
-        New-Item -ItemType Directory -Path $TestDrive -Force | Out-Null
+           # Create an isolated, unique temp area for these tests to avoid collisions across runspaces
+           $global:TestDrive = Join-Path ([System.IO.Path]::GetTempPath()) "pester-test-$([Guid]::NewGuid().ToString('N'))"
+           New-Item -ItemType Directory -Path $TestDrive -Force | Out-Null
         # Dot-source the library from scripts/lib
         . "$PSScriptRoot\..\..\lib\check-csproj-builds-lib.ps1"
     }
@@ -82,7 +89,7 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
         New-Item -ItemType File -Path (Join-Path $root 'Assembly-CSharp.csproj') -Force | Out-Null
 
         $res = Get-ProjectsFromChangedFiles -RepoRoot $root -ChangedFiles @('Assets/Scripts/Player.cs')
-        ($res -contains (Join-Path $root 'Assembly-CSharp.csproj')) | Should Be $true
+        $res | Should -Contain (Join-Path $root 'Assembly-CSharp.csproj')
     }
 
     It 'Maps Assets/Editor/Tool.cs to Assembly-CSharp-Editor.csproj when present' {
@@ -92,7 +99,7 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
         New-Item -ItemType File -Path (Join-Path $root 'Assembly-CSharp-Editor.csproj') -Force | Out-Null
 
         $res = Get-ProjectsFromChangedFiles -RepoRoot $root -ChangedFiles @('Assets/Editor/Tool.cs')
-        ($res -contains (Join-Path $root 'Assembly-CSharp-Editor.csproj')) | Should Be $true
+        $res | Should -Contain (Join-Path $root 'Assembly-CSharp-Editor.csproj')
     }
 
     It 'Maps CoreLogic/src/Class1.cs to CoreLogic project' {
@@ -102,7 +109,7 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
         New-Item -ItemType File -Path (Join-Path $root 'CoreLogic\src\CoreLogic.csproj') -Force | Out-Null
 
         $res = Get-ProjectsFromChangedFiles -RepoRoot $root -ChangedFiles @('CoreLogic/src/Class1.cs')
-        ($res -contains (Join-Path $root 'CoreLogic\src\CoreLogic.csproj')) | Should Be $true
+        $res | Should -Contain (Join-Path $root 'CoreLogic\src\CoreLogic.csproj')
     }
 
     It 'Ignores projects under Assets/Plugins/Sirenix and actions-runner' {
@@ -113,20 +120,23 @@ Describe 'Get-ProjectsFromChangedFiles mapping' {
 
         $res = Get-ProjectsFromChangedFiles -RepoRoot $root -ChangedFiles @('Assets/Plugins/Sirenix/Some.cs')
         # Ensure plugin file does not map to the local Dummy.csproj
-        ($res -contains (Join-Path $root 'Assets\Plugins\Sirenix\Dummy.csproj')) | Should Be $false
+        $res | Should -Not -Contain (Join-Path $root 'Assets\Plugins\Sirenix\Dummy.csproj')
     }
 }
 
 Describe 'CLI wrapper' {
-    BeforeAll { . "$PSScriptRoot\..\..\check-csproj-builds-cli.ps1" }
     It 'Forwards -DryRun and -ChangedOnly to inner wrapper via Start-Process' {
-        $mockArgsFile = Join-Path $env:TEMP 'pester-startproc-args.txt'
+        # Call the CLI script directly (don't rely on $PSCmdlet being available in the function scope)
+        $mockArgsFile = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), 'pester-startproc-args.txt')
         if (Test-Path $mockArgsFile) { Remove-Item $mockArgsFile -Force }
-        Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path $env:TEMP\'pester-startproc-args.txt' -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
-        Invoke-CheckCsprojBuildsCli -ChangedOnly:$true -DiffRef 'main' -DryRun:$true | Out-Null
+        Mock -CommandName Start-Process -MockWith { param($FilePath, $ArgumentList); Set-Content -Path $mockArgsFile -Value ($ArgumentList -join '|'); return @{ ExitCode = 0 } }
+
+        $script = Join-Path $PSScriptRoot '..\..\check-csproj-builds-cli.ps1'
+        & $script -ChangedOnly -DiffRef 'main' -DryRun
+
         Assert-MockCalled -CommandName Start-Process -Times 1 -Exactly -Scope It
         $raw = Get-Content $mockArgsFile -ErrorAction SilentlyContinue
-        ($raw -match '-ChangedOnly') | Should Be $true
-        ($raw -match '-DryRun') | Should Be $true
+        $raw | Should -Match '-ChangedOnly'
+        $raw | Should -Match '-DryRun'
     }
 }

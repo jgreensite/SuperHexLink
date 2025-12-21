@@ -44,7 +44,8 @@ function ScriptSupportsDryRun {
 
 function Run-Guard {
     param([string]$GuardPath, [bool]$IsCli, [switch]$Dry)
-    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$GuardPath,'-ChangedOnly','-DiffRef',$BaseRef)
+    $argList = @('-NoProfile','-ExecutionPolicy','Bypass','-File',$GuardPath,'-ChangedOnly')
+    if ($BaseRef -and $BaseRef.Trim() -ne '') { $argList += @('-DiffRef',$BaseRef) }
     $supportsDry = ScriptSupportsDryRun -p $GuardPath
     if ($env:CHECK_CS_PROJ_DEBUG) {
         Write-Host "[HARNESS-DEBUG] Guard path: $GuardPath" -ForegroundColor Cyan
@@ -54,10 +55,18 @@ function Run-Guard {
     if ($Dry -and $supportsDry) { $argList += '-DryRun' }
     if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
     if ($env:CHECK_CS_PROJ_DEBUG) { Write-Host "[HARNESS-DEBUG] Invoking guard: $exe with args: $($argList -join ' ')" -ForegroundColor Cyan }
+    # Use direct invocation to surface stdout/stderr in harness logs (Start-Process hides them)
     $oldDebug = $env:CHECK_CS_PROJ_DEBUG
-    $proc = Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -Wait -PassThru
+    try {
+        $output = & $exe @argList 2>&1
+        $rc = $LASTEXITCODE
+        if ($env:CHECK_CS_PROJ_DEBUG) { Write-Host "[HARNESS-DEBUG] Guard output:`n$output" -ForegroundColor Cyan }
+    } catch {
+        Write-Host "[HARNESS-DEBUG] Guard invocation threw: $($_.Exception.Message)" -ForegroundColor Red
+        $rc = 100
+    }
     try { if ($oldDebug) { $env:CHECK_CS_PROJ_DEBUG = $oldDebug } else { Remove-Item Env:CHECK_CS_PROJ_DEBUG -ErrorAction SilentlyContinue } } catch { }
-    return $proc.ExitCode
+    return $rc
 }
 
 try {
@@ -75,11 +84,20 @@ try {
     if (-not $status) {
         Write-Host 'Working tree clean: using temp branch' -ForegroundColor Green
         git checkout -b $tempBranch
+        # Ensure git author identity is configured in CI runners so commits succeed
+        try {
+            if (-not (& git config user.email)) { & git config user.email "ci@example.com" }
+            if (-not (& git config user.name))  { & git config user.name  "CI Harness" }
+        } catch { }
         git commit -m "Harness temp commit $guid" --no-verify > $null 2>&1
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }
         git checkout $origBranch
-        git branch -D $tempBranch > $null 2>&1
+        try {
+            git branch -D $tempBranch > $null 2>&1
+        } catch {
+            Write-Warning "Could not delete temp branch '$tempBranch' (may be in use by worktree); leaving it in place for manual cleanup."
+        }
     } else {
         Write-Host 'Working tree dirty: stash + temp branch' -ForegroundColor Yellow
         $stashRes = & git stash push -u -m "harness-stash-$guid" 2>$null
@@ -87,11 +105,19 @@ try {
         git checkout -b $tempBranch
         # Apply the stash to temp branch so changes are present in the commit
         try { & git stash pop 2>$null } catch { try { & git stash apply 2>$null } catch { Write-Warning 'Failed to apply stash to temp branch' } }
+        try {
+            if (-not (& git config user.email)) { & git config user.email "ci@example.com" }
+            if (-not (& git config user.name))  { & git config user.name  "CI Harness" }
+        } catch { }
         git commit -m "Harness temp commit $guid" --no-verify > $null 2>&1
         $rc = Run-Guard -GuardPath $guardInvoker.Path -IsCli:$guardInvoker.IsCli -Dry:$DryRun
         if ($rc -ne 0) { Write-Host "Guard returned non-zero ($rc)" -ForegroundColor Red }
         git checkout $origBranch
-        git branch -D $tempBranch > $null 2>&1
+        try {
+            git branch -D $tempBranch > $null 2>&1
+        } catch {
+            Write-Warning "Could not delete temp branch '$tempBranch' (may be in use by worktree); leaving it in place for manual cleanup."
+        }
         try { & git stash pop 2>$null } catch { try { & git stash apply 2>$null } catch { } }
     }
 } finally {

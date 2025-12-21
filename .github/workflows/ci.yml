@@ -16,12 +16,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Repo csproj build guard
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Host "Running repo-wide csproj build guard (CLI)"
           $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
           if (-not (Test-Path $script)) { Write-Error "Build guard CLI script not found at $script"; exit 2 }
-          powershell -NoProfile -ExecutionPolicy Bypass -File $script
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script
 
   changed-only-checks:
     runs-on: ${{ matrix.platform }}
@@ -48,22 +48,27 @@ jobs:
       - name: Run changed-only csproj build guard (PR)
         shell: bash
         run: |
-          Write-Host "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
-          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
+          echo "Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          script="${GITHUB_WORKSPACE}/scripts/check-csproj-builds-cli.ps1"
+          if [ ! -f "$script" ]; then echo "Build guard script not found at $script"; exit 2; fi
           # `github.base_ref` contains the base branch for the PR (e.g., 'main')
-          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
-          Write-Host "Diff base ref: $baseRef"
+          baseRef=${{ toJSON(github.base_ref) }}
+          baseRef=${baseRef#\"}
+          baseRef=${baseRef%\"}
+          echo "Diff base ref: $baseRef"
           # Ensure base ref is available locally for diffs
-          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          git fetch origin $baseRef --depth=1 || echo "git fetch origin $baseRef failed (possibly already present)"
+          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef"; fi
       - name: Run changed-only csproj build guard (PR - DryRun)
         shell: bash
         run: |
-          Write-Host "DryRun: Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
-          if (-not (Test-Path $script)) { Write-Error "Build guard script not found at $script"; exit 2 }
-          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
-          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          echo "DryRun: Running changed-only csproj build guard for PR: ${{ github.event.pull_request.number }}"
+          script="${GITHUB_WORKSPACE}/scripts/check-csproj-builds-cli.ps1"
+          if [ ! -f "$script" ]; then echo "Build guard script not found at $script"; exit 2; fi
+          baseRef=${{ toJSON(github.base_ref) }}
+          baseRef=${baseRef#\"}
+          baseRef=${baseRef%\"}
+          git fetch origin $baseRef --depth=1 || echo "git fetch origin $baseRef failed (possibly already present)"
           if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -ChangedOnly -DiffRef "$baseRef" -DryRun; fi
           # copy the output artifact with a distinct name and upload for debugging
           if [ -f changed-csprojs.txt ]; then cp changed-csprojs.txt changed-csprojs-dryrun.txt; fi
@@ -72,45 +77,43 @@ jobs:
 
       - name: Set changed-projects output
         id: set_changed_projects
-        shell: powershell
+        shell: pwsh
         run: |
           $name = 'changed_projects'
           $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
-          if (Test-Path $changedFile) {
-              $value = (Get-Content $changedFile -Raw).Trim()
-              if ($value -eq '') { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=" } else { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=$value" }
-          } else {
-              Add-Content -Path $env:GITHUB_OUTPUT -Value "$name="
-          }
+          $value = ''
+          if (Test-Path $changedFile) { $c = (Get-Content $changedFile -Raw); if ($c) { $value = $c.Trim() } }
+          if ($value -eq '') { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=" } else { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=$value" }
           # Export a boolean for presence of changed projects for easier conditional checks
           $hasChanges = 'false'
-          if ((Test-Path $changedFile) -and ((Get-Content $changedFile -Raw).Trim() -ne '')) { $hasChanges = 'true' }
+          if ($value -ne '') { $hasChanges = 'true' }
           Add-Content -Path $env:GITHUB_OUTPUT -Value "has_changes=$hasChanges"
 
       - name: Upload changed-csprojs.txt for debugging
         if: steps.set_changed_projects.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v4
-        with:
-          name: changed-csprojs
-          path: changed-csprojs.txt
+          with:
+            # Include the job name to make artifact names unique across jobs
+            name: changed-csprojs-${{ github.job }}
+            path: changed-csprojs.txt
       - name: Upload changed-csprojs-dryrun.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
-        with:
-          name: changed-csprojs-dryrun
-          path: changed-csprojs-dryrun.txt
+          with:
+            name: changed-csprojs-dryrun-${{ github.job }}
+            path: changed-csprojs-dryrun.txt
 
       - name: Assert DryRun detection parity
         if: always()
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Host "Comparing DryRun vs normal changed-csprojs detection..."
           $dryFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs-dryrun.txt'
           $file = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
           $dry = ''
           $f = ''
-          if (Test-Path $dryFile) { $dry = (Get-Content $dryFile -Raw).Trim() }
-          if (Test-Path $file) { $f = (Get-Content $file -Raw).Trim() }
+          if (Test-Path $dryFile) { $c = (Get-Content $dryFile -Raw) ; if ($c) { $dry = $c.Trim() } }
+          if (Test-Path $file) { $c = (Get-Content $file -Raw) ; if ($c) { $f = $c.Trim() } }
           if ($dry -eq '' -and $f -eq '') { Write-Host 'Both empty - nothing to build'; exit 0 }
           if (($dry -eq '' -and $f -ne '') -or ($dry -ne '' -and $f -eq '')) { Write-Error 'DryRun and normal detection differ: one is empty and the other is not'; exit 1 }
           $a = $dry -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' } | Sort-Object
@@ -122,19 +125,33 @@ jobs:
       - name: Run branch harness in DryRun (additional validation)
         shell: bash
         run: |
-          Write-Host "Running branch harness (DryRun) for diagnostics"
-          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun; fi
+          echo "Running branch harness (DryRun) for diagnostics"
+          # Only pass -BaseRef when a non-empty baseRef is available to avoid leaving an empty parameter token
+          if [ "${{ matrix.shell }}" = "powershell" ]; then
+            if [ -n "$baseRef" ]; then
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun
+            else
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -DryRun
+            fi
+          else
+            if [ -n "$baseRef" ]; then
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -BaseRef "$baseRef" -DryRun
+            else
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/test-check-changedonly-branch.ps1 -DryRun
+            fi
+          fi
           if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-branch-harness.txt -Force }
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: changed-csprojs-branch-harness
+          # Include the job name to make artifact names unique across jobs
+          name: changed-csprojs-branch-harness-${{ github.job }}
           path: changed-csprojs-branch-harness.txt
 
       - name: Build changed projects
         if: steps.set_changed_projects.outputs.has_changes == 'true'
-        shell: powershell
+        shell: pwsh
         run: |
           $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
           if (-not (Test-Path $changedFile)) { Write-Host "No changed-csprojs.txt found; skipping builds"; exit 0 }
@@ -147,7 +164,7 @@ jobs:
           }
 
       - name: Build CoreLogic
-        shell: powershell
+        shell: pwsh
         if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
         run: |
           Write-Host "Building CoreLogic library"
@@ -155,7 +172,7 @@ jobs:
 
       - name: Run CoreLogic dotnet tests
         if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Host "Running CoreLogic dotnet tests"
           dotnet test "$env:GITHUB_WORKSPACE\CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj" --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
@@ -197,11 +214,13 @@ jobs:
       - name: Run branch harness (DryRun)
         shell: bash
         run: |
-          Write-Host "Running branch harness (DryRun) for diagnostics"
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\test-check-changedonly-branch.ps1'
-          if (-not (Test-Path $script)) { Write-Error "Harness script not found at $script"; exit 2 }
-          $baseRef = ${{ toJSON(github.base_ref) }}.Trim('"')
-          git fetch origin $baseRef --depth=1 || Write-Host "git fetch origin $baseRef failed (possibly already present)"
+          echo "Running branch harness (DryRun) for diagnostics"
+          script="${GITHUB_WORKSPACE}/scripts/test-check-changedonly-branch.ps1"
+          if [ ! -f "$script" ]; then echo "Harness script not found at $script"; exit 2; fi
+          baseRef=${{ toJSON(github.base_ref) }}
+          baseRef=${baseRef#\"}
+          baseRef=${baseRef%\"}
+          git fetch origin $baseRef --depth=1 || echo "git fetch origin $baseRef failed (possibly already present)"
           if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File "$script" -BaseRef "$baseRef" -DryRun; else pwsh -NoProfile -ExecutionPolicy Bypass -File "$script" -BaseRef "$baseRef" -DryRun; fi
       - name: Run harness parity tests
         shell: bash
@@ -210,7 +229,20 @@ jobs:
       - name: Run branch harness flow test
         shell: bash
         run: |
-          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"; else pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"; fi
+          # Only pass -BaseRef when a non-empty baseRef is available to avoid leaving an empty parameter token
+          if [ "${{ matrix.shell }}" = "powershell" ]; then
+            if [ -n "$baseRef" ]; then
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"
+            else
+              powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1
+            fi
+          else
+            if [ -n "$baseRef" ]; then
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1 -BaseRef "$baseRef"
+            else
+              pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/tests/harness-branch-flow.ps1
+            fi
+          fi
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
@@ -218,44 +250,7 @@ jobs:
           name: changed-csprojs-branch-harness
           path: changed-csprojs-branch-harness.txt
 
-  unit-tests:
-    runs-on: ${{ matrix.platform }}
-    strategy:
-      matrix:
-        include:
-          - platform: windows-latest
-            shell: 'powershell'
-          - platform: windows-latest
-            shell: 'pwsh'
-          - platform: ubuntu-latest
-            shell: 'pwsh'
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup PowerShell
-        if: matrix.shell == 'pwsh'
-        uses: PowerShell/PowerShell@v2
-      - name: Install Pester
-        shell: bash
-        run: |
-          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -Command "Install-Module Pester -Force -Scope CurrentUser"; else pwsh -NoProfile -ExecutionPolicy Bypass -Command "Install-Module Pester -Force -Scope CurrentUser"; fi
-      - name: Run unit tests (Pester)
-        shell: bash
-        run: |
-          Write-Host "Running Pester unit tests"
-          if [ "${{ matrix.shell }}" = "powershell" ]; then powershell -NoProfile -ExecutionPolicy Bypass -Command "Import-Module Pester -ErrorAction Stop; Invoke-Pester -Script './scripts/tests/Unit' -OutputFormat NUnitXml -OutputFile pester-results.xml"; else pwsh -NoProfile -ExecutionPolicy Bypass -Command "Import-Module Pester -ErrorAction Stop; Invoke-Pester -Script './scripts/tests/Unit' -OutputFormat NUnitXml -OutputFile pester-results.xml"; fi
-      - name: Upload Pester results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pester-results
-          path: pester-results.xml
-      - name: Upload Pester test report to GitHub
-        if: always()
-        uses: actions/upload-test-report@v1
-        with:
-          report-type: junit
-          path: pester-results.xml
+
   unity-tests:
     runs-on: windows-latest
     needs: static-checks
@@ -298,15 +293,46 @@ jobs:
         run: |
           Write-Host 'Running Pester unit tests'
           pwsh -NoProfile -Command "Import-Module Pester; Invoke-Pester -Script ./scripts/tests/Unit -EnableExit -OutputFormat NUnitXml -OutputFile pester-results.xml"
+      - name: List test output (debug)
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host '--- Listing test output files for debug ---'
+          if (Test-Path pester-results.xml) { Write-Host "Found pester-results.xml at: $(Resolve-Path pester-results.xml)" } else { Write-Host 'pester-results.xml not found' }
+          Write-Host '--- Workspace top-level files ---'
+          Get-ChildItem -Path . -Force | Sort-Object Name | ForEach-Object { Write-Host $_.Name }
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pester-results
-          path: scripts/tests/Unit
-      - name: Upload Pester test report to GitHub
+          name: pester-results-${{ matrix.platform }}-${{ matrix.shell }}
+          path: |
+            pester-results.xml
+            pester-results-junit.xml
+            scripts/tests/Unit
+          overwrite: true
+      - name: Convert Pester results to JUnit
         if: always()
-        uses: actions/upload-test-report@v1
+        shell: pwsh
+        run: |
+          Write-Host 'Converting pester-results.xml to JUnit format (pester-results-junit.xml)'
+          if (Test-Path pester-results.xml) {
+              # Ensure python is available; try 'python' then 'python3'
+              try { python --version > $null 2>&1 } catch { }
+              if ($LASTEXITCODE -ne 0) { try { python3 --version > $null 2>&1 } catch { } }
+              if ($LASTEXITCODE -ne 0) { Write-Host 'Python not found in PATH; skipping conversion.' } else { python scripts/tools/pester_nunit2_to_junit.py pester-results.xml pester-results-junit.xml }
+              Write-Host 'Conversion step finished.'
+          } else {
+              Write-Host 'pester-results.xml not found; skipping conversion.'
+          }
+      - name: Publish Pester test report (GitHub UI)
+        if: always()
+        # Use v2 of the test-reporter and publish the JUnit converted file
+        uses: dorny/test-reporter@v2
+        continue-on-error: true
         with:
-          report-type: junit
-          path: pester-results.xml
+          name: pester
+          path: pester-results-junit.xml
+          reporter: java-junit
+          fail-on-error: false
+          fail-on-empty: false

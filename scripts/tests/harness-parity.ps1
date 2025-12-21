@@ -20,10 +20,14 @@ if (-not (Test-Path 'scripts\check-csproj-builds-cli.ps1')) { Write-Error 'CLI g
 Write-Host "Running harness parity test against base: $BaseRef"
 
 # Run DryRun
-$dryArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly','-DiffRef',$BaseRef,'-DryRun')
+$dryArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly')
+if ($BaseRef -and $BaseRef.Trim() -ne '') { $dryArgs += @('-DiffRef',$BaseRef) }
+$dryArgs += '-DryRun'
 if (Get-Command pwsh -ErrorAction SilentlyContinue) { $exe = 'pwsh' } else { $exe = 'powershell.exe' }
-$rc = Start-Process -FilePath $exe -ArgumentList $dryArgs -NoNewWindow -Wait -PassThru
-if ($rc.ExitCode -ne 0) { Write-Error "DryRun invocation failed with exit $($rc.ExitCode)"; Pop-Location; exit 1 }
+Write-Host "Invoking DryRun: $exe $($dryArgs -join ' ')" -ForegroundColor Cyan
+$rawOut = & $exe @dryArgs 2>&1
+$rc = $LASTEXITCODE
+if ($rc -ne 0) { Write-Error "DryRun invocation failed with exit $rc"; Write-Host "DryRun output:`n$rawOut"; Pop-Location; exit 1 }
 if (Test-Path 'changed-csprojs.txt') {
     $src = Join-Path $repoRoot 'changed-csprojs.txt'
     $dest = Join-Path $repoRoot 'changed-csprojs-dryrun.txt'
@@ -31,9 +35,12 @@ if (Test-Path 'changed-csprojs.txt') {
 }
 
 # Run normal detection
-$args = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly','-DiffRef',$BaseRef)
-$rc = Start-Process -FilePath $exe -ArgumentList $args -NoNewWindow -Wait -PassThru
-if ($rc.ExitCode -ne 0) { Write-Error "Normal invocation failed with exit $($rc.ExitCode)"; Pop-Location; exit 1 }
+$args = @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts\check-csproj-builds-cli.ps1','-ChangedOnly')
+if ($BaseRef -and $BaseRef.Trim() -ne '') { $args += @('-DiffRef',$BaseRef) }
+Write-Host "Invoking normal detection: $exe $($args -join ' ')" -ForegroundColor Cyan
+$rawOut = & $exe @args 2>&1
+$rc = $LASTEXITCODE
+if ($rc -ne 0) { Write-Error "Normal invocation failed with exit $rc"; Write-Host "Normal invocation output:`n$rawOut"; Pop-Location; exit 1 }
 
 # Copy artifact
 if (Test-Path 'changed-csprojs.txt') {
