@@ -81,28 +81,26 @@ jobs:
         run: |
           $name = 'changed_projects'
           $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
-          if (Test-Path $changedFile) {
-              $value = (Get-Content $changedFile -Raw).Trim()
-              if ($value -eq '') { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=" } else { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=$value" }
-          } else {
-              Add-Content -Path $env:GITHUB_OUTPUT -Value "$name="
-          }
+          $value = ''
+          if (Test-Path $changedFile) { $c = (Get-Content $changedFile -Raw); if ($c) { $value = $c.Trim() } }
+          if ($value -eq '') { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=" } else { Add-Content -Path $env:GITHUB_OUTPUT -Value "$name=$value" }
           # Export a boolean for presence of changed projects for easier conditional checks
           $hasChanges = 'false'
-          if ((Test-Path $changedFile) -and ((Get-Content $changedFile -Raw).Trim() -ne '')) { $hasChanges = 'true' }
+          if ($value -ne '') { $hasChanges = 'true' }
           Add-Content -Path $env:GITHUB_OUTPUT -Value "has_changes=$hasChanges"
 
       - name: Upload changed-csprojs.txt for debugging
         if: steps.set_changed_projects.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: changed-csprojs
+          # Include matrix OS so multiple jobs can upload similar artifacts without name conflicts
+          name: changed-csprojs-${{ matrix.os }}
           path: changed-csprojs.txt
       - name: Upload changed-csprojs-dryrun.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: changed-csprojs-dryrun
+          name: changed-csprojs-dryrun-${{ matrix.os }}
           path: changed-csprojs-dryrun.txt
 
       - name: Assert DryRun detection parity
@@ -147,7 +145,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: changed-csprojs-branch-harness
+          name: changed-csprojs-branch-harness-${{ matrix.os }}
           path: changed-csprojs-branch-harness.txt
 
       - name: Build changed projects
