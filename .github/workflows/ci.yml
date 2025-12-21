@@ -16,12 +16,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Repo csproj build guard
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Host "Running repo-wide csproj build guard (CLI)"
           $script = Join-Path $env:GITHUB_WORKSPACE 'scripts\check-csproj-builds-cli.ps1'
           if (-not (Test-Path $script)) { Write-Error "Build guard CLI script not found at $script"; exit 2 }
-          powershell -NoProfile -ExecutionPolicy Bypass -File $script
+          pwsh -NoProfile -ExecutionPolicy Bypass -File $script
 
   changed-only-checks:
     runs-on: ${{ matrix.platform }}
@@ -77,7 +77,7 @@ jobs:
 
       - name: Set changed-projects output
         id: set_changed_projects
-        shell: powershell
+        shell: pwsh
         run: |
           $name = 'changed_projects'
           $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
@@ -105,7 +105,7 @@ jobs:
 
       - name: Assert DryRun detection parity
         if: always()
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Host "Comparing DryRun vs normal changed-csprojs detection..."
           $dryFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs-dryrun.txt'
@@ -150,7 +150,7 @@ jobs:
 
       - name: Build changed projects
         if: steps.set_changed_projects.outputs.has_changes == 'true'
-        shell: powershell
+        shell: pwsh
         run: |
           $changedFile = Join-Path $env:GITHUB_WORKSPACE 'changed-csprojs.txt'
           if (-not (Test-Path $changedFile)) { Write-Host "No changed-csprojs.txt found; skipping builds"; exit 0 }
@@ -163,7 +163,7 @@ jobs:
           }
 
       - name: Build CoreLogic
-        shell: powershell
+        shell: pwsh
         if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
         run: |
           Write-Host "Building CoreLogic library"
@@ -171,7 +171,7 @@ jobs:
 
       - name: Run CoreLogic dotnet tests
         if: contains(steps.set_changed_projects.outputs.changed_projects, 'CoreLogic.csproj')
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Host "Running CoreLogic dotnet tests"
           dotnet test "$env:GITHUB_WORKSPACE\CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj" --configuration Debug --verbosity minimal --logger "trx;LogFileName=corelogic-test-results.trx"
