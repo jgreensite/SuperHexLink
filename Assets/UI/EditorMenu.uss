@@ -1,0 +1,42 @@
+/* Main Menu Container */
+.radial-menu-container {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    align-items: center;
+    justify-content: center;
+    display: none; /* Hidden by default */
+}
+
+/* Central Hub */
+.radial-menu-center {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(40, 40, 40, 0.9);
+    border-radius: 30px;
+    border-width: 2px;
+    border-color: #ffffff;
+}
+
+/* Menu Items (Buttons) */
+.radial-button {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(60, 60, 60, 0.85);
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: #aaaaaa;
+    color: white;
+    -unity-font-style: bold;
+    font-size: 10px;
+}
+
+.radial-button:hover {
+    background-color: rgba(100, 100, 255, 0.9);
+    scale: 1.1;
+}
+
+.radial-button:active {
+    background-color: rgb(50, 200, 50);
+}

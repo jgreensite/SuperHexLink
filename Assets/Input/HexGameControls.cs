@@ -35,6 +35,15 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ContextSelect"",
+                    ""type"": ""Button"",
+                    ""id"": ""a1b2c3d4-e5f6-4789-0123-456789abcdef"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -48,6 +57,17 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                     ""action"": ""SelectHex"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""feedface-dead-beef-0000-111122223333"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ContextSelect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -57,6 +77,7 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
         // Move
         m_Move = asset.FindActionMap("Move", throwIfNotFound: true);
         m_Move_SelectHex = m_Move.FindAction("SelectHex", throwIfNotFound: true);
+        m_Move_ContextSelect = m_Move.FindAction("ContextSelect", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -117,11 +138,13 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Move;
     private IMoveActions m_MoveActionsCallbackInterface;
     private readonly InputAction m_Move_SelectHex;
+    private readonly InputAction m_Move_ContextSelect;
     public struct MoveActions
     {
         private @HexGameControls m_Wrapper;
         public MoveActions(@HexGameControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @SelectHex => m_Wrapper.m_Move_SelectHex;
+        public InputAction @ContextSelect => m_Wrapper.m_Move_ContextSelect;
         public InputActionMap Get() { return m_Wrapper.m_Move; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -134,6 +157,10 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                 @SelectHex.started -= m_Wrapper.m_MoveActionsCallbackInterface.OnSelectHex;
                 @SelectHex.performed -= m_Wrapper.m_MoveActionsCallbackInterface.OnSelectHex;
                 @SelectHex.canceled -= m_Wrapper.m_MoveActionsCallbackInterface.OnSelectHex;
+                
+                @ContextSelect.started -= m_Wrapper.m_MoveActionsCallbackInterface.OnContextSelect;
+                @ContextSelect.performed -= m_Wrapper.m_MoveActionsCallbackInterface.OnContextSelect;
+                @ContextSelect.canceled -= m_Wrapper.m_MoveActionsCallbackInterface.OnContextSelect;
             }
             m_Wrapper.m_MoveActionsCallbackInterface = instance;
             if (instance != null)
@@ -141,6 +168,10 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                 @SelectHex.started += instance.OnSelectHex;
                 @SelectHex.performed += instance.OnSelectHex;
                 @SelectHex.canceled += instance.OnSelectHex;
+                
+                @ContextSelect.started += instance.OnContextSelect;
+                @ContextSelect.performed += instance.OnContextSelect;
+                @ContextSelect.canceled += instance.OnContextSelect;
             }
         }
     }
@@ -148,5 +179,6 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
     public interface IMoveActions
     {
         void OnSelectHex(InputAction.CallbackContext context);
+        void OnContextSelect(InputAction.CallbackContext context);
     }
 }

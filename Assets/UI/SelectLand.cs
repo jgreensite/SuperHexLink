@@ -32,23 +32,15 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
                 {
                     HandleHexClick(hit.collider.gameObject);
                 }
-                // Clicked on a Circular Menu Item
-                else if (hit.collider.gameObject.layer == LayerMask.NameToLayer("CircularMenuLayer"))
-                {
-                    HandleMenuItemClick(hit.collider.gameObject);
-                }
-            }
-            // Clicked elsewhere
-            else
-            {
-                DestroyCircularMenu();
             }
         }
     }
 
     private void HandleHexClick(GameObject go)
     {
-        DestroyCircularMenu();
+        // Close any open menu
+        FindObjectOfType<EditorUIManager>()?.HideMenu();
+
         // Get the parent that holds the part of the hex that has been clicked on and toggle the selection
         go.transform.parent.GetComponent<Hex>().ToggleSelect();
 
@@ -77,31 +69,73 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
                 }
             }
         }
-
-        // Show the circular menu
-        ShowCircularMenuAtHex(go.transform.parent.gameObject);
     }
 
-    private void ShowCircularMenuAtHex(GameObject go)
+    public void OnContextSelect(InputAction.CallbackContext context)
     {
-        currentMenuInstance = Instantiate(circularMenuPrefab, go.transform.position, Quaternion.identity);
-        CircularMenu circularMenu = currentMenuInstance.GetComponent<CircularMenu>();
-        circularMenu.ShowMenu();
-    }
-
-    private void HandleMenuItemClick(GameObject menuItem)
-    {
-        // Implement the logic for when a menu item is clicked.
-        // This might involve calling a method on a script attached to the menuItem.
-        Debug.Log("Clicked on menu item: " + menuItem.name);
-    }
-
-    private void DestroyCircularMenu()
-    {
-        if (currentMenuInstance != null)
+        if (context.phase == InputActionPhase.Performed)
         {
-            Destroy(currentMenuInstance);
-            currentMenuInstance = null;
+            HandleContextClick();
         }
+    }
+
+    private void HandleContextClick()
+    {
+        Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
+        
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            // Check for Land/Model hit
+            if (hit.collider.gameObject.CompareTag("Land") &&
+                hit.collider.gameObject.layer == LayerMask.NameToLayer("Model"))
+            {
+                 var hex = hit.collider.transform.parent.GetComponent<Hex>();
+                 if (hex != null)
+                 {
+                     Debug.Log($"[SelectLand] Context Click on {hex.name}");
+                     
+                     var uiManager = FindObjectOfType<EditorUIManager>();
+                     if (uiManager != null)
+                     {
+                         // Show Menu
+                         uiManager.ShowMenu(Mouse.current.position.ReadValue(), (cmd) => 
+                         {
+                             if (cmd == "CMD_ROTATE") RotateHex(hex);
+                             else if (cmd == "CMD_NUMBER") CycleHexNumber(hex);
+                             else UpdateHexType(hex, cmd);
+                         });
+                     }
+                 }
+            }
+        }
+    }
+
+    private void UpdateHexType(Hex hex, string newType)
+    {
+        hex.hexState.HexType = newType;
+        FindObjectOfType<HexSpawner>()?.RefreshHex(hex);
+    }
+
+    private void RotateHex(Hex hex)
+    {
+        hex.hexState.Rotation = (hex.hexState.Rotation + 60) % 360;
+        FindObjectOfType<HexSpawner>()?.RefreshHex(hex);
+    }
+    
+    private void CycleHexNumber(Hex hex)
+    {
+        int[] nums = { 2, 3, 4, 5, 6, 8, 9, 10, 11, 12 };
+        int current = hex.hexState.HexNum ?? 2;
+        int nextIndex = 0;
+        for(int i=0; i<nums.Length; i++)
+        {
+            if (nums[i] == current)
+            {
+                nextIndex = (i + 1) % nums.Length;
+                break;
+            }
+        }
+        hex.hexState.HexNum = nums[nextIndex];
+        FindObjectOfType<HexSpawner>()?.RefreshHex(hex);
     }
 }

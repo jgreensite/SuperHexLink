@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="EditorMenu.uss" />
+    <ui:VisualElement name="radial-menu" class="radial-menu-container">
+        <!-- Central Hub (maybe shows current selection) -->
+        <ui:VisualElement name="center-hub" class="radial-menu-center" />
+        
+        <!-- Options will be dynamically placed via script, but we define defaults here for testing -->
+        <!-- Example buttons -->
+        <ui:Button text="Forest" name="btn-forest" class="radial-button" />
+        <ui:Button text="Sea" name="btn-sea" class="radial-button" />
+        <ui:Button text="Desert" name="btn-desert" class="radial-button" />
+        <ui:Button text="Mountain" name="btn-mountain" class="radial-button" />
+        <ui:Button text="Field" name="btn-field" class="radial-button" />
+        <ui:Button text="Pasture" name="btn-pasture" class="radial-button" />
+        <ui:Button text="Rotate" name="btn-rotate" class="radial-button" style="background-color: #555555; color: #ffdd44;" />
+        <ui:Button text="#" name="btn-number" class="radial-button" style="background-color: #555555; color: #44ddff;" />
+    </ui:VisualElement>
+</ui:UXML>

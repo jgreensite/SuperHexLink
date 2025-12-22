@@ -8,5 +8,7 @@
     <ui:Label text="Load/Save" display-tooltip-when-elided="true" />
     <ui:Button text="Load" display-tooltip-when-elided="true" style="width: auto;" />
     <ui:TextField picking-mode="Ignore" label="filename" value="./data/maps/map.json" text="Filename" max-length="-1" is-delayed="true" style="align-items: stretch; flex-direction: row-reverse; width: auto;" />
+    <ui:Template name="EditorMenu" src="EditorMenu.uxml" />
     <ui:Instance template="HostGameScreen" name="HostGameScreen" style="height: 280px;" />
+    <ui:Instance template="EditorMenu" name="EditorMenu" />
 </ui:UXML>

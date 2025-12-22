@@ -148,6 +148,13 @@ public class MapEditorWindow : EditorWindow
 
     private void OnGUI()
     {
+        // Prevent interference with Runtime Input System during Play Mode
+        if (Application.isPlaying) 
+        {
+            EditorGUILayout.HelpBox("Map Editor is disabled during Play Mode to prevent input conflicts.", MessageType.Info);
+            return;
+        }
+
         DrawToolbar();
         
         EditorGUILayout.Space(5);
@@ -932,6 +939,33 @@ public class MapEditorWindow : EditorWindow
         int col = hexState.Col;
         int row = hexState.Row;
         
+        // Check if we need to auto-repair the state structure
+        if (_hexSpawner?.State != null && 
+            _hexSpawner.GridConfig.HasValue &&
+            col >= 0 && col < _hexSpawner.GridConfig.Value.cols &&
+            row >= 0 && row < _hexSpawner.GridConfig.Value.rows)
+        {
+            // Ensure hexes list has enough columns
+            while (_hexSpawner.State.hexes.Count <= col)
+            {
+                _hexSpawner.State.hexes.Add(new List<Hex.HexState>());
+            }
+            
+            // Ensure column has enough rows
+            while (_hexSpawner.State.hexes[col].Count <= row)
+            {
+                // Fill gaps with null or default state? 
+                // Better to add a blank state that matches the visual info roughly or just a new valid state
+                _hexSpawner.State.hexes[col].Add(new Hex.HexState 
+                { 
+                    Col = col, 
+                    Row = _hexSpawner.State.hexes[col].Count, // Use the index we are filling
+                    HexType = "None",
+                    GroupID = "1"
+                });
+            }
+        }
+
         // First, update the MASTER state array (this is what gets saved and what SetLand reads from)
         if (_hexSpawner?.State?.hexes != null && 
             col >= 0 && col < _hexSpawner.State.hexes.Count &&
@@ -988,7 +1022,7 @@ public class MapEditorWindow : EditorWindow
         }
         else
         {
-            Debug.LogError($"Cannot apply changes: hex [{col}, {row}] not found in master state array");
+            Debug.LogError($"Cannot apply changes: hex [{col}, {row}] not found in master state array (and could not be auto-repaired)");
         }
     }
 
