@@ -207,7 +207,9 @@ public class GameConstants : ScriptableObject
     // Networking Constants
     public const string GAMESERVERLOCALADDRESS = "127.0.0.1";
 
-    // TODO - Make Server and port selectable
+    // WARNING: Hardcoded server address — must move to a runtime config file
+    // before any public/production build. See docs/SECURITY.md §Secrets Management.
+    // TODO: Load from StreamingAssets/server-config.json or environment variable.
     public const string GAMESERVERREMOTEADDRESS = "35.177.228.70";
     public const int GAMESERVERPORT = 6321;
 

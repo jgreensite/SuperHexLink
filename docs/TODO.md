@@ -28,6 +28,17 @@
 - [x] Removed `test-log.txt`
 - [x] Added `BACKLOG.md`, `CHANGELOG.md`, issue/PR templates, `CODEOWNERS`
 - [x] Rewrote `README.md` with badges, architecture diagram, tables
+- [x] `docs/SECURITY.md` — threat model, input validation, secrets management
+- [x] `docs/PERFORMANCE.md` — budgets, profiling guide, optimization patterns
+- [x] `docs/ONBOARDING.md` — day-1 guide, exercises, cheat sheet
+- [x] `docs/adr/` — 4 Architecture Decision Records
+- [x] `HexGrid.Distance()` + 7 distance tests + 10 boundary tests (27 CoreLogic tests total)
+- [x] `.github/dependabot.yml` — NuGet + GitHub Actions scanning
+- [x] `LICENSE` (MIT) + badge in README
+- [x] `global.json` — pinned .NET SDK 8.0.x
+- [x] Consolidated `CONTRIBUTING.md` with `docs/CONTRIBUTING.md`
+- [x] Removed `Prompts/` dev scratch from tracking
+- [x] Fixed GameConstants.cs lint warnings + hardcoded IP warning comment
 
 ## Immediate Next Steps
 
@@ -50,7 +61,7 @@ See `BACKLOG.md` for the detailed breakdown. Summary:
 | High | Mixed responsibilities in `HexSpawner` (factory + registry + selection) | `E3-F2` |
 | Medium | No object pooling — `Instantiate`/`Destroy` causes GC pressure | `E6-F1-S1` |
 | Medium | Synchronous JSON save on main thread | `E3-F3-S2` |
-| Medium | Hardcoded server address/port in `GameConstants` | — |
+| Medium | Hardcoded server address/port in `GameConstants` (WARNING comment added, needs runtime config) | `E3-F3` |
 | Low | `GameUIManager` should use UQuery for element selection | — |
 | Low | `HexLandModel` contains leftover old hex model code | — |
 
@@ -58,7 +69,7 @@ See `BACKLOG.md` for the detailed breakdown. Summary:
 
 | Area | What's Missing | Backlog Ref |
 |------|----------------|-------------|
-| CoreLogic | Distance calculations, neighbor edge cases | — |
+| CoreLogic | ~~Distance calculations~~ (done), ~~boundary tests~~ (done) | — |
 | Unity | EdgeSpawner/CornerSpawner state reconstruction | `E1-F2` |
 | Unity | Deterministic board recreation (hash comparison) | `E1-F3` |
 | E2E | Generate → Save → Clear → Load → Verify identical | `E1-F2-S3` |
@@ -67,3 +78,5 @@ See `BACKLOG.md` for the detailed breakdown. Summary:
 ---
 
 **Next review**: After Edge & Corner reconstruction is complete (v0.4.0).
+
+> **v0.3.0 Senior Uplift is complete.** See `BACKLOG.md` Epic 7 for the full list of security, performance, and onboarding work delivered.

@@ -278,7 +278,7 @@
 |-----------|--------|--------|
 | `v0.1.0` — Core Board | Done | ✅ Hex generation, save/load, map editor |
 | `v0.2.0` — Map Editor v2 | Done | ✅ Validation, auto-repair, undo/redo |
-| `v0.3.0` — Senior Uplift | In Progress | 🔄 Code quality, CI, docs, backlog |
+| `v0.3.0` — Senior Uplift | Done | ✅ Code quality, CI, docs, security, perf, onboarding |
 | `v0.4.0` — Edge & Corner | Planned | ⬜ E1-F2, E3-F2 |
 | `v0.5.0` — Gameplay MVP | Planned | ⬜ E4 (turns, resources, building) |
 | `v1.0.0` — Multiplayer | Planned | ⬜ E5 |
