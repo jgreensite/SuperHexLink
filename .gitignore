@@ -100,6 +100,9 @@ changed-csprojs-branch-harness.txt
 # CoreLogic plugin copies after running deploy-corelogic-to-unity
 /Assets/Plugins/CoreLogic/
 
+# Developer scratch / AI prompts (not part of the project)
+/Prompts/
+
 # Third-party asset packages — download per docs/DEV_SETUP.md
 /Assets/Plugins/Sirenix/
 /Assets/ParadoxNotion/

@@ -1,6 +1,10 @@
 # Contributing
 
-Please run the git hook installer to prevent commits that introduce compile errors.
+For **code style, architecture guidelines, testing patterns, and commit conventions**, see the comprehensive [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+This page covers the quick-start workflow and build tooling.
+
+---
 
 ## Install git hooks
 
@@ -10,89 +14,58 @@ Run this in PowerShell from the repository root:
 .\scripts\install-git-hooks.ps1
 ```
 
-This installs a pre-commit hook that runs `scripts/check-csproj-builds.ps1 -ChangedOnly` to perform a `dotnet build` only for the projects affected by files staged for the commit. This keeps the pre-commit fast while still catching compile errors before a commit. CI still runs a full build guard.
+This installs a pre-commit hook that runs `scripts/check-csproj-builds.ps1 -ChangedOnly` to perform a `dotnet build` only for the projects affected by files staged for the commit. CI still runs a full build guard.
 
-## Local build guard (manual)
-
-If you prefer to run the build guard manually, execute:
+## Run Tests Locally (Required before PR)
 
 ```powershell
+# 1. CoreLogic unit tests (fast — <1 sec)
+dotnet test CoreLogic\tests\CoreLogic.Tests\CoreLogic.Tests.csproj
+
+# 2. Pester script tests
+.\scripts\run-local-pester.ps1
+
+# 3. Build guard (all projects)
 .\scripts\check-csproj-builds.ps1
 ```
 
-This is the same script used by CI and will catch compile errors across projects.
-
-## Changed-only build guard and test harness
-
-The repository includes a changed-only build guard to speed up local checks and CI for pull requests. By default it runs quietly; add `-Verbose` if you want to see debug output.
-
-- Run the changed-only guard against staged changes (local):
+## Build Guard Variants
 
 ```powershell
+# Changed-only (fast, for staged files)
 .\scripts\check-csproj-builds.ps1 -ChangedOnly
-```
 
-- If you want to run it against a Git diff reference (useful in PR checks):
-
-```powershell
+# Against a Git diff reference (PR workflow)
 .\scripts\check-csproj-builds.ps1 -ChangedOnly -DiffRef main
-```
 
-- Enable verbose output to see path mappings and diagnostics:
-
-```powershell
+# Verbose diagnostics
 .\scripts\check-csproj-builds.ps1 -ChangedOnly -Verbose
-```
 
-- Test harness for the changed-only guard:
-
-```powershell
+# Test harness for the changed-only guard
 .\scripts\test-check-changedonly.ps1
-# Or target a specific file to verify the mapping & build:
-.\scripts\test-check-changedonly.ps1 -TargetFile Assets/Editor/MapValidationWindow.cs
 ```
 
 ## Git Workflow
 
 We use a **Feature Branch** workflow. Direct commits to `main` are discouraged.
 
-### Branching Strategy
-- `main` - Stable, production-ready code. Protected by CI.
-- `feature/*` - New features (e.g., `feature/hex-state-refactor`)
-- `bugfix/*` - Bug fixes
-- `hotfix/*` - Urgent production fixes
+- `main` — Stable, production-ready. Protected by CI.
+- `feature/*` — New features (e.g., `feature/hex-state-refactor`)
+- `bugfix/*` — Bug fixes
+- `hotfix/*` — Urgent production fixes
 
 ### Pull Request Process
 
-1. **Create a feature branch** from `main`:
-   ```powershell
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make your changes** following code style guidelines.
-
-3. **Run Tests Locally** (Required):
-   ```powershell
-   # Run all unit tests (Pester)
-   .\scripts\run-local-pester.ps1
-
-   # Run build guard (All projects)
-   .\scripts\check-csproj-builds.cmd
-   ```
-
-4. **Commit changes**:
-   - Follow Conventional Commits (e.g., `feat(ui): add new menu`).
-
-5. **Push and Open PR**:
-   ```powershell
-   git push origin feature/your-feature-name
-   ```
-   - CI will run `changed-only-checks` on your PR.
-   - CI will run `static-checks` (full guard) on push to `feature/*`.
+1. Create a feature branch: `git checkout -b feature/your-feature-name`
+2. Make changes following [code style guidelines](docs/CONTRIBUTING.md#code-style)
+3. Run all tests (see above)
+4. Commit using [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat(ui): add new menu`)
+5. Push and open PR — CI runs `changed-only-checks` on PRs and `static-checks` on push to `feature/*`
 
 ### PR Review Checklist
-- [ ] Code follows style guidelines
+- [ ] Code follows [style guidelines](docs/CONTRIBUTING.md#code-style)
 - [ ] Tests added for new functionality
 - [ ] All tests pass (CoreLogic + Unity + Pester)
 - [ ] Documentation updated if needed
 - [ ] No new compiler warnings
+- [ ] Commit messages follow [conventions](docs/CONTRIBUTING.md#commit-messages)

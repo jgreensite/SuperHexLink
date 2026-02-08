@@ -3,6 +3,7 @@
 ![CI](https://github.com/jgreensite/SuperHexLink/actions/workflows/ci.yml/badge.svg)
 ![Unity](https://img.shields.io/badge/Unity-2021.3.18f1-blue)
 ![.NET](https://img.shields.io/badge/.NET_Standard-2.0-purple)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 A **Unity-based hex-grid strategy game** inspired by classic board games like Catan. Features a custom map editor, save/load system with legacy format conversion, harbour placement pipeline, and a standalone CoreLogic library for fast unit testing.
 
@@ -88,6 +89,7 @@ SuperHexLink/
 
 | Document | Description |
 |----------|-------------|
+| [LICENSE](LICENSE) | MIT license |
 | [BACKLOG.md](BACKLOG.md) | Product roadmap — Epics, Features, Stories |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes and version history |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and key decisions |

@@ -8,16 +8,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased] — v0.3.0 Senior Code Review Uplift
 
 ### Added
-- `BACKLOG.md` — structured product roadmap with Epics, Features, Stories
+- `BACKLOG.md` — structured product roadmap with Epics, Features, Stories (now 7 Epics)
 - `CHANGELOG.md` — this file
 - `.github/ISSUE_TEMPLATE/` — bug report, feature request, and story templates
 - `.github/PULL_REQUEST_TEMPLATE.md` — PR checklist
 - `.github/CODEOWNERS` — auto-review assignment
+- `.github/dependabot.yml` — automated NuGet + GitHub Actions dependency scanning
 - `.editorconfig` — C# naming conventions, var preferences, brace rules
+- `LICENSE` — MIT license
+- `docs/SECURITY.md` — threat model, trust boundaries, input validation, secrets management
+- `docs/PERFORMANCE.md` — performance budgets, profiling guide, known hotspots, optimization patterns
+- `docs/ONBOARDING.md` — day-1 guide for new developers with exercises and cheat sheet
+- `docs/adr/` — 4 Architecture Decision Records (CoreLogic separation, backing state, snapshot undo, structured logging)
+- `HexGrid.Distance()` — cube-coordinate Manhattan distance method in CoreLogic
+- `HexGridDistanceTests` — 7 tests (same hex, neighbor, symmetry, triangle inequality, large/negative coords)
+- `BaseHexStateBoundaryTests` — 10 tests (null fields, empty strings, missing JSON properties, extreme values, equality)
+- `CoreLogic.csproj` + `CoreLogic.Tests.csproj` — recreated project files (were gitignored)
 - XML documentation on all core classes (`GameSpawner`, `HexSpawner`, `Hex`, `SpawnerBase`, `HexGrid`, `Corner`, `EdgeSpawner`, `CornerSpawner`)
 - `EnsureValidGameSpawnerState` method restored in `HexSpawner`
 - `HexGridConfig.CreateDefault()` factory method
 - `Corner.Init()` method (replaces constructor for MonoBehaviour compliance)
+- `corelogic-tests` CI job runs on every push (not just PRs)
 
 ### Changed
 - **GameConstants**: `static` fields → `const`/`static readonly`; removed empty `Start()`; renamed `materialMap` → `MaterialMap`; compound assignments; simplified `new` expressions
@@ -34,10 +45,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **LegacyMapConverter**: Replaced `int.Parse` with `int.TryParse` for defensive null handling
 - **MapValidationWindow**: Fixed dead `summaryStyle` variable; fixed orphaned block (missing `if` condition); removed trailing junk comment
 - **SelectLand**: Updated `NotSelect()` → `Deselect()` references
-- **README.md**: Rewritten with badges, architecture diagram, tables, proper quick-start
+- **README.md**: Rewritten with badges (CI, Unity, .NET, License), architecture diagram, tables, proper quick-start
+- **CONTRIBUTING.md**: Consolidated root file with `docs/CONTRIBUTING.md`; added CoreLogic `dotnet test` to "Run Tests Locally"
+- **GameConstants.cs**: Fixed all lint warnings (braces, ternary, formatting, dictionary spacing)
+- **CI workflow**: Fixed artifact name collision; added dedicated `corelogic-tests` job
+- **BACKLOG.md**: Checked off completed items; added Epic 7 (Security, Performance, Onboarding)
+- **`.gitignore`**: Added `!CoreLogic/**/*.csproj` exception; added `/Prompts/` exclusion
 
 ### Removed
 - `test-log.txt` — stale test artifact
+- `Prompts/` — dev scratch (AI image prompts, superseded backlog)
 - Commented-out material fields and `CS` reference in `HexSpawner`
 - Commented-out code blocks in `EdgeSpawner` and `CornerSpawner`
 - Empty `Start()` method in `GameConstants`

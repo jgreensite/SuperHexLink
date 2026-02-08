@@ -80,22 +80,22 @@
 - [x] **E2-F2-S1** `docs/DEV_SETUP.md` — environment setup guide
 - [x] **E2-F2-S2** `docs/TESTING.md` — how to run tests locally and in CI
 - [x] **E2-F2-S3** `CONTRIBUTING.md` — branching strategy, PR process, hooks
-- [ ] **E2-F2-S4** Add GitHub Issue templates (bug report, feature request, story)
+- [x] **E2-F2-S4** Add GitHub Issue templates (bug report, feature request, story)
   - **AC**: `gh issue create` prompts with a structured template.
   - **Files**: `.github/ISSUE_TEMPLATE/`
 
-- [ ] **E2-F2-S5** Add PR template with checklist
+- [x] **E2-F2-S5** Add PR template with checklist
   - **AC**: Every new PR auto-populates a checklist (tests, docs, no warnings).
   - **Files**: `.github/PULL_REQUEST_TEMPLATE.md`
 
 ### Feature 2.3: Repository Hygiene
 
 - [x] **E2-F3-S1** `.editorconfig` with C# naming, braces, var preferences
-- [ ] **E2-F3-S2** Add `CODEOWNERS` file for auto-review assignment
+- [x] **E2-F3-S2** Add `CODEOWNERS` file for auto-review assignment
   - **AC**: PRs touching `Assets/Scripts/` auto-request review from the core team.
   - **Files**: `.github/CODEOWNERS`
 
-- [ ] **E2-F3-S3** Clean `.gitignore` — exclude `pester-results.xml`, `TestResults/`, `actions-runner/`
+- [x] **E2-F3-S3** Clean `.gitignore` — exclude `pester-results.xml`, `TestResults/`, `actions-runner/`
   - **AC**: `git status` is clean after a fresh test run.
 
 ---
@@ -227,6 +227,48 @@
 - [ ] **E6-F2-S1** Add frustum culling for off-screen hexes
 - [ ] **E6-F2-S2** LOD system for distant hexes (simplified mesh)
 - [ ] **E6-F2-S3** GPU instancing for identical hex types
+
+---
+
+## Epic 7: Security, Performance & Onboarding
+
+> **Goal**: The repo has documented security practices, performance budgets, and a frictionless onboarding experience for new contributors.
+
+### Feature 7.1: Security Documentation & Hardening (✅ Complete)
+
+- [x] **E7-F1-S1** Create `docs/SECURITY.md` — threat model, trust boundaries, input validation patterns
+- [x] **E7-F1-S2** Harden `GameSpawner.LoadState` — path traversal guard, file size limit, schema validation
+- [x] **E7-F1-S3** Add `.github/dependabot.yml` for automated NuGet + GitHub Actions dependency scanning
+
+### Feature 7.2: Performance Documentation (✅ Complete)
+
+- [x] **E7-F2-S1** Create `docs/PERFORMANCE.md` — budgets, profiling guide, known hotspots, optimization patterns
+- [ ] **E7-F2-S2** Add performance regression tests — measure spawn time for 7×7 and 19×19 grids
+  - **AC**: Test fails if spawn time exceeds budget from PERFORMANCE.md.
+  - **Files**: `Assets/Tests/Editor/PerformanceRegressionTests.cs`
+
+### Feature 7.3: Developer Onboarding (✅ Complete)
+
+- [x] **E7-F3-S1** Create `docs/ONBOARDING.md` — day-1 guide, exercises, cheat sheet
+- [x] **E7-F3-S2** Consolidate root `CONTRIBUTING.md` with `docs/CONTRIBUTING.md`
+- [x] **E7-F3-S3** Add `LICENSE` file (MIT)
+
+### Feature 7.4: Architecture Decision Records (✅ Complete)
+
+- [x] **E7-F4-S1** ADR-0001: CoreLogic library separation
+- [x] **E7-F4-S2** ADR-0002: Backing state pattern
+- [x] **E7-F4-S3** ADR-0003: Snapshot undo system
+- [x] **E7-F4-S4** ADR-0004: Structured logging
+- [ ] **E7-F4-S5** ADR-0005: Save file format versioning (when implemented)
+  - **AC**: ADR documents chosen versioning scheme and migration strategy.
+
+### Feature 7.5: Scaling & Future Architecture
+
+- [ ] **E7-F5-S1** Create `docs/SCALING.md` — ECS migration path, async patterns, spatial indexing
+  - **AC**: Document covers scaling from 7×7 to 100×100 with concrete patterns.
+- [ ] **E7-F5-S2** Prototype spatial hash index for O(1) hex lookup by world position
+  - **AC**: `SpatialIndex.GetHexAt(worldPos)` returns hex in O(1). Unit test with 10,000 hexes.
+  - **Files**: `CoreLogic/src/CoreLogic/Grid/SpatialIndex.cs`
 
 ---
 

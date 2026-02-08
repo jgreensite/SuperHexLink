@@ -267,7 +267,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: corelogic-test-results
+          name: corelogic-test-results-dedicated
           path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
 
   unity-tests:

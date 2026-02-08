@@ -46,8 +46,9 @@ public class GameConstants : ScriptableObject
 
     public HexPlacementRuleConfig GetPlacementRule(string hexType)
     {
-        if (string.IsNullOrEmpty(hexType) || hexPlacementRules == null) return null;
-        return hexPlacementRules.FirstOrDefault(rule => rule.Matches(hexType));
+        return string.IsNullOrEmpty(hexType) || hexPlacementRules == null
+            ? null
+            : hexPlacementRules.FirstOrDefault(rule => rule.Matches(hexType));
     }
 
     // Player Defaults
@@ -200,13 +201,13 @@ public class GameConstants : ScriptableObject
     public const string UILABELHOSTREMOTE = "Host Remote";
     public const string UILABELCONNECT = "Connect";
 
-    //Gamecard Offsets
+    // Gamecard Offsets
     public const float CALLERCARDOFFSET = 12.35f;
-    
+
     // Networking Constants
     public const string GAMESERVERLOCALADDRESS = "127.0.0.1";
 
-    //TODO - Make Server and port selectable
+    // TODO - Make Server and port selectable
     public const string GAMESERVERREMOTEADDRESS = "35.177.228.70";
     public const int GAMESERVERPORT = 6321;
 
@@ -221,24 +222,24 @@ public class GameConstants : ScriptableObject
 
     // Available effects pool (used for random selection)
     public static readonly string[] CEP_EFFECTS = { CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_CHANGE_CARD, CEP_EFFECT_RANDOM_REMOVE_CARD };
-    
+
     private void OnEnable()
     {
         MaterialMap = new Dictionary<string, Material>
         {
-            {CAR_TYPE_WORD_NULL, null},
-            {CAR_TYPE_NONE, null},
-            {CAR_TYPE_EMPTY, null},
-            {CAR_TYPE_FOREST, forestMaterial},
-            {CAR_TYPE_PASTURE, pastureMaterial},
-            {CAR_TYPE_FIELD, fieldMaterial},
-            {CAR_TYPE_HILL, hillMaterial},
-            {CAR_TYPE_MOUNTAIN, mountainMaterial},
-            {CAR_TYPE_MINE, mineMaterial},
-            {CAR_TYPE_SEA, seaMaterial},
-            {CAR_TYPE_HARBOUR, seaMaterial},
-            {CAR_TYPE_DESERT, desertMaterial},
-            {CAR_TYPE_GOLD, goldMaterial},
+            { CAR_TYPE_WORD_NULL, null },
+            { CAR_TYPE_NONE, null },
+            { CAR_TYPE_EMPTY, null },
+            { CAR_TYPE_FOREST, forestMaterial },
+            { CAR_TYPE_PASTURE, pastureMaterial },
+            { CAR_TYPE_FIELD, fieldMaterial },
+            { CAR_TYPE_HILL, hillMaterial },
+            { CAR_TYPE_MOUNTAIN, mountainMaterial },
+            { CAR_TYPE_MINE, mineMaterial },
+            { CAR_TYPE_SEA, seaMaterial },
+            { CAR_TYPE_HARBOUR, seaMaterial },
+            { CAR_TYPE_DESERT, desertMaterial },
+            { CAR_TYPE_GOLD, goldMaterial },
         };
         EnsurePlacementRules();
         EnsureHarbourFacingLandTypes();
