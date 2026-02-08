@@ -220,9 +220,24 @@ public class GameSpawner : SpawnerBase
         string targetMapPath = ResolveMapPath(filePath, loadMapPath);
         Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState: loading from {0}", targetMapPath);
 
+        if (!IsPathSafe(targetMapPath))
+        {
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                "LoadState: path rejected (directory traversal detected): {0}", targetMapPath);
+            return;
+        }
+
         if (!File.Exists(targetMapPath))
         {
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error, "LoadState: file not found: {0}", targetMapPath);
+            return;
+        }
+
+        long fileSize = new System.IO.FileInfo(targetMapPath).Length;
+        if (fileSize > MaxMapFileSizeBytes)
+        {
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                "LoadState: file too large ({0:N0} bytes, max {1:N0}): {2}", fileSize, MaxMapFileSizeBytes, targetMapPath);
             return;
         }
 
@@ -410,6 +425,9 @@ public class GameSpawner : SpawnerBase
         ActionLogger.Log(actionLogSettings, category, severity, message, args);
     }
 
+    /// <summary>Maximum file size (10 MB) accepted by LoadState to prevent memory exhaustion.</summary>
+    private const long MaxMapFileSizeBytes = 10 * 1024 * 1024;
+
     private static string ResolveMapPath(string providedPath, string fallbackPath)
     {
         string pathToUse = string.IsNullOrWhiteSpace(providedPath) ? fallbackPath : providedPath;
@@ -426,6 +444,23 @@ public class GameSpawner : SpawnerBase
 
         // Otherwise, assume it's relative to data/maps (Odin FilePath ParentFolder behavior)
         return Path.Combine(".", "data", "maps", pathToUse);
+    }
+
+    /// <summary>
+    /// Validates that a resolved map path does not escape the project directory via traversal.
+    /// Returns true if the path is safe, false if it contains suspicious traversal patterns.
+    /// </summary>
+    private static bool IsPathSafe(string resolvedPath)
+    {
+        if (string.IsNullOrWhiteSpace(resolvedPath))
+        {
+            return false;
+        }
+
+        // Normalise and check for directory traversal
+        string fullPath = Path.GetFullPath(resolvedPath);
+        string projectRoot = Path.GetFullPath(".");
+        return fullPath.StartsWith(projectRoot, StringComparison.OrdinalIgnoreCase);
     }
 
 #if UNITY_EDITOR

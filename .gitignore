@@ -90,6 +90,9 @@ changed-csprojs.txt
 changed-csprojs-dryrun.txt
 changed-csprojs-branch-harness.txt
 
+# CoreLogic .csproj files MUST be tracked (override the global *.csproj rule)
+!CoreLogic/**/*.csproj
+
 # CoreLogic build products (dotnet/bin outputs)
 /CoreLogic/**/bin/
 /CoreLogic/**/obj/

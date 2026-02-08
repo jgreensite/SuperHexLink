@@ -91,6 +91,10 @@ SuperHexLink/
 | [BACKLOG.md](BACKLOG.md) | Product roadmap — Epics, Features, Stories |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes and version history |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and key decisions |
+| [docs/adr/](docs/adr/README.md) | Architecture Decision Records (ADRs) |
+| [docs/SECURITY.md](docs/SECURITY.md) | Threat model, input validation, secrets |
+| [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Performance budgets, profiling, scaling |
+| [docs/ONBOARDING.md](docs/ONBOARDING.md) | Day-1 guide for new developers |
 | [docs/DEV_SETUP.md](docs/DEV_SETUP.md) | Environment setup and build instructions |
 | [docs/TESTING.md](docs/TESTING.md) | How to run tests locally and in CI |
 | [docs/HEXSPAWNER_SETUP.md](docs/HEXSPAWNER_SETUP.md) | Configure HexSpawner prefabs |
