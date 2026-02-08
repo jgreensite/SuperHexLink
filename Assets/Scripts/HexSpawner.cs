@@ -1,36 +1,18 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.IO;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
-using UnityEngine;
+using System.Linq;
 using AnyClone;
 using FDL.Library.Numeric;
-//using Script;
-using TMPro;
-using SimpleHexExtensions;
 using HexExtensions;
-using UnityEngine.Animations;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using SimpleHexExtensions;
 using SuperHexLink.Logging;
+using TMPro;
+using UnityEngine;
 
 public class HexSpawner : SpawnerBase
 {
-   
-    //Hex Materials
-    /*
-    public Material forestMaterial;
-    public Material pastureMaterial;
-    public Material fieldMaterial;
-    public Material hillMaterial;
-    public Material mountainMaterial;
-    public Material desertMaterial;
-    public Material mineMaterial;
-    public Material seaMaterial;
-    public Material goldMaterial;
-    */
-    //Hex Prefab Types
-
     [ShowInInspector,OdinSerialize]
     private HexSpawnerState state;
 
@@ -163,7 +145,7 @@ public class HexSpawner : SpawnerBase
     {
         if (placementRuleEngine == null)
         {
-            placementRuleEngine = new HexPlacementRuleEngine(TryGetHexState, isReplaceableLandType);
+            placementRuleEngine = new HexPlacementRuleEngine(TryGetHexState, IsReplaceable);
         }
 
         return placementRuleEngine;
@@ -194,95 +176,48 @@ public class HexSpawner : SpawnerBase
             "HexSpawner awake; GameSpawner={0}, grid={1}x{2}",
             gameSpawner?.name ?? "<missing>", grid?.cols ?? 0, grid?.rows ?? 0);
 
-        placementRuleEngine = new HexPlacementRuleEngine(TryGetHexState, isReplaceableLandType);
+        placementRuleEngine = new HexPlacementRuleEngine(TryGetHexState, IsReplaceable);
         
         // Run comprehensive diagnostics on startup
         RunStartupDiagnostics();
     }
     
     /// <summary>
-    /// Runs comprehensive diagnostics to help identify setup issues.
+    /// Logs key setup diagnostics via the structured ActionLogger.
     /// </summary>
     private void RunStartupDiagnostics()
     {
-        Debug.Log("=== HexSpawner STARTUP DIAGNOSTICS ===");
-        
-        // Check GameSpawner
         if (gameSpawner == null)
         {
-            Debug.LogError("DIAGNOSTIC: GameSpawner is NULL - cannot spawn hexes");
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                "GameSpawner is NULL – cannot spawn hexes");
         }
-        else
+        else if (gameSpawner.State == null)
         {
-            Debug.Log($"DIAGNOSTIC: GameSpawner found: {gameSpawner.name}");
-            if (gameSpawner.State == null)
-            {
-                Debug.LogError("DIAGNOSTIC: GameSpawner.State is NULL");
-            }
-            else
-            {
-                var cfg = gameSpawner.State.hexGridConfig;
-                Debug.Log($"DIAGNOSTIC: Grid config: cols={cfg.cols}, rows={cfg.rows}, radius={cfg.radius}, height={cfg.height}");
-                if (cfg.cols <= 0 || cfg.rows <= 0)
-                {
-                    Debug.LogWarning("DIAGNOSTIC: Grid has invalid dimensions (cols or rows <= 0)");
-                }
-            }
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                "GameSpawner.State is NULL");
         }
-        
-        // Check CS (GameConstants)
+
         if (CS == null)
         {
-            Debug.LogError("DIAGNOSTIC: CS (GameConstants) is NULL - materials won't work. Assign it in the Inspector!");
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                "CS (GameConstants) is NULL – materials won’t work. Assign in Inspector!");
         }
-        else
-        {
-            Debug.Log($"DIAGNOSTIC: GameConstants found: {CS.name}");
-            if (CS.materialMap == null)
-            {
-                Debug.LogWarning("DIAGNOSTIC: CS.materialMap is NULL (might not be initialized yet - OnEnable runs later)");
-            }
-            else
-            {
-                Debug.Log($"DIAGNOSTIC: materialMap has {CS.materialMap.Count} entries");
-            }
-        }
-        
-        // Check local state
-        if (state == null)
-        {
-            Debug.LogWarning("DIAGNOSTIC: HexSpawner.state is NULL");
-        }
-        else
-        {
-            Debug.Log($"DIAGNOSTIC: HexSpawner.state.hexes has {state.hexes?.Count ?? 0} columns");
-            if (state.hexes != null && state.hexes.Count > 0)
-            {
-                int totalHexes = state.hexes.Sum(col => col?.Count ?? 0);
-                Debug.Log($"DIAGNOSTIC: Total hexes in state: {totalHexes}");
-            }
-        }
-        
-        Debug.Log("=== END DIAGNOSTICS ===");
-    }
 
+        int totalHexes = state?.hexes?.Sum(col => col?.Count ?? 0) ?? 0;
+        Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Info,
+            "Startup diagnostics: {0} hex columns, {1} total cells",
+            state?.hexes?.Count ?? 0, totalHexes);
+    }
+   
     /// <summary>
-    /// Ensures GameSpawner has a valid state with proper grid config.
-    /// Call this before any operation that needs grid dimensions.
+    /// Ensures the GameSpawner has a valid state with grid config, land configs, and num configs.
+    /// Creates sensible defaults if any are missing.
     /// </summary>
     private void EnsureValidGameSpawnerState()
     {
-        if (gameSpawner == null)
-        {
-            gameSpawner = GameObject.Find("GameSpawner")?.GetComponent<GameSpawner>();
-            if (gameSpawner == null)
-            {
-                Debug.LogError("HexSpawner: Cannot find GameSpawner in scene!");
-                return;
-            }
-        }
+        if (gameSpawner == null) return;
 
-        // Ensure State exists
         if (gameSpawner.State == null)
         {
             gameSpawner.State = new GameSpawner.GameSpawnerState();
@@ -290,7 +225,6 @@ public class HexSpawner : SpawnerBase
                 "EnsureValidGameSpawnerState: Created new GameSpawnerState with defaults");
         }
 
-        // Ensure grid config is valid
         if (gameSpawner.State.hexGridConfig.cols <= 0 || gameSpawner.State.hexGridConfig.rows <= 0)
         {
             gameSpawner.State.hexGridConfig = HexGridConfig.CreateDefault();
@@ -298,23 +232,23 @@ public class HexSpawner : SpawnerBase
                 "EnsureValidGameSpawnerState: Applied default grid config (7x7)");
         }
 
-        // Ensure land configs exist (critical for RandomizeLand)
         if (gameSpawner.State.landConfigs == null || gameSpawner.State.landConfigs.Count == 0)
         {
             gameSpawner.State.landConfigs = GameSpawner.GameSpawnerState.CreateDefaultLandConfigs();
             Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Warning,
-                $"EnsureValidGameSpawnerState: Applied default land configs ({gameSpawner.State.landConfigs.Count} types)");
+                "EnsureValidGameSpawnerState: Applied default land configs ({0} types)",
+                gameSpawner.State.landConfigs.Count);
         }
 
-        // Ensure num configs exist (critical for RandomizeNum)
         if (gameSpawner.State.numConfigs == null || gameSpawner.State.numConfigs.Count == 0)
         {
             gameSpawner.State.numConfigs = GameSpawner.GameSpawnerState.CreateDefaultNumConfigs();
             Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Warning,
-                $"EnsureValidGameSpawnerState: Applied default num configs ({gameSpawner.State.numConfigs.Count} numbers)");
+                "EnsureValidGameSpawnerState: Applied default num configs ({0} numbers)",
+                gameSpawner.State.numConfigs.Count);
         }
     }
-   
+
     [Button("Spawn Hexes")]
     public override void Spawn()
     {
@@ -664,7 +598,7 @@ public class HexSpawner : SpawnerBase
         }
 
         //Now if the hex should have a land model ontop of it and a number render them
-        if (isRenderedType(h.hexState.HexType))
+        if (IsRenderedType(h.hexState.HexType))
         {
             CleanUpOldLandChildren(h);
             //reset the rotation of the hex
@@ -791,7 +725,7 @@ public class HexSpawner : SpawnerBase
         List<GameObject> ret = Helpers.GetChildObjectsByName(h.gameObject, h.hexState.HexType, false);
         List<GameObject> sub = Helpers.GetChildObjectsByName(h.gameObject, h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD, true);
         var s = h.hexState.HexType + "_" + GameConstants.CAR_TYPE_SUB_KEYWORD + "_" + h.hexState.HexSubType;
-        List<GameObject> lit = Helpers.GetChilObjectLights(h.gameObject);
+        List<GameObject> lit = Helpers.GetChildObjectLights(h.gameObject);
         ret.RemoveAll((go) => lit.Contains(go));
         sub.RemoveAll((go) => go.name == s);
         ret.RemoveAll((go) => go.GetComponent<TextMeshPro>() != null);
@@ -826,7 +760,7 @@ public class HexSpawner : SpawnerBase
         {
             // TextMeshPro component should be created when land model is instantiated
             // If missing, the hex prefab or land model may not be properly configured
-            if (isNumberedLandType(h.hexState.HexType))
+            if (IsNumberedLandType(h.hexState.HexType))
             {
                 Debug.LogWarning($"SetText: TextMeshPro component not found on hex {h.name} (Type: {h.hexState.HexType}). Hex prefab may need hexTextPrefab configured.");
                 Log(ActionLogCategory.HexLand, ActionLogSeverity.Warning,
@@ -835,7 +769,7 @@ public class HexSpawner : SpawnerBase
             return;
         }
         
-        if (isNumberedLandType(h.hexState.HexType))
+        if (IsNumberedLandType(h.hexState.HexType))
         {
             t.text = h.hexState.HexNum.ToString();
             t.GetComponent<MeshRenderer>().enabled = true;
@@ -914,7 +848,7 @@ public class HexSpawner : SpawnerBase
             }
             
             //do not randomize if supposed to skip
-            if (isReplaceableLandType(h.hexState.HexType))
+            if (IsReplaceable(h.hexState.HexType))
             {
                 RandomizeLand(h, true);
                 SetLand(h);
@@ -950,47 +884,24 @@ public class HexSpawner : SpawnerBase
     }
 
 
-    private bool isConfiguredEmpty(String t)
+    private bool IsReplaceable(string hexType)
     {
-        if (
-            (t == "") || (t == null) ||
-            (t == GameConstants.CAR_TYPE_WORD_NULL) || (t == GameConstants.CAR_TYPE_NONE)
-            )
-        {
-            return true;
-        }
-        else { return false; }
+        return !IsConfiguredEmpty(hexType)
+            && !string.Equals(hexType, GameConstants.CAR_TYPE_SEA, StringComparison.Ordinal)
+            && !string.Equals(hexType, GameConstants.CAR_TYPE_HARBOUR, StringComparison.Ordinal);
     }
 
-    private bool isReplaceableLandType(String t)
+    private bool IsNumberedLandType(string hexType)
     {
-        if (
-            (isConfiguredEmpty(t)) || (t == GameConstants.CAR_TYPE_SEA) || (t == GameConstants.CAR_TYPE_HARBOUR)
-            )
-        {
-            return false;
-        }
-        else { return true; }
+        return !IsConfiguredEmpty(hexType)
+            && !string.Equals(hexType, GameConstants.CAR_TYPE_SEA, StringComparison.Ordinal)
+            && !string.Equals(hexType, GameConstants.CAR_TYPE_DESERT, StringComparison.Ordinal)
+            && !string.Equals(hexType, GameConstants.CAR_TYPE_HARBOUR, StringComparison.Ordinal);
     }
 
-    private bool isNumberedLandType(String t)
+    private bool IsRenderedType(string hexType)
     {
-        if (
-            (isConfiguredEmpty(t)) || (t == GameConstants.CAR_TYPE_SEA) || (t == GameConstants.CAR_TYPE_DESERT) || (t == GameConstants.CAR_TYPE_HARBOUR)
-            )
-        {
-            return false;
-        }
-        else { return true; }
-    }
-
-    private bool isRenderedType(String t)
-    {
-        if (isConfiguredEmpty(t))
-        {
-            return false;
-        }
-        else { return true; }
+        return !IsConfiguredEmpty(hexType);
     }
 
     private void RandomizeLand(Hex h, bool isRefresh)
@@ -1008,7 +919,7 @@ public class HexSpawner : SpawnerBase
         if (isRefresh)
         {
             types = landTypes
-                .Where(t => t.landGroupID == effectiveGroupID && isReplaceableLandType(t.landType) && t.landCnt > 0)
+                .Where(t => t.landGroupID == effectiveGroupID && IsReplaceable(t.landType) && t.landCnt > 0)
                 .ToList();
         }
         else
@@ -1062,7 +973,7 @@ public class HexSpawner : SpawnerBase
             "RandomizeLand assigned {0} (group {1}) at {2}_{3}",
             randomLand, h.hexState.GroupID, h.hexState.Col, h.hexState.Row);
 
-        if (isNumberedLandType(h.hexState.HexType))
+        if (IsNumberedLandType(h.hexState.HexType))
         {
             nums = numTypes
                 .Where(n => string.Equals(n.numGroupID, h.hexState.GroupID) && n.numCnt > 0)
@@ -1145,7 +1056,6 @@ public class HexSpawner : SpawnerBase
         return (fallbackType, CS?.GetPlacementRule(fallbackType), true, false, iteration);
     }
 
-    //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
     private float Get_Z_Offset(int col) => col % 2 == 0 ? gameSpawner.State.hexGridConfig.Apothem * 1.0f : 0f;
 
     public List<Hex> GetAllHexes()

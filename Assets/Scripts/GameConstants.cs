@@ -5,8 +5,10 @@ using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
-//todo - really should have private setters and public getters on each of these
-
+/// <summary>
+/// Central configuration asset holding game constants, material mappings, and placement rules.
+/// Assign via the Inspector on the GameSpawner prefab.
+/// </summary>
 [CreateAssetMenu(fileName = "GameConstants", menuName = "ScriptableObjects/GameConstants", order = 1)]
 public class GameConstants : ScriptableObject
 {
@@ -53,44 +55,44 @@ public class GameConstants : ScriptableObject
         return hexPlacementRules.FirstOrDefault(rule => rule.Matches(hexType));
     }
 
-    //Player Defaults
-    public static string NO_CLIENT_ID = "No Client ID";
-    
-    //Message Types
-    public static string MESSAGE_COMMAND = "COMMAND";
-    public static string MESSAGE_REPLY = "REPLY";
-    public static string MESSAGE_EVENT = "EVENT";
-    
-    //Message Names - Client
-    public static string MESSAGE_CWHO = "CWHO";
-    public static string MESSAGE_CBEG = "CBEG";
-    public static string MESSAGE_CDIC = "CDIC";
-    
-    //Message Names - Server
-    public static string SERVER_ID = "SERVER";
-    public static string SERVER_NAME = "I_AM_THE_SERVER";
-    public static string MESSAGE_SWHO = "SWHO";
-    public static string MESSAGE_SCNN = "SCNN";
-    public static string MESSAGE_SBEG = "SBEG";
-    public static string MESSAGE_SDIC = "SDIC";
+    // Player Defaults
+    public const string NO_CLIENT_ID = "No Client ID";
 
-    //Names of Objects
-    public static string OBJ_NAME_ROOT_CARD = "Card Root";
+    // Message Types
+    public const string MESSAGE_COMMAND = "COMMAND";
+    public const string MESSAGE_REPLY = "REPLY";
+    public const string MESSAGE_EVENT = "EVENT";
 
-    //Layers
-    public static string OBJ_LOCATION_LAYER_GAMEBOARD = "Hex";
-    public static string OBJ_LOCATION_LAYER_GAMEMODEL = "Model";
-    public static string OBJ_LOCATION_LAYER_GAMETEXT = "Text";
-    public static string OBJ_LOCATION_LAYER_GAMESTRUCTURE = "Structure";
-    public static string OBJ_LOCATION_LAYER_PLAYERHAND = "Hand";
-    
-    //Owners
-    public static string OBJ_OWNER_PLAYER = "Player";
-    public static string OBJ_OWNER_CALLER = "Caller";
-    
-    //Tag make the same as layers, note that these must be set in the editor
-    public static string OBJ_LOCATION_TAG_GAMEBOARD = OBJ_LOCATION_LAYER_GAMEBOARD;
-    public static string OBJ_LOCATION_TAG_PLAYERHAND = OBJ_LOCATION_LAYER_PLAYERHAND;
+    // Message Names - Client
+    public const string MESSAGE_CWHO = "CWHO";
+    public const string MESSAGE_CBEG = "CBEG";
+    public const string MESSAGE_CDIC = "CDIC";
+
+    // Message Names - Server
+    public const string SERVER_ID = "SERVER";
+    public const string SERVER_NAME = "I_AM_THE_SERVER";
+    public const string MESSAGE_SWHO = "SWHO";
+    public const string MESSAGE_SCNN = "SCNN";
+    public const string MESSAGE_SBEG = "SBEG";
+    public const string MESSAGE_SDIC = "SDIC";
+
+    // Names of Objects
+    public const string OBJ_NAME_ROOT_CARD = "Card Root";
+
+    // Layers
+    public const string OBJ_LOCATION_LAYER_GAMEBOARD = "Hex";
+    public const string OBJ_LOCATION_LAYER_GAMEMODEL = "Model";
+    public const string OBJ_LOCATION_LAYER_GAMETEXT = "Text";
+    public const string OBJ_LOCATION_LAYER_GAMESTRUCTURE = "Structure";
+    public const string OBJ_LOCATION_LAYER_PLAYERHAND = "Hand";
+
+    // Owners
+    public const string OBJ_OWNER_PLAYER = "Player";
+    public const string OBJ_OWNER_CALLER = "Caller";
+
+    // Tags (must match layers; set in the Unity Editor Tag Manager)
+    public const string OBJ_LOCATION_TAG_GAMEBOARD = OBJ_LOCATION_LAYER_GAMEBOARD;
+    public const string OBJ_LOCATION_TAG_PLAYERHAND = OBJ_LOCATION_LAYER_PLAYERHAND;
 
     //Card Types
     public const string CAR_TYPE_FOREST = "forest";
@@ -125,9 +127,9 @@ public class GameConstants : ScriptableObject
     //Floating Menus
     public const float FLOATING_MENU_OFFSET = 1.0f;
 
-    //Highlight Colours
-    public static Color SELECTED_HEX_COLOR = Color.yellow;
-    public static Color NOT_SELECTED_HEX_COLOR = Color.grey;
+    // Highlight Colours
+    public static readonly Color SELECTED_HEX_COLOR = Color.yellow;
+    public static readonly Color NOT_SELECTED_HEX_COLOR = Color.grey;
 
     //Card Location
     public const string CAR_LOCATION_GAMEBOARD = "card is on the Gameboard";
@@ -137,65 +139,63 @@ public class GameConstants : ScriptableObject
     public const string CAR_LOCATION_BLUE_HAND = "card is in the Blue Hand";
     public const string CAR_LOCATION_DISCARD_DECK = "card is in the Discard Deck";
 
-    //Card Status
-    public static string CAR_REVEAL_HIDDEN = "card face is hidden";
-    public static string CAR_REVEAL_SHOWN = "card face is shown";
+    // Card Status
+    public const string CAR_REVEAL_HIDDEN = "card face is hidden";
+    public const string CAR_REVEAL_SHOWN = "card face is shown";
 
-    //Card when playable
-    public static string CWP_PLAY_PLAYER_TURN = "on the players turn";
-    public static string CWP_PLAY_ANY_TURN = "on any players turn";
+    // Card when playable
+    public const string CWP_PLAY_PLAYER_TURN = "on the players turn";
+    public const string CWP_PLAY_ANY_TURN = "on any players turn";
 
-    //Card effect playable
-    //Effects
-    public static string CEP_EFFECT_RANDOM_REVEAL_CARD = "randomly reveals a card on the board";
-    public static string CEP_EFFECT_RANDOM_CHANGE_CARD = "randomly changes a card on the board";
-    public static string CEP_EFFECT_RANDOM_REMOVE_CARD = "randomly removes a card from the board";
+    // Card effects
+    public const string CEP_EFFECT_RANDOM_REVEAL_CARD = "randomly reveals a card on the board";
+    public const string CEP_EFFECT_RANDOM_CHANGE_CARD = "randomly changes a card on the board";
+    public const string CEP_EFFECT_RANDOM_REMOVE_CARD = "randomly removes a card from the board";
 
-    //Affects
-    public static string CEP_AFFECT_GAMEBOARD = "affects the game board";
-    public static string CEP_AFFECT_OWN_DECK = "affects your deck";
-    public static string CEP_AFFECT_OPPONENT_DECK = "affects your opponent's deck";
-    public static string CEP_AFFECT_OWN_HAND = "affects your hand";
-    public static string CEP_AFFECT_OPPONENT_HAND = "affects opponent's hand";
+    // Affects
+    public const string CEP_AFFECT_GAMEBOARD = "affects the game board";
+    public const string CEP_AFFECT_OWN_DECK = "affects your deck";
+    public const string CEP_AFFECT_OPPONENT_DECK = "affects your opponent's deck";
+    public const string CEP_AFFECT_OWN_HAND = "affects your hand";
+    public const string CEP_AFFECT_OPPONENT_HAND = "affects opponent's hand";
 
-    //Number of Cards in player's hands
-    public static int CSCARDHANDDIM = 3;
+    // Number of Cards in player's hands
+    public const int CSCARDHANDDIM = 3;
 
     //Gameboard dimensions
 
-    //Game Winstates
-    public static string NONEWIN = "nonewin";
-    public static string BLUEWIN = "bluewin";
-    public static string REDWIN = "redwin";
-    
-    //Card Class and Team staticants
-    public static string NO_TEAM = "noteam";
-    public static string BLUE_TEAM = "blue";
-    public static string RED_TEAM = "red";
-    public static string YELLOW_TEAM = "yellow";
-    public static string ORANGE_TEAM = "orange";
-    public static string GREEN_TEAM = "green";
-    public static string BROWN_TEAM = "brown";
-    public static int IDCARDFRONTMATERIAL = 1;
-    public static int IDCARDBACKMATERIAL = 0;
-    public static int NUMCARDMATERIALS = 4;
+    // Game Win-States
+    public const string NONEWIN = "nonewin";
+    public const string BLUEWIN = "bluewin";
+    public const string REDWIN = "redwin";
 
-    //Turn staticants
-    public static int TEP_NUM_DRAW = 1;
-    
-    //Flow Control staticants
-    public static string GOOD = "good";
-    public static string BAD = "bad";
-    public static string EMPTY = "empty";
-    public static string ERROR = "error";
-    public static string CREATE = "create";
-    public static string READ = "read";
-    public static string UPDATE = "update";
-    public static string DELETE = "delete";
-    public static string END = "end";
+    // Card Class and Team Constants
+    public const string NO_TEAM = "noteam";
+    public const string BLUE_TEAM = "blue";
+    public const string RED_TEAM = "red";
+    public const string YELLOW_TEAM = "yellow";
+    public const string ORANGE_TEAM = "orange";
+    public const string GREEN_TEAM = "green";
+    public const string BROWN_TEAM = "brown";
+    public const int IDCARDFRONTMATERIAL = 1;
+    public const int IDCARDBACKMATERIAL = 0;
+    public const int NUMCARDMATERIALS = 4;
 
+    // Turn Constants
+    public const int TEP_NUM_DRAW = 1;
 
-    //UI Label staticants
+    // Flow Control Constants
+    public const string GOOD = "good";
+    public const string BAD = "bad";
+    public const string EMPTY = "empty";
+    public const string ERROR = "error";
+    public const string CREATE = "create";
+    public const string READ = "read";
+    public const string UPDATE = "update";
+    public const string DELETE = "delete";
+    public const string END = "end";
+
+    // UI Label Constants
     public const string UILABELPANZOOM = "Pan/Zoom";
     public const string UILABELSELECT = "Select";
     public const string UILABELBACK = "<-Back";
@@ -208,14 +208,14 @@ public class GameConstants : ScriptableObject
     //Gamecard Offsets
     public const float CALLERCARDOFFSET = 12.35f;
     
-    //Networking staticants
+    // Networking Constants
     public const string GAMESERVERLOCALADDRESS = "127.0.0.1";
 
     //TODO - Make Server and port selectable
     public const string GAMESERVERREMOTEADDRESS = "35.177.228.70";
     public const int GAMESERVERPORT = 6321;
 
-    //Build script staticants
+    // Build Script Constants
     public const string SERVERSCENECOLLECTION = "server";
     public const string CLIENTSCENECOLLECTION = "client";
     public const string OSXBUILDPLATFORM = "OSX";
@@ -224,9 +224,8 @@ public class GameConstants : ScriptableObject
     public const string ANDBUILDPLATFORM = "AND";
     public const string IOSBUILDPLATFORM = "IOS";
 
-    //Put all the Effects in here to make it is easy to ramdonly pick one
-    //public static string[] CEP_EFFECTS = {CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_CHANGE_CARD, CEP_EFFECT_RANDOM_REMOVE_CARD};
-    public static string[] CEP_EFFECTS = {CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_REVEAL_CARD};
+    // Available effects pool (used for random selection)
+    public static readonly string[] CEP_EFFECTS = { CEP_EFFECT_RANDOM_REVEAL_CARD, CEP_EFFECT_RANDOM_CHANGE_CARD, CEP_EFFECT_RANDOM_REMOVE_CARD };
     
     private void OnEnable()
     {
@@ -249,11 +248,6 @@ public class GameConstants : ScriptableObject
         };
         EnsurePlacementRules();
         EnsureHarbourFacingLandTypes();
-    }
-
-    private void Start()
-    {
-
     }
 
     private void EnsurePlacementRules()
