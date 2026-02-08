@@ -46,6 +46,28 @@
                     "action": "ContextSelect",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "touch-select-id",
+                    "path": "<Touchscreen>/primaryTouch/tap",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SelectHex",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "touch-context-id",
+                    "path": "<Touchscreen>/primaryTouch/tap",
+                    "interactions": "Hold(duration=0.5)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ContextSelect",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         }

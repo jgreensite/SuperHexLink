@@ -39,6 +39,106 @@ public class HexSpawner : SpawnerBase
         get { return state; }
         set { state = value; }
     }
+
+    // Snapshot service for robust Undo
+    private SuperHexLink.Utils.IHexSnapshotService _snapshotService;
+
+    // Undo Snapshot (Serialized JSON)
+    // DEV NOTE: We store a full serialized snapshot of the state because Odin's deep-nested 
+    // serialization structures (List<List<HexState>>) are not reliably tracked by Unity's native Undo.
+    // We snapshot BEFORE edits, and Unity restores this field. OnUndoRedoPerformed then rehydrates the Odin state.
+    [SerializeField, HideInInspector]
+    private byte[] _undoSnapshot;
+
+    /// <summary>
+    /// For testing purposes only. Allows injection of a mock snapshot service.
+    /// </summary>
+    public void SetSnapshotService(SuperHexLink.Utils.IHexSnapshotService service)
+    {
+        _snapshotService = service;
+    }
+
+    public void CreateUndoSnapshot()
+    {
+        // Snapshot the current Odin state into a Unity-serialized byte array
+        // This allows Unity's native Undo system to capture the deep state
+        if (_snapshotService == null) _snapshotService = new SuperHexLink.Utils.HexSnapshotService(); // Fallback for editor mode
+        
+        if (state != null)
+        {
+            _undoSnapshot = _snapshotService.CreateSnapshot(state);
+            Debug.Log($"[Undo] Created snapshot: {(_undoSnapshot?.Length ?? 0)} bytes");
+        }
+    }
+
+    private void OnEnable()
+    {
+#if UNITY_EDITOR
+        UnityEditor.Undo.undoRedoPerformed += OnUndoRedoPerformed;
+#endif
+    }
+
+    private void OnDisable()
+    {
+#if UNITY_EDITOR
+        UnityEditor.Undo.undoRedoPerformed -= OnUndoRedoPerformed;
+#endif
+    }
+
+#if UNITY_EDITOR
+    private void OnUndoRedoPerformed()
+    {
+        // If we have a snapshot (restored by Unity Undo), restore the Odin state from it
+        if (_undoSnapshot != null && _undoSnapshot.Length > 0)
+        {
+            if (_snapshotService == null) _snapshotService = new SuperHexLink.Utils.HexSnapshotService();
+
+            var restoredState = _snapshotService.RestoreSnapshot<HexSpawnerState>(_undoSnapshot);
+            if (restoredState != null)
+            {
+                state = restoredState;
+                // Unity Undo restores the Visual GameObject state (mesh/materials) to what it was
+                // BUT it might not perfectly match the restored master state if references were broken.
+                // To be safe and deterministic, we explicitly sync visuals to the restored master state.
+                SyncAllVisualsToState();
+            }
+        }
+    }
+
+    private void SyncAllVisualsToState()
+    {
+        if (state == null || state.hexes == null) return;
+
+        var allHexes = GetAllHexes();
+        foreach (var hex in allHexes)
+        {
+            if (hex == null || hex.hexState == null) continue;
+
+            int col = hex.hexState.Col;
+            int row = hex.hexState.Row;
+
+            // Find authoritative state
+            if (state.hexes.Count > col && state.hexes[col] != null && 
+                state.hexes[col].Count > row)
+            {
+                var masterHexState = state.hexes[col][row];
+                if (masterHexState != null)
+                {
+                    // Update visual component's state to match restored master state
+                    // We copy values to ensure the visual uses the data from the snapshot
+                    hex.hexState.HexType = masterHexState.HexType;
+                    hex.hexState.HexNum = masterHexState.HexNum;
+                    hex.hexState.Rotation = masterHexState.Rotation;
+                    hex.hexState.GroupID = masterHexState.GroupID;
+                    hex.hexState.Selected = masterHexState.Selected;
+                    
+                    // Refresh visual appearance (mesh, material, text)
+                    RefreshHex(hex);
+                }
+            }
+        }
+    }
+#endif
     
     public Hex hexPrefab;
 
@@ -79,6 +179,10 @@ public class HexSpawner : SpawnerBase
     private void Awake()
     {
         gameSpawner = GameObject.Find("GameSpawner").GetComponent<GameSpawner>();
+        
+        // Initialize helpers
+        _snapshotService = new SuperHexLink.Utils.HexSnapshotService();
+
         // Ensure state is initialized to avoid null reference exceptions when BuildMe/Clear are called
         if (state == null) state = new HexSpawnerState();
 
@@ -735,6 +839,13 @@ public class HexSpawner : SpawnerBase
         {
             t.text = h.hexState.HexNum.ToString();
             t.GetComponent<MeshRenderer>().enabled = true;
+            
+            // Fix Z-height (Y-axis in Unity) to prevent z-fighting with the land model
+            // Reset local position first then apply offset, or just adjust Y? 
+            // Assuming default local pos (0,y,0), we'll bump Y slightly.
+            Vector3 currentPos = t.transform.localPosition;
+            t.transform.localPosition = new Vector3(currentPos.x, 0.15f, currentPos.z); 
+
             Log(ActionLogCategory.HexLand, ActionLogSeverity.Info,
                 "SetText assigned number {0} for {1}", h.hexState.HexNum, h.name);
             
@@ -1037,6 +1148,20 @@ public class HexSpawner : SpawnerBase
     //private float Get_X_Offset(int row) => row % 2 == 0 ? hexGrid.radius * 1.5f : 0f;
     private float Get_Z_Offset(int col) => col % 2 == 0 ? gameSpawner.State.hexGridConfig.Apothem * 1.0f : 0f;
 
+    public List<Hex> GetAllHexes()
+    {
+        var hexes = new List<Hex>();
+        foreach (Transform child in transform)
+        {
+            var hex = child.GetComponent<Hex>();
+            if (hex != null)
+            {
+                hexes.Add(hex);
+            }
+        }
+        return hexes;
+    }
+
     //checks to see if the Hex is on the board
     public bool isOnBoardHex(HexExtensions.HexExtensions.Hex h)
     {
@@ -1084,6 +1209,22 @@ public class HexSpawner : SpawnerBase
                 return isEven ? (1, 0) : (1, -1);
         }
         return (0, 0);
+    }
+
+    public Hex TryGetHexAt(int col, int row)
+    {
+        // Iterate through child transforms which is safer/faster than global FindObjectsOfType if hexes are children
+        foreach (Transform child in transform)
+        {
+            var hex = child.GetComponent<Hex>();
+            // Null checks for safety
+            if (hex != null && hex.hexState != null && 
+                hex.hexState.Col == col && hex.hexState.Row == row)
+            {
+                return hex;
+            }
+        }
+        return null;
     }
 
     public HexStateRepairReport RepairLoadedState(HexGridConfig gridConfig, HexSpawnerState loadedState, GameConstants constants)

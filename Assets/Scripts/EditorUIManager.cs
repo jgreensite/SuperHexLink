@@ -67,12 +67,20 @@ public class EditorUIManager : MonoBehaviour
         // NOTE: UI Toolkit (0,0) is top-left. Input.mousePosition (0,0) is bottom-left.
         
         float panelHeight = root.resolvedStyle.height;
+        if (float.IsNaN(panelHeight) || panelHeight <= 0) panelHeight = Screen.height; // Fallback
+        
         float top = panelHeight - screenPos.y; // Invert Y
         
-        radialMenu.style.left = screenPos.x - (radialMenu.resolvedStyle.width / 2);
-        radialMenu.style.top = top - (radialMenu.resolvedStyle.height / 2);
+        float menuWidth = radialMenu.resolvedStyle.width;
+        float menuHeight = radialMenu.resolvedStyle.height;
         
-        ArrangeButtonsRadial();
+        if (float.IsNaN(menuWidth) || menuWidth <= 0) menuWidth = 300f; // Default fallback
+        if (float.IsNaN(menuHeight) || menuHeight <= 0) menuHeight = 300f; // Default fallback
+        
+        radialMenu.style.left = screenPos.x - (menuWidth / 2);
+        radialMenu.style.top = top - (menuHeight / 2);
+        
+        ArrangeButtonsRadial(menuWidth, menuHeight);
         
         radialMenu.style.display = DisplayStyle.Flex;
     }
@@ -82,14 +90,22 @@ public class EditorUIManager : MonoBehaviour
         if (radialMenu != null) radialMenu.style.display = DisplayStyle.None;
     }
 
-    private void ArrangeButtonsRadial()
+    private void ArrangeButtonsRadial(float width = 300f, float height = 300f)
     {
+        if (radialMenu == null) return;
+
         // Simple radial layout logic
         // Find all buttons in the menu
         var buttons = radialMenu.Query<Button>(className: "radial-button").ToList();
         int count = buttons.Count;
+        
+        if (count == 0) return;
+        
         float radius = 100f; // pixel radius from center
         float angleStep = 360f / count;
+        
+        float centerX = width / 2;
+        float centerY = height / 2;
         
         for (int i = 0; i < count; i++)
         {
@@ -97,11 +113,15 @@ public class EditorUIManager : MonoBehaviour
             float x = Mathf.Cos(angle) * radius;
             float y = Mathf.Sin(angle) * radius;
             
-            // center is (150, 150) if width/height is 300
-            // assuming button center alignment
-            
-            buttons[i].style.left = 150 + x - 25; // 25 is half button width
-            buttons[i].style.top = 150 + y - 25;
+            // Dynamic button size offset
+            float btnHalfSize = 25f; // Default if layout not ready
+            if (!float.IsNaN(buttons[i].resolvedStyle.width) && buttons[i].resolvedStyle.width > 0)
+            {
+                btnHalfSize = buttons[i].resolvedStyle.width / 2;
+            }
+
+            buttons[i].style.left = centerX + x - btnHalfSize;
+            buttons[i].style.top = centerY + y - btnHalfSize;
         }
     }
 }

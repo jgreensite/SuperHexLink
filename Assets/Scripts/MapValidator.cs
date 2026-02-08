@@ -501,12 +501,23 @@ public static class MapValidator
     private static bool CheckHarbourFacesLand(int col, int row, int rotation, 
         HexSpawner.HexSpawnerState hexState, HexGridConfig gridConfig, GameConstants constants)
     {
+        // Use HexExtensions to match HexSpawner logic exactly
+        var directions = HexExtensions.HexExtensions.Hex.directions;
+        
         // Direction index based on rotation (0=E, 60=SE, 120=SW, 180=W, 240=NW, 300=NE)
-        int directionIndex = (rotation / 60) % 6;
+        // Ensure positive index
+        int directionIndex = ((rotation / 60) % 6 + 6) % 6;
         
-        // Get neighbor coordinates based on direction (odd-q layout)
-        var (neighborCol, neighborRow) = GetNeighborCoordinates(col, row, directionIndex);
+        if (directionIndex >= directions.Count) return false;
+
+        var baseOffset = new HexExtensions.HexExtensions.OffsetCoord(col, row);
+        var baseHex = HexExtensions.HexExtensions.OffsetCoord.QoffsetToCube(HexExtensions.HexExtensions.OffsetCoord.ODD, baseOffset);
+        var neighborHex = baseHex.Add(directions[directionIndex]);
+        var neighborOffset = HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, neighborHex);
         
+        int neighborCol = neighborOffset.col;
+        int neighborRow = neighborOffset.row;
+
         // Check bounds
         if (neighborCol < 0 || neighborCol >= gridConfig.cols || 
             neighborRow < 0 || neighborRow >= gridConfig.rows)
@@ -528,39 +539,6 @@ public static class MapValidator
 
         // Check if neighbor is a land type that harbours can face
         return constants.harbourFacingLandTypes?.Contains(neighbor.HexType) ?? false;
-    }
-
-    private static (int col, int row) GetNeighborCoordinates(int col, int row, int direction)
-    {
-        // Odd-q offset coordinates - odd columns are shifted down
-        bool isOddCol = col % 2 == 1;
-        
-        // Direction offsets for odd-q layout
-        // 0=E, 1=SE, 2=SW, 3=W, 4=NW, 5=NE
-        var evenColOffsets = new (int dc, int dr)[]
-        {
-            (1, 0),   // E
-            (1, 1),   // SE
-            (0, 1),   // SW (actually S for even cols)
-            (-1, 0),  // W
-            (0, -1),  // NW (actually N for even cols)
-            (1, -1)   // NE
-        };
-        
-        var oddColOffsets = new (int dc, int dr)[]
-        {
-            (1, 0),   // E
-            (1, 0),   // SE (shifted)
-            (0, 1),   // SW
-            (-1, 0),  // W
-            (-1, -1), // NW
-            (0, -1)   // NE
-        };
-
-        var offsets = isOddCol ? oddColOffsets : evenColOffsets;
-        var offset = offsets[direction % 6];
-        
-        return (col + offset.dc, row + offset.dr);
     }
 
     private static void TrackHexUsage(Hex.HexState hex, 
@@ -612,7 +590,7 @@ public static class MapValidator
 
             if (!configsByGroup.TryGetValue(groupId, out var groupConfigs))
             {
-                result.AddInfo(ValidationCategory.LandConfig, 
+                result.AddWarning(ValidationCategory.LandConfig, 
                     $"Hexes use GroupID '{groupId}' which has no landConfig entries");
                 continue;
             }
@@ -627,12 +605,12 @@ public static class MapValidator
                 
                 if (config == null)
                 {
-                    result.AddInfo(ValidationCategory.LandConfig, 
+                    result.AddWarning(ValidationCategory.LandConfig, 
                         $"Land type '{landType}' used {actualCount} times in group '{groupId}' but not in config");
                 }
                 else if (actualCount != config.landCnt)
                 {
-                    result.AddInfo(ValidationCategory.LandConfig, 
+                    result.AddWarning(ValidationCategory.LandConfig, 
                         $"Land type '{landType}' in group '{groupId}': used {actualCount}, config expects {config.landCnt}");
                 }
             }
@@ -655,7 +633,7 @@ public static class MapValidator
 
             if (!configsByGroup.TryGetValue(groupId, out var groupConfigs))
             {
-                result.AddInfo(ValidationCategory.NumConfig, 
+                result.AddWarning(ValidationCategory.NumConfig, 
                     $"Hexes use numGroupID '{groupId}' which has no numConfig entries");
                 continue;
             }
@@ -669,12 +647,12 @@ public static class MapValidator
                 
                 if (config == null)
                 {
-                    result.AddInfo(ValidationCategory.NumConfig, 
+                    result.AddWarning(ValidationCategory.NumConfig, 
                         $"Number {numType} used {actualCount} times in group '{groupId}' but not in config");
                 }
                 else if (actualCount != config.numCnt)
                 {
-                    result.AddInfo(ValidationCategory.NumConfig, 
+                    result.AddWarning(ValidationCategory.NumConfig, 
                         $"Number {numType} in group '{groupId}': used {actualCount}, config expects {config.numCnt}");
                 }
             }

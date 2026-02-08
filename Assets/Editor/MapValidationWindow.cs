@@ -324,11 +324,17 @@ public class MapEditorWindow : EditorWindow
         if (_validationResult == null || _hexSpawner == null) return;
         
         var autoFixIssues = _validationResult.Issues.Where(i => i.CanAutoFix).ToList();
+        if (autoFixIssues.Count > 0)
+        {
+            _hexSpawner.CreateUndoSnapshot();
+            Undo.RegisterCompleteObjectUndo(_hexSpawner, "Apply All Auto-Fixes");
+        }
+
         int fixedCount = 0;
         
         foreach (var issue in autoFixIssues)
         {
-            if (ApplyFix(issue))
+            if (ApplyFix(issue, false))
             {
                 fixedCount++;
             }
@@ -336,12 +342,13 @@ public class MapEditorWindow : EditorWindow
         
         if (fixedCount > 0)
         {
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(_hexSpawner.gameObject.scene);
             Debug.Log($"Applied {fixedCount} auto-fixes. Re-validating...");
             RunValidation();
         }
     }
 
-    private bool ApplyFix(ValidationIssue issue)
+    private bool ApplyFix(ValidationIssue issue, bool recordUndo = true)
     {
         if (!issue.CanAutoFix || _hexSpawner?.State?.hexes == null) return false;
         
@@ -352,6 +359,13 @@ public class MapEditorWindow : EditorWindow
         
         var hexState = column[issue.Row];
         if (hexState == null) return false;
+
+        // Snapshot state if this is a standalone fix
+        if (recordUndo)
+        {
+            _hexSpawner.CreateUndoSnapshot();
+            Undo.RegisterCompleteObjectUndo(_hexSpawner, "Apply Fix");
+        }
         
         bool applied = false;
         
@@ -407,6 +421,15 @@ public class MapEditorWindow : EditorWindow
             
             // Clear highlight if this was the selected/hovered hex
             ClearHighlightIfMatches(issue.Col, issue.Row);
+            
+            // Mark scene dirty
+            if (_hexSpawner != null)
+            {
+                EditorUtility.SetDirty(_hexSpawner);
+                // CRITICAL: Update snapshot to capture the "Future" state for Redo
+                _hexSpawner.CreateUndoSnapshot();
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(_hexSpawner.gameObject.scene);
+            }
             
             // Remove issue from result if fixed
             _validationResult?.Issues.Remove(issue);
@@ -674,10 +697,17 @@ public class MapEditorWindow : EditorWindow
     {
         if (_hexSpawner == null) return;
         
-        int fixedCount = 0;
-        foreach (var issue in issues.Where(i => i.CanAutoFix))
+        var fixable = issues.Where(i => i.CanAutoFix).ToList();
+        if (fixable.Count > 0)
         {
-            if (ApplyFix(issue))
+            _hexSpawner.CreateUndoSnapshot();
+            Undo.RegisterCompleteObjectUndo(_hexSpawner, "Apply Group Fixes");
+        }
+        
+        int fixedCount = 0;
+        foreach (var issue in fixable)
+        {
+            if (ApplyFix(issue, false))
             {
                 fixedCount++;
             }
@@ -685,6 +715,7 @@ public class MapEditorWindow : EditorWindow
         
         if (fixedCount > 0)
         {
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(_hexSpawner.gameObject.scene);
             Debug.Log($"Applied {fixedCount} fixes. Re-validating...");
             RunValidation();
         }
@@ -863,9 +894,11 @@ public class MapEditorWindow : EditorWindow
         int currentTypeIndex = Array.IndexOf(LandTypeOptions, hexState.HexType);
         if (currentTypeIndex < 0) currentTypeIndex = 0;
         
+        // Monitor strictly for changes to apply immediately
         EditorGUI.BeginChangeCheck();
+        
         int newTypeIndex = EditorGUILayout.Popup("Land Type", currentTypeIndex, LandTypeOptions);
-        if (EditorGUI.EndChangeCheck())
+        if (newTypeIndex != currentTypeIndex)
         {
             _newHexType = LandTypeOptions[newTypeIndex];
         }
@@ -876,7 +909,8 @@ public class MapEditorWindow : EditorWindow
         
         // Rotation slider (multiples of 60)
         _newRotation = EditorGUILayout.IntSlider("Rotation", _newRotation, 0, 300);
-        _newRotation = Mathf.RoundToInt(_newRotation / 60f) * 60; // Snap to 60 degree increments
+        // Snap logic
+        if (_newRotation % 60 != 0) _newRotation = Mathf.RoundToInt(_newRotation / 60f) * 60;
         
         // Rotation quick buttons
         using (new EditorGUILayout.HorizontalScope())
@@ -885,20 +919,27 @@ public class MapEditorWindow : EditorWindow
             if (GUILayout.Button("↺ -60°", GUILayout.Width(60)))
             {
                 _newRotation = ((_newRotation - 60) + 360) % 360;
+                // Explicitly apply changes for buttons
+                ApplyHexChanges();
             }
             if (GUILayout.Button("↻ +60°", GUILayout.Width(60)))
             {
                 _newRotation = (_newRotation + 60) % 360;
+                ApplyHexChanges();
             }
         }
         
         // Number
         bool hasNumber = _newHexNum.HasValue;
-        EditorGUI.BeginChangeCheck();
         hasNumber = EditorGUILayout.Toggle("Has Number", hasNumber);
-        if (EditorGUI.EndChangeCheck())
+        
+        if (!hasNumber)
         {
-            _newHexNum = hasNumber ? (hexState.HexNum ?? 2) : null;
+             _newHexNum = null;
+        }
+        else if (_newHexNum == null)
+        {
+            _newHexNum = hexState.HexNum ?? 2;
         }
         
         if (_newHexNum.HasValue)
@@ -907,6 +948,7 @@ public class MapEditorWindow : EditorWindow
             var numberStrings = numbers.Select(n => n.ToString()).ToArray();
             int numIndex = Array.IndexOf(numbers, _newHexNum.Value);
             if (numIndex < 0) numIndex = 0;
+            
             numIndex = EditorGUILayout.Popup("Number", numIndex, numberStrings);
             _newHexNum = numbers[numIndex];
         }
@@ -914,20 +956,18 @@ public class MapEditorWindow : EditorWindow
         // GroupID
         _newGroupID = EditorGUILayout.TextField("GroupID", _newGroupID ?? hexState.GroupID ?? "1");
         
+        // Apply changes automatically if anything changed
+        if (EditorGUI.EndChangeCheck())
+        {
+            ApplyHexChanges();
+        }
+        
         EditorGUILayout.Space(10);
         
-        // Apply button
-        using (new EditorGUILayout.HorizontalScope())
+        // Reset button
+        if (GUILayout.Button("Reset to Original", GUILayout.Height(25)))
         {
-            if (GUILayout.Button("Apply Changes", GUILayout.Height(30)))
-            {
-                ApplyHexChanges();
-            }
-            
-            if (GUILayout.Button("Reset", GUILayout.Width(60), GUILayout.Height(30)))
-            {
-                ResetHexEditorValues();
-            }
+            ResetHexEditorValues();
         }
     }
 
@@ -974,6 +1014,7 @@ public class MapEditorWindow : EditorWindow
             var masterState = _hexSpawner.State.hexes[col][row];
             if (masterState != null)
             {
+                _hexSpawner.CreateUndoSnapshot();
                 Undo.RecordObject(_hexSpawner, "Modify Hex State");
                 
                 bool changed = false;
@@ -1009,10 +1050,20 @@ public class MapEditorWindow : EditorWindow
                 if (changed)
                 {
                     // Refresh the visual representation
+                    if (_selectedHex != null)
+                    {
+                         _hexSpawner.CreateUndoSnapshot();
+                         Undo.RegisterCompleteObjectUndo(_selectedHex.gameObject, "Modify Hex Visuals");
+                    }
                     _hexSpawner.RefreshHex(_selectedHex);
                     
                     EditorUtility.SetDirty(_hexSpawner);
                     EditorUtility.SetDirty(_selectedHex);
+                    
+                    // CRITICAL: Update snapshot to capture the "Future" state for Redo
+                    _hexSpawner.CreateUndoSnapshot();
+                    
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(_selectedHex.gameObject.scene);
                     Debug.Log($"Applied changes to hex [{col}, {row}]: Type={masterState.HexType}, Rot={masterState.Rotation}, Num={masterState.HexNum}, Group={masterState.GroupID}");
                     
                     // Re-validate to update the issue list
@@ -1119,14 +1170,14 @@ public class MapEditorWindow : EditorWindow
 
     private void ClearHoverHighlight()
     {
-        if (_hoveredHex == null || _hoveredHex == _selectedHex) return;
+        if (_hoveredHex == null) return;
         _hoveredHex = null;
         SceneView.RepaintAll();
     }
 
     private void HighlightHexForHover(Hex hex)
     {
-        if (hex == null || hex == _selectedHex || hex == _hoveredHex) return;
+        if (hex == null || hex == _hoveredHex) return;
         
         // Clear previous hover
         ClearHoverHighlight();
@@ -1232,7 +1283,7 @@ public class MapEditorWindow : EditorWindow
         var hexUnderMouse = GetHexUnderMouse(sceneView);
         
         // Handle hover highlighting
-        if (hexUnderMouse != null && hexUnderMouse != _hoveredHex && hexUnderMouse != _selectedHex)
+        if (hexUnderMouse != null && hexUnderMouse != _hoveredHex)
         {
             HighlightHexForHover(hexUnderMouse);
             sceneView.Repaint();
@@ -1321,33 +1372,36 @@ public class MapEditorWindow : EditorWindow
     private void DrawHexHighlights(SceneView sceneView)
     {
         // Draw selected hex highlight (yellow)
+        // User Request: Selected ring larger and underneath
         if (_selectedHex != null)
         {
-            DrawHexOutline(_selectedHex, Color.yellow, 3f);
+            // Larger radius (1.7), slightly lower Y (0.1)
+            DrawHexOutline(_selectedHex, Color.yellow, 3f, 1.7f, 0.1f);
         }
         
         // Draw hovered hex highlight (cyan)
-        if (_hoveredHex != null && _hoveredHex != _selectedHex)
+        // Always draw hover if it exists (removed != selected check)
+        if (_hoveredHex != null)
         {
-            DrawHexOutline(_hoveredHex, Color.cyan, 2f);
+            // Standard radius (1.55), slightly higher Y (0.15) to sit on top
+            DrawHexOutline(_hoveredHex, Color.cyan, 2f, 1.55f, 0.15f);
         }
     }
     
-    private void DrawHexOutline(Hex hex, Color color, float thickness)
+    private void DrawHexOutline(Hex hex, Color color, float thickness, float radius = 1.5f, float yOffset = 0.1f)
     {
         if (hex == null) return;
         
         var pos = hex.transform.position;
-        var size = 1.5f; // Approximate hex size
         
         // Draw a circle/disc around the hex
         Handles.color = color;
-        Handles.DrawWireDisc(pos + Vector3.up * 0.1f, Vector3.up, size, thickness);
+        Handles.DrawWireDisc(pos + Vector3.up * yOffset, Vector3.up, radius, thickness);
         
-        // Draw vertical lines at corners for visibility
+        // Draw vertical lines at corners for visibility (using solid disc as center marker?)
         var oldColor = Handles.color;
         Handles.color = new Color(color.r, color.g, color.b, 0.5f);
-        Handles.DrawSolidDisc(pos + Vector3.up * 0.1f, Vector3.up, size * 0.3f);
+        Handles.DrawSolidDisc(pos + Vector3.up * yOffset, Vector3.up, radius * 0.3f);
         Handles.color = oldColor;
     }
     

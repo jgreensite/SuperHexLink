@@ -68,6 +68,28 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                     ""action"": ""ContextSelect"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""touch-select-id"",
+                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SelectHex"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""touch-context-id"",
+                    ""path"": ""<Touchscreen>/primaryTouch/tap"",
+                    ""interactions"": ""Hold(duration=0.5)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ContextSelect"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -157,7 +179,6 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                 @SelectHex.started -= m_Wrapper.m_MoveActionsCallbackInterface.OnSelectHex;
                 @SelectHex.performed -= m_Wrapper.m_MoveActionsCallbackInterface.OnSelectHex;
                 @SelectHex.canceled -= m_Wrapper.m_MoveActionsCallbackInterface.OnSelectHex;
-                
                 @ContextSelect.started -= m_Wrapper.m_MoveActionsCallbackInterface.OnContextSelect;
                 @ContextSelect.performed -= m_Wrapper.m_MoveActionsCallbackInterface.OnContextSelect;
                 @ContextSelect.canceled -= m_Wrapper.m_MoveActionsCallbackInterface.OnContextSelect;
@@ -168,7 +189,6 @@ public partial class @HexGameControls : IInputActionCollection2, IDisposable
                 @SelectHex.started += instance.OnSelectHex;
                 @SelectHex.performed += instance.OnSelectHex;
                 @SelectHex.canceled += instance.OnSelectHex;
-                
                 @ContextSelect.started += instance.OnContextSelect;
                 @ContextSelect.performed += instance.OnContextSelect;
                 @ContextSelect.canceled += instance.OnContextSelect;

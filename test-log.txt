@@ -1,0 +1,12 @@
+[LicensingClient] Error: Code 10 while verifying Licensing Client signature (process Id: 19656, path: "C:/Program Files/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Module] Warning: LicensingClient has failed validation; ignoring
+[LicensingClient] Handshaking with LicensingClient (version: 1.17.3+a4e98f1)
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-joelg" (connect: 0.00s, validation: 0.01s, handshake: 0.08s)
+Entitlement-based licensing initiated
+[Licensing::Module] Error: Access token is unavailable
+[LicensingClient] Licenses updated successfully
+BatchMode: Unity has not been activated with a valid License. Could be a new activation or renewal...
+[UnityConnectServicesConfig] config is NOT valid, switching to default
+Cancelling DisplayDialog: Failed to activate/update license Missing or bad username or password. Please try again using valid credentials or contact support@unity3d.com
+This should not be called in batch mode.
+Exiting without the bug reporter. Application will terminate with return code 1

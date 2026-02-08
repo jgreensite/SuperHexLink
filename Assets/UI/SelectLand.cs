@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,12 +10,22 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
 
     public GameObject circularMenuPrefab;
     private GameObject currentMenuInstance;
+    
+    // Cached references
+    private HexSpawner _hexSpawner;
+    private EditorUIManager _editorUiManager;
 
     private void Awake()
     {
         cam = Camera.main;
         inputs = new HexGameControls();
         inputs.Move.SetCallbacks(this);
+    }
+
+    private void Start()
+    {
+        _hexSpawner = FindObjectOfType<HexSpawner>();
+        _editorUiManager = FindObjectOfType<EditorUIManager>();
     }
 
     private void OnEnable() => inputs.Move.Enable();
@@ -38,35 +50,43 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
 
     private void HandleHexClick(GameObject go)
     {
-        // Close any open menu
-        FindObjectOfType<EditorUIManager>()?.HideMenu();
+        // Close any open menu using cached reference
+        if (_editorUiManager == null) _editorUiManager = FindObjectOfType<EditorUIManager>();
+        _editorUiManager?.HideMenu();
 
-        // Get the parent that holds the part of the hex that has been clicked on and toggle the selection
-        go.transform.parent.GetComponent<Hex>().ToggleSelect();
-
-        // Grey out all other hexes
-        foreach (GameObject otherHex in GameObject.FindGameObjectsWithTag("Land"))
+        // Get the parent that holds the part of the hex that has been clicked on
+        var clickedHex = go.GetComponentInParent<Hex>();
+        if (clickedHex == null)
         {
-            if (go.transform.parent == null)
+            Debug.LogError("Clicked object does not have a Hex component in parent hierarchy.");
+            return;
+        }
+
+        // Toggle selection on the clicked hex
+        clickedHex.ToggleSelect();
+
+        // Efficiently deselect others using HexSpawner helper
+        if (_hexSpawner != null)
+        {
+            var allHexes = _hexSpawner.GetAllHexes();
+            foreach (var otherHex in allHexes)
             {
-                Debug.LogError("Parent is null");
-            }
-            else if (go.transform.parent.GetComponent<Hex>() == null)
-            {
-                Debug.LogError("Hex component on parent is null");
-            }
-            else if (otherHex == null)
-            {
-                Debug.LogError("otherHex is null");
-            }
-            else        
-            {
-                if ((otherHex.transform.parent.GetComponent<Hex>() != go.transform.parent.GetComponent<Hex>())
-                && (otherHex.layer == LayerMask.NameToLayer("Model")))
+                if (otherHex != null && otherHex != clickedHex && otherHex.hexState != null && otherHex.hexState.Selected)
                 {
-                    //call not selected method
-                    otherHex.transform.parent.GetComponent<Hex>().NotSelect();
+                    otherHex.NotSelect();
                 }
+            }
+        }
+        else
+        {
+            // Fallback: FindObjectsOfType is better than FindGameObjectsWithTag
+            var allHexes = FindObjectsOfType<Hex>();
+            foreach (var otherHex in allHexes)
+            {
+                 if (otherHex != null && otherHex != clickedHex && otherHex.hexState != null && otherHex.hexState.Selected)
+                 {
+                     otherHex.NotSelect();
+                 }
             }
         }
     }
@@ -89,16 +109,18 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
             if (hit.collider.gameObject.CompareTag("Land") &&
                 hit.collider.gameObject.layer == LayerMask.NameToLayer("Model"))
             {
-                 var hex = hit.collider.transform.parent.GetComponent<Hex>();
+                 var hex = hit.collider.GetComponentInParent<Hex>();
                  if (hex != null)
                  {
-                     Debug.Log($"[SelectLand] Context Click on {hex.name}");
+                     // Debug logging reduced for production cleanliness
+                     // Debug.Log($"[SelectLand] Context Click on {hex.name}");
                      
-                     var uiManager = FindObjectOfType<EditorUIManager>();
-                     if (uiManager != null)
+                     if (_editorUiManager == null) _editorUiManager = FindObjectOfType<EditorUIManager>();
+                     
+                     if (_editorUiManager != null)
                      {
                          // Show Menu
-                         uiManager.ShowMenu(Mouse.current.position.ReadValue(), (cmd) => 
+                         _editorUiManager.ShowMenu(Mouse.current.position.ReadValue(), (cmd) => 
                          {
                              if (cmd == "CMD_ROTATE") RotateHex(hex);
                              else if (cmd == "CMD_NUMBER") CycleHexNumber(hex);
@@ -112,18 +134,84 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
 
     private void UpdateHexType(Hex hex, string newType)
     {
+        if (hex == null || hex.hexState == null) return;
+        if (_hexSpawner == null) _hexSpawner = FindObjectOfType<HexSpawner>();
+
+#if UNITY_EDITOR
+        _hexSpawner.CreateUndoSnapshot();
+        Undo.RecordObject(hex, "Change Hex Type");
+        if (_hexSpawner != null) 
+        {
+            Undo.RegisterCompleteObjectUndo(_hexSpawner, "Change Hex Type");
+        }
+#endif
+
         hex.hexState.HexType = newType;
-        FindObjectOfType<HexSpawner>()?.RefreshHex(hex);
+        
+        // Normalize rotation for types that don't support it (e.g. Sea)
+        // This prevents "hidden" rotation state from persisting when replacing back and forth
+        if (newType == GameConstants.CAR_TYPE_SEA)
+        {
+            hex.hexState.Rotation = 0;
+        }
+
+        _hexSpawner?.RefreshHex(hex);
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(hex);
+        if (_hexSpawner != null) 
+        {
+            EditorUtility.SetDirty(_hexSpawner);
+            // CRITICAL: Update snapshot to capture the "Future" state for Redo
+            _hexSpawner.CreateUndoSnapshot();
+        }
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(hex.gameObject.scene);
+#endif
     }
 
     private void RotateHex(Hex hex)
     {
+        if (hex == null || hex.hexState == null) return;
+        if (_hexSpawner == null) _hexSpawner = FindObjectOfType<HexSpawner>();
+
+#if UNITY_EDITOR
+        _hexSpawner.CreateUndoSnapshot();
+        Undo.RecordObject(hex, "Rotate Hex");
+        if (_hexSpawner != null)
+        {
+             Undo.RegisterCompleteObjectUndo(_hexSpawner, "Rotate Hex");
+        }
+#endif
+
         hex.hexState.Rotation = (hex.hexState.Rotation + 60) % 360;
-        FindObjectOfType<HexSpawner>()?.RefreshHex(hex);
+        _hexSpawner?.RefreshHex(hex);
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(hex);
+        if (_hexSpawner != null) 
+        {
+            EditorUtility.SetDirty(_hexSpawner);
+            // CRITICAL: Update snapshot to capture the "Future" state for Redo
+            _hexSpawner.CreateUndoSnapshot();
+        }
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(hex.gameObject.scene);
+#endif
     }
     
     private void CycleHexNumber(Hex hex)
     {
+        if (hex == null || hex.hexState == null) return;
+        if (_hexSpawner == null) _hexSpawner = FindObjectOfType<HexSpawner>();
+
+#if UNITY_EDITOR
+        _hexSpawner.CreateUndoSnapshot();
+        Undo.RecordObject(hex, "Cycle Hex Number");
+        if (_hexSpawner != null)
+        {
+             Undo.RegisterCompleteObjectUndo(_hexSpawner, "Cycle Hex Number");
+        }
+#endif
+
         int[] nums = { 2, 3, 4, 5, 6, 8, 9, 10, 11, 12 };
         int current = hex.hexState.HexNum ?? 2;
         int nextIndex = 0;
@@ -136,6 +224,17 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
             }
         }
         hex.hexState.HexNum = nums[nextIndex];
-        FindObjectOfType<HexSpawner>()?.RefreshHex(hex);
+        _hexSpawner?.RefreshHex(hex);
+
+#if UNITY_EDITOR
+        EditorUtility.SetDirty(hex);
+        if (_hexSpawner != null) 
+        {
+            EditorUtility.SetDirty(_hexSpawner);
+            // CRITICAL: Update snapshot to capture the "Future" state for Redo
+            _hexSpawner.CreateUndoSnapshot();
+        }
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(hex.gameObject.scene);
+#endif
     }
 }

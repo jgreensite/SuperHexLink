@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 
+[System.Obsolete("Replaced by EditorUIManager (UI Toolkit). Do not use.")]
 public class CircularMenu : MonoBehaviour
 {
     [System.Serializable]

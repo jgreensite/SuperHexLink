@@ -231,6 +231,23 @@ Pre-push Hook
 Push (if passing)
 ```
 
+## Undo System & State Snapshots
+
+### Problem
+Odin Inspector's serialized structures (deeply nested `List<List<HexState>>`) are not reliably tracked by Unity's native `Undo.RecordObject`. Native Undo often misses changes to deep properties, leading to state desynchronization.
+
+### Solution: Snapshotting
+Reference: `Assets/Scripts/Utils/HexSnapshotService.cs`
+
+1.  **Wrapper**: We use `HexSnapshotService` to serialize the *entire* `HexSpawner.State` into a `byte[]` blob.
+2.  **Storage**: The blob is stored in `HexSpawner._undoSnapshot` (which is a primitive array, so Unity Undo tracks it perfectly).
+3.  **Restore**: When Unity Undo reverts the `_undoSnapshot` field, `HexSpawner.OnUndoRedoPerformed` detects the change and deserializes the blob back into the live `HexSpawner.State` object graph.
+4.  **Visual Sync**: `HexSpawner.SyncAllVisualsToState()` is called to force all `Hex` GameObjects to match the restored master state.
+
+### Trade-offs
+*   **Memory**: Storing full snapshots of large maps (10k+ hexes) in the Undo stack increases memory usage. If this becomes a bottleneck, clearing the undo stack or confirming edits (clearing `_undoSnapshot` logic) may be required.
+*   **Redo**: This system supports Redo automatically (Unity restores the "future" snapshot, we rehydrate it). **Caution**: Clearing snapshots after Undo prevents Redo. Only clear if memory is critical and Redo is acceptable to lose.
+
 ## Third-Party Integration
 
 ### Odin Inspector (Sirenix)
