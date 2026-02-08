@@ -92,16 +92,15 @@ jobs:
       - name: Upload changed-csprojs.txt for debugging
         if: steps.set_changed_projects.outputs.has_changes == 'true'
         uses: actions/upload-artifact@v4
-          with:
-            # Include the job name to make artifact names unique across jobs
-            name: changed-csprojs-${{ github.job }}
-            path: changed-csprojs.txt
+        with:
+          name: changed-csprojs-${{ github.job }}
+          path: changed-csprojs.txt
       - name: Upload changed-csprojs-dryrun.txt for debugging
         if: always()
         uses: actions/upload-artifact@v4
-          with:
-            name: changed-csprojs-dryrun-${{ github.job }}
-            path: changed-csprojs-dryrun.txt
+        with:
+          name: changed-csprojs-dryrun-${{ github.job }}
+          path: changed-csprojs-dryrun.txt
 
       - name: Assert DryRun detection parity
         if: always()
@@ -251,15 +250,34 @@ jobs:
           path: changed-csprojs-branch-harness.txt
 
 
-  unity-tests:
-    runs-on: windows-latest
-    needs: static-checks
+  corelogic-tests:
+    name: CoreLogic Build & Test
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Unity
-        run: echo "This job expects Unity to be installed on the runner or use a hosted Unity action. Configure Unity version and run tests accordingly."
-      - name: Run EditMode Tests (placeholder)
-        run: echo "Skipping full Unity run in CI by default; enable Unity Test Runner step when environment is available"
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build CoreLogic
+        run: dotnet build CoreLogic/src/CoreLogic/CoreLogic.csproj --configuration Release --verbosity minimal
+      - name: Run CoreLogic Tests
+        run: dotnet test CoreLogic/tests/CoreLogic.Tests/CoreLogic.Tests.csproj --configuration Release --verbosity minimal --logger "trx;LogFileName=corelogic-results.trx"
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corelogic-test-results
+          path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
+
+  unity-tests:
+    name: Unity EditMode Tests (placeholder)
+    runs-on: windows-latest
+    needs: [static-checks, corelogic-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unity Tests (disabled — requires license)
+        run: echo "Unity EditMode tests require a licensed runner. See BACKLOG.md E2-F1-S5."
 
   unit-tests:
     runs-on: ${{ matrix.platform }}

@@ -268,34 +268,52 @@ Reference: `Assets/Scripts/Utils/HexSnapshotService.cs`
 
 ## Future Architecture Goals
 
-### Phase 1: Refactor (Current)
+> Full roadmap with stories: see [`BACKLOG.md`](../BACKLOG.md)
+
+### Phase 1: Refactor — ✅ Complete
 - [x] Extract CoreLogic library
 - [x] Implement backing state pattern
 - [x] Add fast unit tests
 - [x] Set up CI pipeline
-- [ ] Complete EdgeSpawner/CornerSpawner
+- [x] Senior code review uplift (v0.3.0)
+- [x] Structured logging via ActionLogger
+- [x] Map Editor v2 with validation, auto-repair, undo/redo
+- [ ] Complete EdgeSpawner/CornerSpawner (`E1-F2`)
 
-### Phase 2: Services
-- [ ] Introduce dependency injection
-- [ ] Create service layer (SaveLoadService, EventBus)
-- [ ] Remove GameObject.Find usage
-- [ ] Implement object pooling
+### Phase 2: Services — Planned (`E3`)
+- [ ] Introduce dependency injection (`E3-F1`)
+- [ ] Create service layer — SaveLoadService, HexFactory, HexRegistry (`E3-F2`, `E3-F3`)
+- [ ] Remove GameObject.Find usage (`E3-F1-S1`)
+- [ ] Implement object pooling (`E6-F1`)
 
-### Phase 3: Networking
-- [ ] Deterministic simulation
-- [ ] State synchronization
+### Phase 3: Gameplay — Planned (`E4`)
+- [ ] Turn management (`E4-F1`)
+- [ ] Resource production (`E4-F2`)
+- [ ] Building placement rules (`E4-F3`)
+- [ ] Win condition detection (`E4-F4`)
+
+### Phase 4: Networking — Planned (`E5`)
+- [ ] Deterministic simulation (`E5-F1`)
+- [ ] State synchronization (`E5-F2`)
 - [ ] Rollback/prediction
 - [ ] Replay system
 
-### Phase 4: Performance
-- [ ] ECS migration (if needed)
-- [ ] Burst compiler integration
-- [ ] Job system parallelization
-- [ ] Asset streaming
+### Phase 5: Performance — Planned (`E6`)
+- [ ] Object pooling (`E6-F1`)
+- [ ] Frustum culling, LOD, GPU instancing (`E6-F2`)
 
 ## Migration Notes
 
-### Recent Changes (Nov 2025)
+### Recent Changes (Feb 2026 — v0.3.0 Uplift)
+1. Renamed `materialMap` → `MaterialMap` in `GameConstants`
+2. Consolidated `NotSelect()` → `Deselect()` in `Hex`
+3. Renamed methods to PascalCase in `HexSpawner` (`IsReplaceable`, `IsNumberedLandType`, `IsRenderedType`)
+4. Replaced `RNGCryptoServiceProvider` with `RandomNumberGenerator` in `Rng`
+5. Fixed `Veertex0` → `Vertex0` in `Extensions`
+6. Removed `Corner` constructor (MonoBehaviour) — use `Corner.Init()` instead
+7. `Helpers` changed from `MonoBehaviour` to `static class`
+
+### Earlier Changes (Nov 2025 — v0.1.0)
 1. Created CoreLogic library from Unity code
 2. Added CoreLogicAdapter for type conversions
 3. Refactored Hex.HexState to use backing pattern
@@ -306,6 +324,8 @@ Reference: `Assets/Scripts/Utils/HexSnapshotService.cs`
 - `Hex.Initialize()` signature changed (now requires BaseHexState)
 - Serialization moved from HexSpawner to CoreLogic
 - Some public fields made private (use properties)
+- `materialMap` → `MaterialMap` (PascalCase property)
+- `NotSelect()` removed — use `Deselect()` instead
 
 ### Migration Guide
-See commit history on `feature/hex-state-refactor` branch for step-by-step changes.
+See commit history on `refactor/senior-code-review-uplift` branch for the v0.3.0 changes.

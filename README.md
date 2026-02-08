@@ -1,61 +1,119 @@
 # SuperHexLink
 
-A Unity-based hex-grid strategy game prototype inspired by classic board games.
+![CI](https://github.com/jgreensite/SuperHexLink/actions/workflows/ci.yml/badge.svg)
+![Unity](https://img.shields.io/badge/Unity-2021.3.18f1-blue)
+![.NET](https://img.shields.io/badge/.NET_Standard-2.0-purple)
+
+A **Unity-based hex-grid strategy game** inspired by classic board games like Catan. Features a custom map editor, save/load system with legacy format conversion, harbour placement pipeline, and a standalone CoreLogic library for fast unit testing.
+
+---
+
+## Architecture at a Glance
+
+```
+┌─────────────────────────────────────────┐
+│     Unity Presentation Layer            │  MonoBehaviours, UI, Rendering
+├─────────────────────────────────────────┤
+│     Unity Game Logic Layer              │  Spawners, State, Map Editor
+├─────────────────────────────────────────┤
+│     CoreLogic Adapter                   │  Unity ↔ CoreLogic bridge
+├─────────────────────────────────────────┤
+│     CoreLogic Library (.NET Std 2.0)    │  Grid math, serialization — no Unity deps
+└─────────────────────────────────────────┘
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full details.
+
+## Quick Start
+
+### Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Unity | 2021.3.18f1+ | Game engine |
+| .NET SDK | 6.0+ | CoreLogic library development |
+| .NET Framework | 4.7.1 Developer Pack | Unity Assembly-CSharp builds |
+| PowerShell | 7+ (pwsh) | Build scripts and CI tooling |
+
+### Clone & Run
+
+```bash
+git clone https://github.com/jgreensite/SuperHexLink.git
+cd SuperHexLink
+```
+
+Then open the project in **Unity Hub** and load the main scene from `Assets/Scenes/`.
+
+For detailed environment setup, see [docs/DEV_SETUP.md](docs/DEV_SETUP.md).
+
+### Running Tests
+
+```powershell
+# CoreLogic unit tests (fast, no Unity required — run these first)
+dotnet test CoreLogic/tests/CoreLogic.Tests/CoreLogic.Tests.csproj
+
+# Build guard (validates all .csproj files compile)
+.\scripts\check-csproj-builds.cmd
+
+# Pester tests for build scripts
+.\scripts\run-local-pester.ps1
+
+# Unity EditMode tests (requires Unity installed)
+.\scripts\run-unity-editmode-tests.cmd
+```
+
+See [docs/TESTING.md](docs/TESTING.md) for the full testing guide.
 
 ## Project Structure
 
 ```
 SuperHexLink/
-├── Assets/              # Unity game assets and scripts
-├── CoreLogic/           # Standalone .NET library for game logic (see CoreLogic/README.md)
-├── Build/               # Build output and platform-specific files
-├── docs/                # Project documentation
-├── scripts/             # Build and development automation scripts
-├── data/                # Game data and map files
-└── ProjectSettings/     # Unity project configuration
+├── .github/             # CI workflows, issue/PR templates, CODEOWNERS
+├── Assets/
+│   ├── Scripts/         # Core game scripts (spawners, state, utilities)
+│   ├── Editor/          # Unity Editor extensions (Map Editor window)
+│   ├── Tests/Editor/    # Unity EditMode tests
+│   ├── UI/              # UI scripts and UXML layouts
+│   └── Prefabs/         # Hex, edge, corner prefabs
+├── CoreLogic/           # Standalone .NET library (grid math, serialization)
+│   ├── src/CoreLogic/   # Library source
+│   └── tests/           # NUnit tests
+├── docs/                # Architecture, testing, setup guides
+├── scripts/             # Build automation, CI tooling, git hooks
+├── data/maps/           # Saved map files (JSON)
+└── BACKLOG.md           # Epics, Features, Stories for the product roadmap
 ```
-
-## Quick Start
-
-### Prerequisites
-- Unity 2021.3.18f1 or later
-- .NET SDK 6.0+ (for CoreLogic development)
-- .NET Framework 4.7.1 Developer Pack (for Unity Assembly-CSharp)
-
-### Getting Started
-1. Clone the repository
-2. Open the project in Unity Hub
-3. See [docs/DEV_SETUP.md](docs/DEV_SETUP.md) for detailed setup instructions
-
-### Running Tests
-- **CoreLogic tests** (fast): `dotnet test CoreLogic/tests/CoreLogic.Tests/CoreLogic.Tests.csproj`
-- **Unit tests** (Pester): `.\scripts\run-local-pester.ps1`
-- **Unity EditMode tests**: See [docs/TESTING.md](docs/TESTING.md)
-- **Pre-push checks**: `.\scripts\check-csproj-builds.cmd`
 
 ## Documentation
 
-- **[Development Setup](docs/DEV_SETUP.md)** - Environment setup and build instructions
-- **[HexSpawner Setup](docs/HEXSPAWNER_SETUP.md)** - Configure HexSpawner prefabs in Unity
-- **[Testing Guide](docs/TESTING.md)** - How to run tests locally and in CI
-- **[Architecture](docs/ARCHITECTURE.md)** - Technical architecture and design decisions
-- **[TODO List](docs/TODO.md)** - Consolidated project tasks and issues
-- **[Contributing](docs/CONTRIBUTING.md)** - How to contribute to the project
-- **[Scripts Documentation](scripts/README.md)** - Build automation and CI/CD tooling
-
-## CoreLogic Library
-
-The `CoreLogic/` directory contains a standalone .NET Standard 2.0 library for game logic that can be tested independently of Unity. See [CoreLogic/README.md](CoreLogic/README.md) for details.
+| Document | Description |
+|----------|-------------|
+| [BACKLOG.md](BACKLOG.md) | Product roadmap — Epics, Features, Stories |
+| [CHANGELOG.md](CHANGELOG.md) | Release notes and version history |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and key decisions |
+| [docs/DEV_SETUP.md](docs/DEV_SETUP.md) | Environment setup and build instructions |
+| [docs/TESTING.md](docs/TESTING.md) | How to run tests locally and in CI |
+| [docs/HEXSPAWNER_SETUP.md](docs/HEXSPAWNER_SETUP.md) | Configure HexSpawner prefabs |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Branching strategy, PR process |
+| [scripts/README.md](scripts/README.md) | Build automation and CI tooling |
+| [CoreLogic/README.md](CoreLogic/README.md) | CoreLogic library details |
 
 ## Third-Party Assets
 
-These libraries are not committed (see `docs/DEV_SETUP.md` for download instructions) and should be placed into the matching folders after cloning:
-- **Odin Inspector** (Sirenix) → `Assets/Plugins/Sirenix/`
-- **ParadoxNotion** (flow graph helper packages) → `Assets/ParadoxNotion/`
-- **SimpleFileBrowser** → `Assets/Plugins/SimpleFileBrowser/`
-- **NativeFilePicker** → `Assets/Plugins/NativeFilePicker/`
+These libraries are **not committed** to the repo. See [docs/DEV_SETUP.md](docs/DEV_SETUP.md) for download instructions.
 
-See `packages.config` for the package list that Unity restores automatically.
+| Library | Location | Purpose |
+|---------|----------|---------|
+| Odin Inspector (Sirenix) | `Assets/Plugins/Sirenix/` | Inspector tooling, serialization |
+| ParadoxNotion | `Assets/ParadoxNotion/` | Flow graph helpers |
+| SimpleFileBrowser | `Assets/Plugins/SimpleFileBrowser/` | File dialogs |
+| NativeFilePicker | `Assets/Plugins/NativeFilePicker/` | Native file dialogs |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the branching strategy, PR process, and coding conventions.
+
+**TL;DR**: Feature branch → PR → CI passes → Code review → Merge.
 
 ## License
 
@@ -63,4 +121,4 @@ See `packages.config` for the package list that Unity restores automatically.
 
 ## Credits
 
-Initially inspired by [this tutorial on 3D hex grids in Unity](https://youtu.be/3ZjjlNqjX8c).
+Originally inspired by [this tutorial on 3D hex grids in Unity](https://youtu.be/3ZjjlNqjX8c).
