@@ -42,7 +42,7 @@
   - **Files**: `Assets/Scripts/CornerSpawner.cs`
   - **Tests**: Add `CornerSpawnerStateTests.cs` in `Assets/Tests/Editor/`
 
-- [ ] **E1-F2-S3** End-to-end save/load validation test
+- [x] **E1-F2-S3** End-to-end save/load validation test
   - **AC**: Generate board → Save → Clear → Load → Assert hex/edge/corner counts and types match.
   - **Files**: `Assets/Tests/Editor/SaveLoadRoundTripTests.cs`
 

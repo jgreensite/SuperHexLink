@@ -23,6 +23,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `HexGrid.Distance()` — cube-coordinate Manhattan distance method in CoreLogic
 - `HexGridDistanceTests` — 7 tests (same hex, neighbor, symmetry, triangle inequality, large/negative coords)
 - `BaseHexStateBoundaryTests` — 10 tests (null fields, empty strings, missing JSON properties, extreme values, equality)
+- `SaveLoadRoundTripTests` — 3 end-to-end tests (generate→save→clear→load round-trip, modified state preservation, empty board handling)
 - `CoreLogic.csproj` + `CoreLogic.Tests.csproj` — recreated project files (were gitignored)
 - XML documentation on all core classes (`GameSpawner`, `HexSpawner`, `Hex`, `SpawnerBase`, `HexGrid`, `Corner`, `EdgeSpawner`, `CornerSpawner`)
 - `EnsureValidGameSpawnerState` method restored in `HexSpawner`
