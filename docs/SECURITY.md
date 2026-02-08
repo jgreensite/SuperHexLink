@@ -99,6 +99,7 @@ public static bool IsValidGroupID(string groupId)
 - Use Unity's `PlayerPrefs` for user tokens (encrypted on supported platforms)
 - Use environment variables for CI secrets (`${{ secrets.UNITY_LICENSE }}`)
 - Add `.env` to `.gitignore` before any networking work begins
+- **Known issue**: `GameConstants.GAMESERVERREMOTEADDRESS` contains a hardcoded IP (`35.177.228.70`). This **must** be moved to a runtime config file (e.g., `StreamingAssets/server-config.json` or environment variable) before any public or production build.
 
 ### 5. Dependency Security
 
@@ -125,8 +126,9 @@ Before merging any PR:
 
 | Priority | Item | Backlog Ref |
 |----------|------|-------------|
-| High | Add path traversal guard to `ResolveMapPath` | `E1-F1` |
-| High | Add JSON file size limit (10 MB) to `LoadState` | `E1-F1` |
+| ~~High~~ | ~~Add path traversal guard to `ResolveMapPath`~~ | ✅ Done |
+| ~~High~~ | ~~Add JSON file size limit (10 MB) to `LoadState`~~ | ✅ Done |
+| **High** | Externalize hardcoded server IP/port from `GameConstants` to runtime config | `E3-F3` |
 | Medium | Add schema version validation on load | — |
 | Medium | Network packet signing for multiplayer | `E5-F2` |
 | Low | Fuzz testing for `LegacyMapConverter` | — |

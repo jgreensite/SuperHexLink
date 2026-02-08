@@ -32,7 +32,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full details.
 | Tool | Version | Purpose |
 |------|---------|---------|
 | Unity | 2021.3.18f1+ | Game engine |
-| .NET SDK | 6.0+ | CoreLogic library development |
+| .NET SDK | 8.0+ (pinned in `global.json`) | CoreLogic library development |
 | .NET Framework | 4.7.1 Developer Pack | Unity Assembly-CSharp builds |
 | PowerShell | 7+ (pwsh) | Build scripts and CI tooling |
 
