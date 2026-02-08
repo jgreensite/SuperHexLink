@@ -10,9 +10,12 @@ using SuperHexLink.Logging;
 using UnityEditor;
 #endif
 
+/// <summary>
+/// Central orchestrator for spawning and managing all game board elements.
+/// Owns the master <see cref="GameSpawnerState"/> and coordinates hex, edge, and corner spawners.
+/// </summary>
 public class GameSpawner : SpawnerBase
 {
-
     [ShowInInspector]
     [OdinSerialize]
     private GameSpawnerState SerializedState { get; set; }
@@ -22,8 +25,6 @@ public class GameSpawner : SpawnerBase
         get => SerializedState;
         set => SerializedState = value;
     }
-
-    //public override GameSpawnerState State { set => throw new NotImplementedException(); }
 
     [SerializeField]
     private HexSpawner hexSpawner;
@@ -175,6 +176,10 @@ public class GameSpawner : SpawnerBase
         Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "GameSpawner Refresh executed");
     }
 
+    /// <summary>
+    /// Saves the current board state to JSON files at the specified (or configured) path.
+    /// Also writes individual state files for each spawner for debugging.
+    /// </summary>
     public void SaveHexes(string filePath = null)
     {
         string targetMapPath = ResolveMapPath(filePath, saveMapPath);
@@ -206,133 +211,91 @@ public class GameSpawner : SpawnerBase
         File.WriteAllBytes(Path.Combine(directory, "3_cornerSpawnerState.json"), bytes4);
     }
 
+    /// <summary>
+    /// Loads a saved map from disk, handling both current and legacy formats.
+    /// Deserializes, repairs, and rebuilds the full board.
+    /// </summary>
     public void LoadState(string filePath = null)
     {
-        Debug.Log("=== LOADSTATE START ===");
         string targetMapPath = ResolveMapPath(filePath, loadMapPath);
-        Debug.Log($"LoadState: Loading from {targetMapPath}");
-        
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState: loading from {0}", targetMapPath);
+
         if (!File.Exists(targetMapPath))
         {
-            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "LoadState could not find file {0}", targetMapPath);
-            Debug.LogError($"LoadState: File not found: {targetMapPath}");
+            Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error, "LoadState: file not found: {0}", targetMapPath);
             return;
         }
 
         byte[] bytes = File.ReadAllBytes(targetMapPath);
         string jsonContent = System.Text.Encoding.UTF8.GetString(bytes);
-        Debug.Log($"LoadState: Read {bytes.Length} bytes from file");
-
         CombinedSpawnerState spawnerStates;
 
-        // Check for legacy format and attempt conversion
         bool isLegacy = LegacyMapConverter.IsLegacyFormat(jsonContent);
-        Debug.Log($"LoadState: IsLegacyFormat={isLegacy}");
-        
+
         if (isLegacy)
         {
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
-                "LoadState detected legacy format in {0}, attempting conversion...", targetMapPath);
+                "LoadState: detected legacy format in {0}, attempting conversion", targetMapPath);
 
             var conversionResult = LegacyMapConverter.TryConvertLegacyJson(jsonContent);
-            Debug.Log($"LoadState: Legacy conversion success={conversionResult.Success}");
-            
             if (!conversionResult.Success)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
-                    "LoadState failed to convert legacy file {0}: {1}", targetMapPath, conversionResult.ErrorMessage);
-                Debug.LogError($"LoadState: Legacy conversion failed: {conversionResult.ErrorMessage}");
+                    "LoadState: legacy conversion failed for {0}: {1}", targetMapPath, conversionResult.ErrorMessage);
                 return;
             }
 
             spawnerStates = conversionResult.ConvertedState;
-            Debug.Log($"LoadState: Conversion report: {conversionResult.Report}");
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info,
-                "Legacy conversion: {0}", conversionResult.Report.ToString());
+                "Legacy conversion complete: {0}", conversionResult.Report);
 
-            // Debug: Log first few hex types to verify conversion worked
-            if (spawnerStates.HexState?.hexes != null && spawnerStates.HexState.hexes.Count > 0)
-            {
-                Debug.Log($"LoadState: Converted state has {spawnerStates.HexState.hexes.Count} columns");
-                var firstCol = spawnerStates.HexState.hexes[0];
-                Debug.Log($"LoadState: First column has {firstCol.Count} rows");
-                for (int i = 0; i < Math.Min(3, firstCol.Count); i++)
-                {
-                    Debug.Log($"LoadState: After conversion, hex[0][{i}] HexType='{firstCol[i]?.HexType ?? "NULL OBJ"}'");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("LoadState: Converted state has no hex data!");
-            }
-
-            foreach (var warning in conversionResult.Report.Warnings)
+            foreach (string warning in conversionResult.Report.Warnings)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "Legacy conversion warning: {0}", warning);
             }
         }
         else
         {
-            Debug.Log("LoadState: Deserializing as current format...");
-            // Normal deserialization for current format
             try
             {
                 spawnerStates = SirenixSerializationUtility.DeserializeValue<CombinedSpawnerState>(bytes, DataFormat.JSON);
-                Debug.Log($"LoadState: Deserialization completed, spawnerStates is {(spawnerStates == null ? "NULL" : "not null")}");
             }
             catch (Exception ex)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
-                    "LoadState failed to deserialize {0}: {1}", targetMapPath, ex.Message);
-                Debug.LogError($"LoadState: Deserialization exception: {ex.Message}");
+                    "LoadState: deserialization failed for {0}: {1}", targetMapPath, ex.Message);
                 return;
             }
 
             if (spawnerStates == null)
             {
-                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning, "LoadState could not deserialize state from {0}", targetMapPath);
-                Debug.LogError("LoadState: spawnerStates is null after deserialization");
+                Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
+                    "LoadState: deserialized null from {0}", targetMapPath);
                 return;
             }
 
-            // Validate that hex state has usable data
             if (spawnerStates.HexState?.hexes == null)
             {
                 Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Error,
-                    "LoadState failed: File {0} has no valid hex data. The file may be corrupted or in an incompatible format.",
-                    targetMapPath);
-                Debug.LogError("LoadState: HexState or hexes is null");
+                    "LoadState: no hex data in {0} — file may be corrupted", targetMapPath);
                 return;
             }
-            
-            Debug.Log($"LoadState: Deserialized {spawnerStates.HexState.hexes.Count} columns of hexes");
         }
 
-        // Log landConfigs BEFORE assignment
-        Debug.Log($"LoadState: spawnerStates.GameState has {spawnerStates.GameState?.landConfigs?.Count ?? 0} landConfigs BEFORE assignment");
-
+        // Apply state and validate grid config
         State = spawnerStates.GameState ?? new GameSpawnerState();
-        
-        // Log landConfigs AFTER assignment
-        Debug.Log($"LoadState: State.landConfigs has {State.landConfigs?.Count ?? 0} entries AFTER assignment");
-        Debug.Log($"LoadState: GameState grid config: cols={State.hexGridConfig.cols}, rows={State.hexGridConfig.rows}");
-        
-        // Ensure loaded state has valid grid config
+
         if (State.hexGridConfig.cols <= 0 || State.hexGridConfig.rows <= 0)
         {
             Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Warning,
-                "LoadState: Invalid grid config in file, applying defaults (7x7)");
-            Debug.LogWarning("LoadState: Grid config invalid, applying 7x7 defaults");
+                "LoadState: invalid grid config in file, applying defaults (7x7)");
             State.hexGridConfig = HexGridConfig.CreateDefault();
         }
-        
+
+        // Repair any inconsistencies in the loaded hex data
         HexGridConfig gridConfig = State.hexGridConfig;
-        Debug.Log($"LoadState: About to repair with grid {gridConfig.cols}x{gridConfig.rows}");
-        Debug.Log($"LoadState: HexState before repair has {spawnerStates.HexState?.hexes?.Count ?? 0} columns");
-        
         HexStateRepairReport repairReport = hexSpawner.RepairLoadedState(gridConfig, spawnerStates.HexState, CS);
-        Debug.Log($"LoadState: Repair report - HasChanges={repairReport.HasChanges}, CellsCreated={repairReport.CellsCreated}, HexTypesDefaulted={repairReport.HexTypesDefaulted}");
-        
+
         if (repairReport.HasChanges)
         {
             Log(ActionLogCategory.HexLifecycle, ActionLogSeverity.Warning,
@@ -345,26 +308,19 @@ public class GameSpawner : SpawnerBase
                 repairReport.HarbourRotationsFixed);
         }
 
-        Debug.Log($"LoadState: Assigning state to spawners...");
-        Debug.Log($"LoadState: spawnerStates.HexState has {spawnerStates.HexState?.hexes?.Count ?? 0} columns");
-        if (spawnerStates.HexState?.hexes != null && spawnerStates.HexState.hexes.Count > 0 && spawnerStates.HexState.hexes[0].Count > 0)
-        {
-            Debug.Log($"LoadState: First hex after repair: HexType='{spawnerStates.HexState.hexes[0][0]?.HexType ?? "NULL"}'");
-        }
-        
+        // Assign state to spawners
         hexSpawner.State = spawnerStates.HexState ?? new HexSpawner.HexSpawnerState();
         edgeSpawner.State = spawnerStates.EdgeState ?? new EdgeSpawner.EdgeSpawnerState();
         cornerSpawner.State = spawnerStates.CornerState ?? new CornerSpawner.CornerSpawnerState();
-        
-        Debug.Log($"LoadState: hexSpawner.State now has {hexSpawner.State?.hexes?.Count ?? 0} columns");
 
-        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState applying saved data from {0}", targetMapPath);
-        Debug.Log("LoadState: Calling BuildMe(true)...");
+        Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info,
+            "LoadState: rebuilding board from {0} ({1}x{2})",
+            targetMapPath, gridConfig.cols, gridConfig.rows);
+
         BuildMe(true);
-        Debug.Log("LoadState: Calling hexSpawner.UpdateHexes()...");
         hexSpawner.UpdateHexes();
+
         Log(ActionLogCategory.GameLifecycle, ActionLogSeverity.Info, "LoadState finished");
-        Debug.Log("=== LOADSTATE END ===");
     }
 
 

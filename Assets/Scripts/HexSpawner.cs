@@ -522,10 +522,10 @@ public class HexSpawner : SpawnerBase
             return;
         }
         
-        // Null check for materialMap (may not be initialized if OnEnable hasn't run)
-        if (CS.materialMap == null)
+        // Null check for MaterialMap (may not be initialized if OnEnable hasn't run)
+        if (CS.MaterialMap == null)
         {
-            Debug.LogError($"SetLand: CS.materialMap is NULL for hex {h.name} - GameConstants.OnEnable may not have run yet");
+            Debug.LogError($"SetLand: CS.MaterialMap is NULL for hex {h.name} - GameConstants.OnEnable may not have run yet");
             return;
         }
         
@@ -559,9 +559,9 @@ public class HexSpawner : SpawnerBase
         
         // Safely resolve the material from the IoC container based on the HexType value
         Material material = null;
-        if (!string.IsNullOrEmpty(hexType) && CS.materialMap.ContainsKey(hexType))
+        if (!string.IsNullOrEmpty(hexType) && CS.MaterialMap.ContainsKey(hexType))
         {
-            material = CS.materialMap[hexType];
+            material = CS.MaterialMap[hexType];
         }
         
         // Set the material and visibility of the mesh renderer based on the material and HexType values

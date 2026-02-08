@@ -1,12 +1,18 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using UnityEngine;
 
-// Restored Hex implementation with HexState API required across the codebase.
+/// <summary>
+/// Represents a single hexagonal tile on the game board.
+/// Owns a <see cref="HexState"/> that stores persistent data (type, number, rotation, etc.).
+/// </summary>
 public class Hex : MonoBehaviour
 {
+    /// <summary>
+    /// Lightweight data-transfer object used by <see cref="CoreLogicAdapter"/> and <see cref="Initialize"/>.
+    /// </summary>
     [Serializable]
     public class BaseHexState
     {
@@ -20,29 +26,28 @@ public class Hex : MonoBehaviour
         public bool Selected;
     }
 
+    /// <summary>
+    /// Full hex state used by spawners, the editor, and serialization.
+    /// </summary>
     [Serializable]
     public class HexState
     {
-        // Position helpers (optional internal representation)
-        private HexExtensions.HexExtensions.Hex _hex;
+        [ShowInInspector, OdinSerialize] public int Col;
+        [ShowInInspector, OdinSerialize] public int Row;
+        [ShowInInspector, OdinSerialize] public string HexType;
+        [ShowInInspector, OdinSerialize] public string HexSubType;
+        [ShowInInspector, OdinSerialize] public int Rotation;
+        [ShowInInspector, OdinSerialize] public int? HexNum;
+        [ShowInInspector, OdinSerialize] public string GroupID;
+        [ShowInInspector, OdinSerialize] public bool Selected;
 
-    // Public properties expected by spawners and UI
-    [ShowInInspector, OdinSerialize] public int Col;
-    [ShowInInspector, OdinSerialize] public int Row;
-    [ShowInInspector, OdinSerialize] public string HexType;
-    [ShowInInspector, OdinSerialize] public string HexSubType;
-    [ShowInInspector, OdinSerialize] public int Rotation;
-    [ShowInInspector, OdinSerialize] public int? HexNum;
-    [ShowInInspector, OdinSerialize] public string GroupID;
-    [ShowInInspector, OdinSerialize] public bool Selected;
-
-        // runtime-only visuals - do NOT serialize GameObject references into saved state
-    [System.NonSerialized]
-    public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
+        // Runtime-only — do NOT serialize GameObject references into saved state
+        [System.NonSerialized]
+        public Dictionary<GameObject, Color> originalMaterialColors = new Dictionary<GameObject, Color>();
 
         public HexState() { }
 
-        // Convert column/row to HexExtensions hex
+        /// <summary>Converts offset (col, row) to cube coordinates.</summary>
         public HexExtensions.HexExtensions.Hex CRToHex(int col, int row)
         {
             var b = new HexExtensions.HexExtensions.OffsetCoord(col, row);
@@ -50,17 +55,19 @@ public class Hex : MonoBehaviour
             return c;
         }
 
+        /// <summary>Extracts the column from a cube-coordinate hex.</summary>
         public int CFromHex(HexExtensions.HexExtensions.Hex h)
         {
             return HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).col;
         }
 
+        /// <summary>Extracts the row from a cube-coordinate hex.</summary>
         public int RFromHex(HexExtensions.HexExtensions.Hex h)
         {
             return HexExtensions.HexExtensions.OffsetCoord.QoffsetFromCube(HexExtensions.HexExtensions.OffsetCoord.ODD, h).row;
         }
 
-        // Return the neighbors as HexExtensions hexes — used by some land placement logic
+        /// <summary>Returns the six canonical hex direction vectors.</summary>
         public List<HexExtensions.HexExtensions.Hex> Neighbours()
         {
             var list = new List<HexExtensions.HexExtensions.Hex>();
@@ -103,21 +110,13 @@ public class Hex : MonoBehaviour
         if (hexSpawner == null) hexSpawner = GameObject.FindObjectOfType<HexSpawner>();
     }
 
-    public void Select()
-    {
-        state.Selected = true;
-    }
+    public void Select() => state.Selected = true;
 
-    public void NotSelect()
-    {
-        state.Selected = false;
-    }
-
-    public void Deselect() => NotSelect();
+    public void Deselect() => state.Selected = false;
 
     public void ToggleSelect() => state.Selected = !state.Selected;
 
-    // Edge update stub (actual visual logic lives elsewhere)
+    /// <summary>Stub — visual edge updates are handled by <see cref="EdgeSpawner"/>.</summary>
     public void UpdateEdge(SimpleHexExtensions.SimpleHexExtensions.HexNeighborDirection direction) { }
 
     public int Col => state.Col;
