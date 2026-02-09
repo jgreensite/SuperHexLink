@@ -73,7 +73,7 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
             {
                 if (otherHex != null && otherHex != clickedHex && otherHex.hexState != null && otherHex.hexState.Selected)
                 {
-                    otherHex.NotSelect();
+                    otherHex.Deselect();
                 }
             }
         }
@@ -85,7 +85,7 @@ public class SelectLand : MonoBehaviour, HexGameControls.IMoveActions
             {
                  if (otherHex != null && otherHex != clickedHex && otherHex.hexState != null && otherHex.hexState.Selected)
                  {
-                     otherHex.NotSelect();
+                     otherHex.Deselect();
                  }
             }
         }

@@ -61,14 +61,18 @@ public static class LegacyMapConverter
                 gridMatch = Regex.Match(jsonContent, @"""hexGrid"":\s*\{[^}]*""rows"":\s*(\d+)[^}]*""cols"":\s*(\d+)", RegexOptions.Singleline);
                 if (gridMatch.Success)
                 {
-                    result.Report.GridRows = int.Parse(gridMatch.Groups[1].Value);
-                    result.Report.GridCols = int.Parse(gridMatch.Groups[2].Value);
+                    int.TryParse(gridMatch.Groups[1].Value, out int parsedRows);
+                    int.TryParse(gridMatch.Groups[2].Value, out int parsedCols);
+                    result.Report.GridRows = parsedRows;
+                    result.Report.GridCols = parsedCols;
                 }
             }
             else
             {
-                result.Report.GridCols = int.Parse(gridMatch.Groups[1].Value);
-                result.Report.GridRows = int.Parse(gridMatch.Groups[2].Value);
+                int.TryParse(gridMatch.Groups[1].Value, out int parsedCols);
+                int.TryParse(gridMatch.Groups[2].Value, out int parsedRows);
+                result.Report.GridCols = parsedCols;
+                result.Report.GridRows = parsedRows;
             }
 
             if (result.Report.GridCols <= 0 || result.Report.GridRows <= 0)
@@ -100,13 +104,13 @@ public static class LegacyMapConverter
 
                 // Extract Rotation
                 var rotationMatch = Regex.Match(stateContent, @"""Rotation"":\s*(\d+)", RegexOptions.IgnoreCase);
-                int rotation = rotationMatch.Success ? int.Parse(rotationMatch.Groups[1].Value) : 0;
+                int rotation = rotationMatch.Success && int.TryParse(rotationMatch.Groups[1].Value, out int parsedRot) ? parsedRot : 0;
 
                 // Extract col/row if present (some formats have lowercase)
                 var colMatch = Regex.Match(stateContent, @"""col"":\s*(\d+)", RegexOptions.IgnoreCase);
                 var rowMatch = Regex.Match(stateContent, @"""row"":\s*(\d+)", RegexOptions.IgnoreCase);
-                int? col = colMatch.Success ? int.Parse(colMatch.Groups[1].Value) : (int?)null;
-                int? row = rowMatch.Success ? int.Parse(rowMatch.Groups[1].Value) : (int?)null;
+                int? col = colMatch.Success && int.TryParse(colMatch.Groups[1].Value, out int parsedCol) ? parsedCol : (int?)null;
+                int? row = rowMatch.Success && int.TryParse(rowMatch.Groups[1].Value, out int parsedRow) ? parsedRow : (int?)null;
                 
                 // Track whether ANY hex has col/row data in file (not just non-zero values)
                 if (colMatch.Success && rowMatch.Success)
@@ -318,10 +322,11 @@ public static class LegacyMapConverter
                 var matches = landConfigPattern.Matches(content);
                 foreach (Match match in matches)
                 {
+                    if (!int.TryParse(match.Groups[2].Value, out int landCnt)) continue;
                     configs.Add(new GameSpawner.LandConfig
                     {
                         landGroupID = string.IsNullOrEmpty(match.Groups[1].Value) ? "1" : match.Groups[1].Value,
-                        landCnt = int.Parse(match.Groups[2].Value),
+                        landCnt = landCnt,
                         landType = match.Groups[3].Value
                     });
                 }
@@ -332,10 +337,11 @@ public static class LegacyMapConverter
                     matches = landConfigPatternAlt.Matches(content);
                     foreach (Match match in matches)
                     {
+                        if (!int.TryParse(match.Groups[2].Value, out int altLandCnt)) continue;
                         configs.Add(new GameSpawner.LandConfig
                         {
                             landType = match.Groups[1].Value,
-                            landCnt = int.Parse(match.Groups[2].Value),
+                            landCnt = altLandCnt,
                             landGroupID = string.IsNullOrEmpty(match.Groups[3].Value) ? "1" : match.Groups[3].Value
                         });
                     }
@@ -379,11 +385,13 @@ public static class LegacyMapConverter
                 var matches = numConfigPattern.Matches(content);
                 foreach (Match match in matches)
                 {
+                    if (!int.TryParse(match.Groups[2].Value, out int numCnt) ||
+                        !int.TryParse(match.Groups[3].Value, out int numType)) continue;
                     configs.Add(new GameSpawner.NumConfig
                     {
                         numGroupID = string.IsNullOrEmpty(match.Groups[1].Value) ? "1" : match.Groups[1].Value,
-                        numCnt = int.Parse(match.Groups[2].Value),
-                        numType = int.Parse(match.Groups[3].Value)
+                        numCnt = numCnt,
+                        numType = numType
                     });
                 }
             }

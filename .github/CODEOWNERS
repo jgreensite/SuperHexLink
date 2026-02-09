@@ -1,0 +1,16 @@
+# Code Owners — auto-request reviews for PRs touching these paths.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @jgreensite
+
+# Core game scripts
+Assets/Scripts/          @jgreensite
+Assets/Editor/           @jgreensite
+
+# CoreLogic library
+CoreLogic/               @jgreensite
+
+# CI/CD and build scripts
+.github/                 @jgreensite
+scripts/                 @jgreensite

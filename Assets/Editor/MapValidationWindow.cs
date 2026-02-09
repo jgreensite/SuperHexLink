@@ -205,7 +205,7 @@ public class MapEditorWindow : EditorWindow
             
             // Hex Selection Mode toggle
             var oldColor = GUI.backgroundColor;
- 
+            if (_hexSelectionMode)
             {
                 GUI.backgroundColor = new Color(0.3f, 0.8f, 0.3f);
             }
@@ -237,7 +237,6 @@ public class MapEditorWindow : EditorWindow
         // Summary bar
         if (_validationResult != null)
         {
-            var summaryStyle = _validationResult.IsValid ? EditorStyles.helpBox : EditorStyles.helpBox;
             var bgColor = _validationResult.ErrorCount > 0 ? new Color(1, 0.3f, 0.3f, 0.3f) :
                           _validationResult.WarningCount > 0 ? new Color(1, 0.8f, 0.3f, 0.3f) :
                           new Color(0.3f, 1, 0.3f, 0.3f);
@@ -1447,14 +1446,4 @@ public class MapEditorWindow : EditorWindow
     }
 }
 #endif
-
-
-
-// Temp change for check-csproj-builds testing: 5c202efb-5e96-48bb-ad40-64f6f6a25f0b
-
-
-
-
-
-
 

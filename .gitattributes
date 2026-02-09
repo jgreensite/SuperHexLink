@@ -1,0 +1,72 @@
+# Auto-detect text files and normalise line endings to LF in the repo.
+* text=auto
+
+# Unity serialised files — force LF to prevent merge noise.
+*.cs text diff=csharp
+*.shader text
+*.cginc text
+*.hlsl text
+*.compute text
+*.asmdef text
+*.json text
+*.xml text
+*.yaml text
+*.yml text
+*.md text
+*.txt text
+
+# Unity YAML assets — force LF and use unionmerge where possible.
+*.unity text merge=unityyamlmerge
+*.prefab text merge=unityyamlmerge
+*.asset text merge=unityyamlmerge
+*.meta text
+*.mat text
+*.controller text
+*.anim text
+*.overrideController text
+*.physicMaterial text
+*.physicsMaterial2D text
+*.spriteatlas text
+*.terrainlayer text
+*.mixer text
+*.shadergraph text
+*.shadersubgraph text
+
+# Image / binary — mark as binary to prevent diff/merge corruption.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.tga binary
+*.tif binary
+*.tiff binary
+*.psd binary
+*.exr binary
+*.hdr binary
+
+# Audio / Video
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.mp4 binary
+
+# 3D models
+*.fbx binary
+*.obj binary
+*.blend binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+
+# Archives / packages
+*.zip binary
+*.unitypackage binary
+*.dll binary
+*.so binary
+*.dylib binary
+
+# LFS (uncomment if using Git LFS)
+# *.png filter=lfs diff=lfs merge=lfs -text
+# *.fbx filter=lfs diff=lfs merge=lfs -text

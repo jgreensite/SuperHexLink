@@ -1,19 +1,24 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using HexExtensions;
-using SimpleHexExtensions;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
+
+/// <summary>
+/// Represents a corner (vertex) shared by up to three hexes on the board.
+/// Identified by cube coordinates (q, r, s) and a corner index (0–5).
+/// </summary>
 public class Corner : MonoBehaviour
 {
-    public readonly int q;
-    public readonly int r;
-    public readonly int s;
-    public readonly int cornerIndex;
+    public int q;
+    public int r;
+    public int s;
+    public int cornerIndex;
 
-    public Corner(int q, int r, int s, int cornerIndex)
+    /// <summary>
+    /// Initialise the corner identifier after instantiation.
+    /// Unity MonoBehaviours must not use constructors.
+    /// </summary>
+    public void Init(int q, int r, int s, int cornerIndex)
     {
         this.q = q;
         this.r = r;
@@ -21,7 +26,6 @@ public class Corner : MonoBehaviour
         this.cornerIndex = cornerIndex;
     }
 
-    // Override Equals and GetHashCode to ensure uniqueness in dictionary
     public override bool Equals(object obj)
     {
         return obj is Corner corner &&
@@ -34,18 +38,6 @@ public class Corner : MonoBehaviour
     public override int GetHashCode()
     {
         return HashCode.Combine(q, r, s, cornerIndex);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
 
@@ -70,8 +62,12 @@ public static class CornerManager
         // Use the GetHexesSharingCorner method to find all the hexes that share this corner
         List<HexExtensions.HexExtensions.Hex> sharedHexes = HexExtensions.HexExtensions.GetHexesSharingCorner(hex, cornerIndex, numColumns, numRows);
 
-        // Create a Corner identifier (for simplicity, use the first hex in the list)
-        return new Corner(sharedHexes[0].q, sharedHexes[0].r, sharedHexes[0].s, cornerIndex);
+        // Create a temporary Corner identifier for dictionary lookups.
+        // NOTE: This creates a standalone object not attached to a GameObject — acceptable
+        // because it is only used as a dictionary key via Equals/GetHashCode.
+        var corner = new GameObject("_cornerKey").AddComponent<Corner>();
+        corner.Init(sharedHexes[0].q, sharedHexes[0].r, sharedHexes[0].s, cornerIndex);
+        return corner;
     }
 
     // Method to set corner data

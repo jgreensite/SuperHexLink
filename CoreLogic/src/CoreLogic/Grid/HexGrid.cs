@@ -44,8 +44,16 @@ namespace CoreLogic.Grid
             return new AxialCoord(x, z);
         }
 
-        // Fractional cube rounding (for world -> axial conversions)
-        // NOTE: implementation moved lower so public members appear before private members (SA1202).
+        /// <summary>
+        /// Returns the hex distance (minimum number of steps) between two axial coordinates.
+        /// Uses the cube-coordinate Manhattan distance formula: max(|dx|, |dy|, |dz|).
+        /// </summary>
+        public static int Distance(AxialCoord a, AxialCoord b)
+        {
+            var (ax, ay, az) = AxialToCube(a);
+            var (bx, by, bz) = AxialToCube(b);
+            return Math.Max(Math.Abs(ax - bx), Math.Max(Math.Abs(ay - by), Math.Abs(az - bz)));
+        }
 
         // World conversion for pointy-top hexes:
         // x = size * sqrt(3) * (q + r/2), y = size * 3/2 * r

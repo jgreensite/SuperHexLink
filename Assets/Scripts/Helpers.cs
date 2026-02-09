@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Helpers : MonoBehaviour
+/// <summary>
+/// Static utility methods for querying and destroying GameObjects by layer/name.
+/// </summary>
+public static class Helpers
 {
     public static List<GameObject> GetObjectsInLayer(GameObject root, int layer)
     {
@@ -29,7 +32,7 @@ public class Helpers : MonoBehaviour
         {
             if (t.gameObject.name != root.name)
             {
-                if ((t.gameObject.name.StartsWith(name, StringComparison.CurrentCultureIgnoreCase)) || (name==""))
+                if (t.gameObject.name.StartsWith(name, StringComparison.OrdinalIgnoreCase) || name == "")
                 {
                     if (matched) ret.Add(t.gameObject);
                 }
@@ -39,7 +42,7 @@ public class Helpers : MonoBehaviour
         return ret;
     }
 
-    public static List<GameObject> GetChilObjectLights(GameObject root)
+    public static List<GameObject> GetChildObjectLights(GameObject root)
     {
         List<GameObject> ret = new List<GameObject>();
         foreach (Transform t in root.transform.GetComponentsInChildren(typeof(Transform), true))
@@ -59,13 +62,13 @@ public class Helpers : MonoBehaviour
     {
         foreach (GameObject g in ret)
         {
-            //make g inactive before destroying it
-            //g.SetActive(false);
             if (Application.isEditor)
             {
-                DestroyImmediate(g);
-            } else {   
-                Destroy(g);
+                UnityEngine.Object.DestroyImmediate(g);
+            }
+            else
+            {
+                UnityEngine.Object.Destroy(g);
             }
         }
     }
