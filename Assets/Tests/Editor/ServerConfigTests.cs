@@ -238,5 +238,93 @@ namespace Tests.Editor
             Assert.IsNotNull(config, "GetServerConfig should not return null");
             Assert.AreEqual("test.example.com", config.ServerHost, "Should return environment override");
         }
+
+        [Test]
+        public void GetEnvironmentVariables_ReturnsAllVariables()
+        {
+            // Arrange: Set some environment variables
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_HOST", "env.test.com");
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_PORT", "9999");
+
+            // Act
+            var envVars = ServerConfig.GetEnvironmentVariables();
+
+            // Assert: Should return all environment variables
+            Assert.AreEqual(5, envVars.Count, "Should return 5 environment variables");
+            Assert.AreEqual("env.test.com", envVars["SUPERHEX_SERVER_HOST"], "Should return host value");
+            Assert.AreEqual("9999", envVars["SUPERHEX_SERVER_PORT"], "Should return port value");
+            Assert.AreEqual("not set", envVars["SUPERHEX_CONNECTION_TIMEOUT"], "Should show 'not set' for missing vars");
+        }
+
+        [Test]
+        public void LogEnvironmentVariables_DoesNotThrow()
+        {
+            // Arrange: Set up environment variables
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_HOST", "log.test.com");
+
+            // Act & Assert: Should not throw exception
+            Assert.DoesNotThrow(() => ServerConfig.LogEnvironmentVariables(), 
+                "LogEnvironmentVariables should not throw exception");
+        }
+
+        [Test]
+        public void Load_WithInvalidEnvironmentValues_LogsWarningsAndUsesDefaults()
+        {
+            // Arrange: Set invalid environment variables
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_PORT", "invalid_port");
+            Environment.SetEnvironmentVariable("SUPERHEX_CONNECTION_TIMEOUT", "not_a_number");
+            Environment.SetEnvironmentVariable("SUPERHEX_MAX_RETRIES", "abc");
+            Environment.SetEnvironmentVariable("SUPERHEX_ENABLE_LOGGING", "maybe");
+
+            // Act
+            var config = ServerConfig.Load();
+
+            // Assert: Should use config file or default values for invalid env vars
+            Assert.AreEqual(6321, config.ServerPort, "Should use default port for invalid env var");
+            Assert.AreEqual(5000, config.ConnectionTimeoutMs, "Should use default timeout for invalid env var");
+            Assert.AreEqual(3, config.MaxRetries, "Should use default retries for invalid env var");
+            Assert.IsTrue(config.EnableLogging, "Should use default logging for invalid env var");
+        }
+
+        [Test]
+        public void Load_WithPartialEnvironmentVariables_AppliesOnlyValidOnes()
+        {
+            // Arrange: Create config file and set partial environment variables
+            string configJson = @"{
+                ""serverHost"": ""config.example.com"",
+                ""serverPort"": 8080,
+                ""connectionTimeoutMs"": 10000,
+                ""maxRetries"": 5,
+                ""enableLogging"": false
+            }";
+            File.WriteAllText(TempConfigPath, configJson);
+
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_HOST", "env.example.com");
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_PORT", "9999");
+            // Leave other env vars unset
+
+            // Act
+            var config = ServerConfig.Load();
+
+            // Assert: Should apply only valid environment variable overrides
+            Assert.AreEqual("env.example.com", config.ServerHost, "Should apply host override");
+            Assert.AreEqual(9999, config.ServerPort, "Should apply port override");
+            Assert.AreEqual(10000, config.ConnectionTimeoutMs, "Should keep config timeout when env not set");
+            Assert.AreEqual(5, config.MaxRetries, "Should keep config retries when env not set");
+            Assert.IsFalse(config.EnableLogging, "Should keep config logging when env not set");
+        }
+
+        [Test]
+        public void Load_WithWhitespaceInEnvironmentVariable_TrimsValue()
+        {
+            // Arrange: Set environment variable with whitespace
+            Environment.SetEnvironmentVariable("SUPERHEX_SERVER_HOST", "  trimmed.example.com  ");
+
+            // Act
+            var config = ServerConfig.Load();
+
+            // Assert: Should trim whitespace from environment variable
+            Assert.AreEqual("trimmed.example.com", config.ServerHost, "Should trim whitespace from host");
+        }
     }
 }

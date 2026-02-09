@@ -53,30 +53,72 @@ namespace SuperHexLink
             }
 
             // Environment variable overrides (highest priority)
-            config.serverHost = GetEnvVar("SUPERHEX_SERVER_HOST", config.serverHost);
+            bool hasEnvOverrides = false;
             
-            string portEnv = GetEnvVar("SUPERHEX_SERVER_PORT", config.serverPort.ToString(CultureInfo.InvariantCulture));
-            if (int.TryParse(portEnv, out int portOverride))
+            // Server host override
+            string hostEnv = GetEnvVar("SUPERHEX_SERVER_HOST", null);
+            if (!string.IsNullOrEmpty(hostEnv))
+            {
+                config.serverHost = hostEnv.Trim();
+                hasEnvOverrides = true;
+                Debug.Log($"ServerConfig: Environment override - Host = {config.serverHost}");
+            }
+            
+            // Server port override
+            string portEnv = GetEnvVar("SUPERHEX_SERVER_PORT", null);
+            if (!string.IsNullOrEmpty(portEnv) && int.TryParse(portEnv, out int portOverride))
             {
                 config.serverPort = portOverride;
+                hasEnvOverrides = true;
+                Debug.Log($"ServerConfig: Environment override - Port = {config.serverPort}");
+            }
+            else if (!string.IsNullOrEmpty(portEnv))
+            {
+                Debug.LogWarning($"ServerConfig: Invalid SUPERHEX_SERVER_PORT value '{portEnv}', using config file value");
             }
 
-            string timeoutEnv = GetEnvVar("SUPERHEX_CONNECTION_TIMEOUT", config.connectionTimeoutMs.ToString(CultureInfo.InvariantCulture));
-            if (int.TryParse(timeoutEnv, out int timeoutOverride))
+            // Connection timeout override
+            string timeoutEnv = GetEnvVar("SUPERHEX_CONNECTION_TIMEOUT", null);
+            if (!string.IsNullOrEmpty(timeoutEnv) && int.TryParse(timeoutEnv, out int timeoutOverride))
             {
                 config.connectionTimeoutMs = timeoutOverride;
+                hasEnvOverrides = true;
+                Debug.Log($"ServerConfig: Environment override - Timeout = {config.connectionTimeoutMs}ms");
+            }
+            else if (!string.IsNullOrEmpty(timeoutEnv))
+            {
+                Debug.LogWarning($"ServerConfig: Invalid SUPERHEX_CONNECTION_TIMEOUT value '{timeoutEnv}', using config file value");
             }
 
-            string retriesEnv = GetEnvVar("SUPERHEX_MAX_RETRIES", config.maxRetries.ToString(CultureInfo.InvariantCulture));
-            if (int.TryParse(retriesEnv, out int retriesOverride))
+            // Max retries override
+            string retriesEnv = GetEnvVar("SUPERHEX_MAX_RETRIES", null);
+            if (!string.IsNullOrEmpty(retriesEnv) && int.TryParse(retriesEnv, out int retriesOverride))
             {
                 config.maxRetries = retriesOverride;
+                hasEnvOverrides = true;
+                Debug.Log($"ServerConfig: Environment override - MaxRetries = {config.maxRetries}");
+            }
+            else if (!string.IsNullOrEmpty(retriesEnv))
+            {
+                Debug.LogWarning($"ServerConfig: Invalid SUPERHEX_MAX_RETRIES value '{retriesEnv}', using config file value");
             }
 
-            string loggingEnv = GetEnvVar("SUPERHEX_ENABLE_LOGGING", config.enableLogging.ToString());
-            if (bool.TryParse(loggingEnv, out bool loggingOverride))
+            // Logging enable override
+            string loggingEnv = GetEnvVar("SUPERHEX_ENABLE_LOGGING", null);
+            if (!string.IsNullOrEmpty(loggingEnv) && bool.TryParse(loggingEnv, out bool loggingOverride))
             {
                 config.enableLogging = loggingOverride;
+                hasEnvOverrides = true;
+                Debug.Log($"ServerConfig: Environment override - EnableLogging = {config.enableLogging}");
+            }
+            else if (!string.IsNullOrEmpty(loggingEnv))
+            {
+                Debug.LogWarning($"ServerConfig: Invalid SUPERHEX_ENABLE_LOGGING value '{loggingEnv}', using config file value");
+            }
+
+            if (hasEnvOverrides)
+            {
+                Debug.Log("ServerConfig: Environment variable overrides applied");
             }
 
             // Validate configuration
@@ -93,6 +135,37 @@ namespace SuperHexLink
         {
             string value = Environment.GetEnvironmentVariable(key);
             return string.IsNullOrEmpty(value) ? defaultValue : value;
+        }
+
+        /// <summary>
+        /// Get all available SuperHexLink environment variables for debugging.
+        /// Returns a dictionary of variable names to their values (or "not set").
+        /// </summary>
+        public static System.Collections.Generic.Dictionary<string, string> GetEnvironmentVariables()
+        {
+            var envVars = new System.Collections.Generic.Dictionary<string, string>();
+            
+            envVars["SUPERHEX_SERVER_HOST"] = GetEnvVar("SUPERHEX_SERVER_HOST", "not set");
+            envVars["SUPERHEX_SERVER_PORT"] = GetEnvVar("SUPERHEX_SERVER_PORT", "not set");
+            envVars["SUPERHEX_CONNECTION_TIMEOUT"] = GetEnvVar("SUPERHEX_CONNECTION_TIMEOUT", "not set");
+            envVars["SUPERHEX_MAX_RETRIES"] = GetEnvVar("SUPERHEX_MAX_RETRIES", "not set");
+            envVars["SUPERHEX_ENABLE_LOGGING"] = GetEnvVar("SUPERHEX_ENABLE_LOGGING", "not set");
+            
+            return envVars;
+        }
+
+        /// <summary>
+        /// Log all available environment variables for debugging purposes.
+        /// </summary>
+        public static void LogEnvironmentVariables()
+        {
+            Debug.Log("=== SuperHexLink Environment Variables ===");
+            var envVars = GetEnvironmentVariables();
+            foreach (var kvp in envVars)
+            {
+                Debug.Log($"{kvp.Key}: {kvp.Value}");
+            }
+            Debug.Log("=========================================");
         }
 
         /// <summary>

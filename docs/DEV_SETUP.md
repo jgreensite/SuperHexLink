@@ -304,11 +304,17 @@ The game loads server settings from `Assets/StreamingAssets/server-config.json` 
 ```
 
 **Environment Variable Overrides** (higher priority):
-- `SUPERHEX_SERVER_HOST` - Server hostname/IP
-- `SUPERHEX_SERVER_PORT` - Server port number
-- `SUPERHEX_CONNECTION_TIMEOUT` - Connection timeout in milliseconds
-- `SUPERHEX_MAX_RETRIES` - Maximum retry attempts
-- `SUPERHEX_ENABLE_LOGGING` - Enable/disable logging (true/false)
+- `SUPERHEX_SERVER_HOST` - Server hostname/IP (whitespace trimmed)
+- `SUPERHEX_SERVER_PORT` - Server port number (integer, validated)
+- `SUPERHEX_CONNECTION_TIMEOUT` - Connection timeout in milliseconds (integer, validated)
+- `SUPERHEX_MAX_RETRIES` - Maximum retry attempts (integer, validated)
+- `SUPERHEX_ENABLE_LOGGING` - Enable/disable logging (boolean, validated)
+
+**Environment Variable Features**:
+- **Validation**: Invalid values are logged and ignored, falling back to config file defaults
+- **Logging**: All valid overrides are logged to Unity Console for debugging
+- **Debugging**: Use `ServerConfig.LogEnvironmentVariables()` to see current environment state
+- **Whitespace Handling**: String values are automatically trimmed of leading/trailing whitespace
 
 **Usage in Code**:
 ```csharp
@@ -318,7 +324,31 @@ Debug.Log($"Connecting to {config.ServerHost}:{config.ServerPort}");
 
 // Legacy: Deprecated constants (will be removed in future)
 Debug.Log(GameConstants.GAMESERVERREMOTEADDRESS); // Shows deprecation warning
+
+// Debugging: Check current environment variables
+ServerConfig.LogEnvironmentVariables();
+var envVars = ServerConfig.GetEnvironmentVariables();
+foreach (var kvp in envVars)
+{
+    Debug.Log($"{kvp.Key}: {kvp.Value}");
+}
 ```
+
+**Debugging Environment Variables**:
+```csharp
+// Log all environment variables to console
+ServerConfig.LogEnvironmentVariables();
+
+// Get environment variables programmatically
+var envVars = ServerConfig.GetEnvironmentVariables();
+bool hasHostOverride = envVars["SUPERHEX_SERVER_HOST"] != "not set";
+```
+
+**Common Environment Variable Issues**:
+- **Invalid values**: Logged as warnings, fall back to config file
+- **Missing values**: Use config file or defaults
+- **Whitespace**: Automatically trimmed from string values
+- **Type errors**: Non-numeric values for ports/timeouts are ignored
 
 ### Unity Project Settings
 
