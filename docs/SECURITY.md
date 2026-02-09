@@ -99,7 +99,7 @@ public static bool IsValidGroupID(string groupId)
 - Use Unity's `PlayerPrefs` for user tokens (encrypted on supported platforms)
 - Use environment variables for CI secrets (`${{ secrets.UNITY_LICENSE }}`)
 - Add `.env` to `.gitignore` before any networking work begins
-- **Known issue**: `GameConstants.GAMESERVERREMOTEADDRESS` contains a hardcoded IP (`35.177.228.70`). This **must** be moved to a runtime config file (e.g., `StreamingAssets/server-config.json` or environment variable) before any public or production build.
+- **Resolved**: `GameConstants` now uses `ServerConfig.Load()` which loads from `StreamingAssets/server-config.json` with environment variable overrides. The hardcoded IP has been removed and replaced with secure runtime configuration.
 
 ### 5. Dependency Security
 

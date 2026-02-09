@@ -207,11 +207,21 @@ public class GameConstants : ScriptableObject
     // Networking Constants
     public const string GAMESERVERLOCALADDRESS = "127.0.0.1";
 
-    // WARNING: Hardcoded server address — must move to a runtime config file
-    // before any public/production build. See docs/SECURITY.md §Secrets Management.
-    // TODO: Load from StreamingAssets/server-config.json or environment variable.
-    public const string GAMESERVERREMOTEADDRESS = "35.177.228.70";
+    // DEPRECATED: Use ServerConfig.Load() for runtime configuration
+    // These constants are kept for backward compatibility only
+    [Obsolete("Use ServerConfig.Load() instead of hardcoded values")]
+    public const string GAMESERVERREMOTEADDRESS = "127.0.0.1";
+    [Obsolete("Use ServerConfig.Load() instead of hardcoded values")]
     public const int GAMESERVERPORT = 6321;
+
+    /// <summary>
+    /// Get runtime server configuration loaded from StreamingAssets with environment variable overrides.
+    /// This is the recommended way to access server settings in production code.
+    /// </summary>
+    public static ServerConfig GetServerConfig()
+    {
+        return ServerConfig.Load();
+    }
 
     // Build Script Constants
     public const string SERVERSCENECOLLECTION = "server";

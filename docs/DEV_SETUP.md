@@ -289,6 +289,37 @@ scripts/
 - `Assets/Scripts/ActionLogger.cs` now records key interactions inside `GameSpawner` and `HexSpawner`. Logs are gated by `Assets/Scripts/ActionLogSettings` (a ScriptableObject you can create from the Unity menu via **Create → Logging → Action Log Settings**). Configure which categories/ severities are captured (General, HexLifecycle, HexLand, GameLifecycle) and set the `enabled` toggle to turn the action log on or off without code changes.
 - Assign the same `ActionLogSettings` asset to the `actionLogSettings` field on the `GameSpawner` and `HexSpawner` GameObjects in your scene so Unity emits `[ActionLog/...` entries for builds, state loads, land assignments, etc. When enabled, you get reproducible textual traces in the Console or `check-unity-errors.ps1` output to mirror what the UI does while you manually test.
 
+### Server Configuration
+
+The game loads server settings from `Assets/StreamingAssets/server-config.json` with environment variable overrides:
+
+```json
+{
+  "serverHost": "127.0.0.1",
+  "serverPort": 6321,
+  "connectionTimeoutMs": 5000,
+  "maxRetries": 3,
+  "enableLogging": true
+}
+```
+
+**Environment Variable Overrides** (higher priority):
+- `SUPERHEX_SERVER_HOST` - Server hostname/IP
+- `SUPERHEX_SERVER_PORT` - Server port number
+- `SUPERHEX_CONNECTION_TIMEOUT` - Connection timeout in milliseconds
+- `SUPERHEX_MAX_RETRIES` - Maximum retry attempts
+- `SUPERHEX_ENABLE_LOGGING` - Enable/disable logging (true/false)
+
+**Usage in Code**:
+```csharp
+// Recommended: Use runtime configuration
+var config = GameConstants.GetServerConfig();
+Debug.Log($"Connecting to {config.ServerHost}:{config.ServerPort}");
+
+// Legacy: Deprecated constants (will be removed in future)
+Debug.Log(GameConstants.GAMESERVERREMOTEADDRESS); // Shows deprecation warning
+```
+
 ### Unity Project Settings
 
 **Player Settings**:

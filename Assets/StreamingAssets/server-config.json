@@ -1,0 +1,1 @@
+{"serverHost": "127.0.0.1", "serverPort": 6321, "connectionTimeoutMs": 5000, "maxRetries": 3, "enableLogging": true, "_comment": "This is a template configuration file. Copy to your environment and modify as needed. Environment variables override these values."}
