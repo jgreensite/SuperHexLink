@@ -1,0 +1,262 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths: 
+      - 'Assets/**'
+      - 'ProjectSettings/**'
+      - 'Packages/**'
+      - '.github/workflows/deploy-staging.yml'
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy even if tests fail'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  UNITY_VERSION: 2021.3.18f1
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    outputs:
+      build-success: ${{ steps.build.outcome }}
+      test-success: ${{ steps.test.outcome }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Cache Unity Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Staging-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Staging-
+            Library-
+
+      - name: Setup Unity
+        uses: game-ci/unity-test-runner@v2
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+
+      - name: Build Unity Project
+        id: build
+        uses: game-ci/unity-builder@v2
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneWindows64
+          buildName: SuperHexLink-Staging
+          buildsPath: build
+          projectPath: .
+          buildMethod: SuperHexLink.Build.StagingBuild.PerformBuild
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        if: steps.build.outcome == 'success'
+        with:
+          name: staging-build
+          path: build/StandaloneWindows64
+          retention-days: 7
+
+      - name: Run Tests
+        id: test
+        uses: game-ci/unity-test-runner@v2
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: |
+            artifacts
+            **/test-results**
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy Scan Results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-and-test, security-scan]
+    if: |
+      (needs.build-and-test.outputs.build-success == 'success' && needs.build-and-test.outputs.test-success == 'success') ||
+      github.event.inputs.force_deploy == 'true'
+    environment:
+      name: staging
+      url: https://staging.superhexlink.com
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: staging-build
+          path: ./build-artifact
+
+      - name: Create Staging Config
+        run: |
+          mkdir -p ./config
+          cat > ./config/server-config.json << EOF
+          {
+            "serverHost": "staging.superhexlink.com",
+            "serverPort": 6321,
+            "connectionTimeoutMs": 5000,
+            "maxRetries": 3,
+            "enableLogging": true,
+            "_comment": "Staging environment configuration"
+          }
+          EOF
+
+      - name: Create Deployment Package
+        run: |
+          mkdir -p ./deployment-package
+          cp -r ./build-artifact/* ./deployment-package/
+          cp -r ./config ./deployment-package/
+          cp ./LICENSE ./deployment-package/
+          cp ./README.md ./deployment-package/
+          
+          # Create deployment manifest
+          cat > ./deployment-package/manifest.json << EOF
+          {
+            "version": "${{ github.sha }}",
+            "buildTime": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "environment": "staging",
+            "unityVersion": "${{ env.UNITY_VERSION }}"
+          }
+          EOF
+
+      - name: Deploy to Staging Server
+        run: |
+          echo "Deploying to staging environment..."
+          echo "Build artifact: $(ls -la ./deployment-package/)"
+          echo "Deployment manifest:"
+          cat ./deployment-package/manifest.json
+          
+          # Simulate deployment (replace with actual deployment logic)
+          mkdir -p ./staging-deployment
+          cp -r ./deployment-package/* ./staging-deployment/
+          echo "Deployment completed successfully"
+
+      - name: Health Check
+        run: |
+          echo "Performing health check..."
+          sleep 10  # Wait for deployment to settle
+          
+          # Simulate health check (replace with actual health check)
+          if [ -f "./staging-deployment/SuperHexLink-Staging.exe" ]; then
+            echo "✅ Health check passed - executable found"
+          else
+            echo "❌ Health check failed - executable not found"
+            exit 1
+          fi
+
+      - name: Smoke Tests
+        run: |
+          echo "Running smoke tests..."
+          
+          # Test configuration loading
+          if [ -f "./staging-deployment/config/server-config.json" ]; then
+            echo "✅ Configuration file present"
+            if grep -q "staging.superhexlink.com" "./staging-deployment/config/server-config.json"; then
+              echo "✅ Staging configuration correct"
+            else
+              echo "❌ Staging configuration incorrect"
+              exit 1
+            fi
+          else
+            echo "❌ Configuration file missing"
+            exit 1
+          fi
+          
+          # Test deployment manifest
+          if [ -f "./staging-deployment/manifest.json" ]; then
+            echo "✅ Deployment manifest present"
+          else
+            echo "❌ Deployment manifest missing"
+            exit 1
+          fi
+
+      - name: Create Rollback Information
+        if: always()
+        run: |
+          mkdir -p ./rollback-info
+          cat > ./rollback-info/rollback-plan.json << EOF
+          {
+            "previousDeployment": {
+              "commit": "${{ github.event.before }}",
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            },
+            "currentDeployment": {
+              "commit": "${{ github.sha }}",
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "status": "${{ job.status }}"
+            },
+            "rollbackCommand": "git checkout ${{ github.event.before }} && ./deploy-staging.sh"
+          }
+          EOF
+
+      - name: Upload Rollback Information
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: rollback-info
+          path: ./rollback-info
+          retention-days: 30
+
+      - name: Deployment Notification
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "🚀 Staging deployment successful!"
+            echo "Environment: https://staging.superhexlink.com"
+            echo "Commit: ${{ github.sha }}"
+            echo "Branch: ${{ github.ref_name }}"
+          else
+            echo "❌ Staging deployment failed!"
+            echo "Check the logs for details"
+          fi
+
+  cleanup:
+    name: Cleanup
+    runs-on: ubuntu-latest
+    needs: [deploy-staging]
+    if: always()
+    steps:
+      - name: Cleanup Temporary Resources
+        run: |
+          echo "Cleaning up temporary resources..."
+          # Add any cleanup logic here
+          echo "Cleanup completed"
