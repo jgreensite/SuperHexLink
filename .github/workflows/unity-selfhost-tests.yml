@@ -34,7 +34,7 @@ jobs:
 
       - name: Upload CoreLogic test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: corelogic-test-results
           path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
@@ -57,7 +57,7 @@ jobs:
           & $unityPath -batchmode -projectPath "$env:GITHUB_WORKSPACE" -runTests -testPlatform EditMode -testResults "$env:GITHUB_WORKSPACE\TestResults\editmode-results.xml" -logFile "$env:GITHUB_WORKSPACE\TestResults\unity-batch-log.txt" -quit
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unity-test-results
           path: TestResults/
