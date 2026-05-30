@@ -1,0 +1,846 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/game-rules-config.schema.json",
+  "title": "SuperHexLink Game Rules Configuration",
+  "description": "Comprehensive declarative rules system based on NotebookLM expert analysis for hex-based resource management games",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Configuration version for compatibility tracking",
+      "default": "1.0.0"
+    },
+    "gameMetadata": {
+      "type": "object",
+      "description": "Basic game information and settings",
+      "properties": {
+        "gameName": {
+          "type": "string",
+          "description": "Display name of the game",
+          "default": "SuperHexLink"
+        },
+        "playerCount": {
+          "type": "object",
+          "description": "Player count configuration",
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 6,
+              "default": 2
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 6,
+              "default": 4
+            },
+            "recommended": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 6,
+              "default": 3
+            }
+          }
+        },
+        "victoryConditions": {
+          "type": "object",
+          "description": "Victory condition configuration",
+          "properties": {
+            "victoryPoints": {
+              "type": "object",
+              "description": "Victory point thresholds",
+              "properties": {
+                "settlement": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "default": 1,
+                  "description": "VP per settlement"
+                },
+                "city": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "default": 2,
+                  "description": "VP per city"
+                },
+                "longestRoad": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "default": 2,
+                  "description": "VP for longest road"
+                },
+                "largestArmy": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "default": 2,
+                  "description": "VP for largest army"
+                },
+                "victoryThreshold": {
+                  "type": "integer",
+                  "minimum": 5,
+                  "maximum": 20,
+                  "default": 10,
+                  "description": "VP needed to win"
+                }
+              }
+            }
+        }
+      }
+    },
+    "resourceSystem": {
+      "type": "object",
+      "description": "Resource management and economic system based on NotebookLM liquid/frozen commodity research",
+      "properties": {
+        "resources": {
+          "type": "array",
+          "description": "Available resource types with economic classification",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique resource identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "economicRole": {
+                "type": "string",
+                "enum": ["source", "sink", "converter", "trader"],
+                "description": "Economic role based on NotebookLM research"
+              },
+              "commodityType": {
+                "type": "string",
+                "enum": ["liquid", "frozen"],
+                "description": "Liquid (easily traded) vs Frozen (construction materials) based on NotebookLM research"
+              },
+              "baseValue": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 10,
+                "description": "Base economic value for AI calculations"
+              },
+              "semanticTags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Semantic tags for AI rule generation coherence"
+              }
+            },
+            "required": ["id", "name", "economicRole", "commodityType"]
+          }
+        },
+        "economicBalancing": {
+          "type": "object",
+          "description": "Economic feedback control based on NotebookLM runaway leader prevention research",
+          "properties": {
+            "hoardingThreshold": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 15,
+              "default": 7,
+              "description": "Resource count triggering hoarding penalty (7+ card rule from Catan)"
+            },
+            "hoardingPenalty": {
+              "type": "string",
+              "enum": ["lose_half", "lose_third", "fixed_amount"],
+              "default": "lose_half",
+              "description": "Type of penalty for exceeding hoarding threshold"
+            },
+            "maintenanceCosts": {
+              "type": "object",
+              "description": "Maintenance costs for buildings (negative feedback loops)",
+              "properties": {
+                "perSettlement": {
+                  "type": "object",
+                  "properties": {
+                    "resource": {
+                      "type": "string",
+                      "description": "Resource type for maintenance"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 5,
+                      "default": 0
+                    }
+                  }
+                },
+                "perCity": {
+                  "type": "object",
+                  "properties": {
+                    "resource": {
+                      "type": "string",
+                      "description": "Resource type for maintenance"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 5,
+                      "default": 1
+                    }
+                  }
+                }
+              }
+            },
+            "exhaustionSystem": {
+              "type": "object",
+              "description": "Resource exhaustion for diminishing returns",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "exhaustionRate": {
+                  "type": "number",
+                  "minimum": 0.05,
+                  "maximum": 0.5,
+                  "default": 0.1,
+                  "description": "Production reduction per exhaustion level"
+                },
+                "maxExhaustion": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10,
+                  "default": 5,
+                  "description": "Maximum exhaustion level per hex"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "buildingSystem": {
+      "type": "object",
+      "description": "Building placement and upgrade rules",
+      "properties": {
+        "buildings": {
+          "type": "array",
+          "description": "Available building types",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique building identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["settlement", "city", "road"],
+                "description": "Building type"
+              },
+              "placementRules": {
+                "type": "object",
+                "description": "Placement validation rules",
+                "properties": {
+                  "requiresRoadConnection": {
+                    "type": "boolean",
+                    "description": "Must be connected to player's road network"
+                  },
+                  "distanceFromOtherBuildings": {
+                    "type": "object",
+                    "description": "Minimum distance from other buildings",
+                    "properties": {
+                      "settlements": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 5,
+                        "default": 2,
+                        "description": "Minimum edges from other settlements"
+                      },
+                      "cities": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 5,
+                        "default": 2,
+                        "description": "Minimum edges from other cities"
+                      }
+                    }
+                  },
+                  "placementLocations": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["corner", "edge"]
+                    },
+                    "description": "Valid placement locations"
+                  }
+                }
+              },
+              "resourceCost": {
+                "type": "object",
+                "description": "Resource cost to build",
+                "patternProperties": {
+                  "^[a-zA-Z]+$": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              },
+              "productionBonus": {
+                "type": "object",
+                "description": "Production bonuses provided",
+                "properties": {
+                  "multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 3,
+                    "default": 1,
+                    "description": "Production multiplier"
+                  },
+                  "additionalResources": {
+                    "type": "object",
+                    "description": "Additional resources produced",
+                    "patternProperties": {
+                      "^[a-zA-Z]+$": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "required": ["id", "name", "type", "placementRules", "resourceCost"]
+          }
+        }
+      }
+    },
+    "productionSystem": {
+      "type": "object",
+      "description": "Resource production from dice rolls",
+      "properties": {
+        "diceConfiguration": {
+          "type": "object",
+          "description": "Dice roll configuration",
+          "properties": {
+            "diceCount": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3,
+              "default": 2,
+              "description": "Number of dice to roll"
+            },
+            "diceSides": {
+              "type": "integer",
+              "minimum": 4,
+              "maximum": 12,
+              "default": 6,
+              "description": "Number of sides per die"
+            },
+            "productionNumbers": {
+              "type": "array",
+              "description": "Valid production numbers and their probabilities",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "number": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 12,
+                    "description": "Dice roll sum"
+                  },
+                  "probability": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Probability of this number"
+                  },
+                  "isCritical": {
+                    "type": "boolean",
+                    "description": "Whether this is a high-probability number (6, 8)"
+                  }
+                },
+                "required": ["number", "probability"]
+              }
+            }
+          }
+        },
+        "hexProduction": {
+          "type": "object",
+          "description": "Hex-based production rules",
+          "properties": {
+            "resourceDistribution": {
+              "type": "array",
+              "description": "Distribution of resources across hex types",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "hexType": {
+                    "type": "string",
+                    "description": "Hex terrain type"
+                  },
+                  "resource": {
+                    "type": "string",
+                    "description": "Resource produced"
+                  },
+                  "frequency": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "Frequency of this resource on this hex type"
+                  }
+                },
+                "required": ["hexType", "resource", "frequency"]
+              }
+            },
+            "productionRules": {
+              "type": "array",
+              "description": "Rules for calculating production",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Rule identifier"
+                  },
+                  "condition": {
+                    "type": "string",
+                    "description": "Lua script condition for production"
+                  },
+                  "action": {
+                    "type": "string",
+                    "description": "Lua script action for production calculation"
+                  },
+                  "priority": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Rule priority for conflict resolution"
+                  }
+                },
+                "required": ["id", "condition", "action"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "timingSystem": {
+      "type": "object",
+      "description": "Rule timing and priority system based on NotebookLM stack research",
+      "properties": {
+        "timingWindows": {
+          "type": "array",
+          "description": "Available timing windows for rule execution",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Timing window identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "executionOrder": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Order of execution (lower = earlier)"
+              },
+              "stackBehavior": {
+                "type": "string",
+                "enum": ["LIFO", "FIFO", "Simultaneous"],
+                "description": "Stack behavior for rules in this window"
+              }
+            },
+            "required": ["id", "name", "executionOrder", "stackBehavior"]
+          }
+        },
+        "rulePriorities": {
+          "type": "object",
+          "description": "Priority system for rule conflict resolution",
+          "properties": {
+            "priorityLayers": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 100,
+              "default": 100,
+              "description": "Number of priority layers available"
+            },
+            "conflictResolution": {
+              "type": "string",
+              "enum": ["specific_beats_general", "high_priority_wins", "last_in_wins"],
+              "default": "specific_beats_general",
+              "description": "Default conflict resolution strategy"
+            }
+          }
+        }
+      }
+    },
+    "semanticSystem": {
+      "type": "object",
+      "description": "Semantic ontology system for AI rule generation based on NotebookLM MDA research",
+      "properties": {
+        "mdaCategories": {
+          "type": "array",
+          "description": "MDA (Mechanics, Dynamics, Aesthetics) categories",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Category identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "description": {
+                "type": "string",
+                "description": "Category description"
+              },
+              "examples": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Example game elements in this category"
+              }
+            },
+            "required": ["id", "name", "description"]
+          }
+        },
+        "gameMechanics": {
+          "type": "array",
+          "description": "Game mechanics ontology from BoardGameGeek research",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Mechanic identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "primaryType": {
+                "type": "string",
+                "enum": ["Algorithm", "Data_Representation", "Action", "Resource", "Goal"],
+                "description": "Primary type classification"
+              },
+              "specificMechanics": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Specific sub-mechanics"
+              },
+              "economicRole": {
+                "type": "string",
+                "enum": ["source", "sink", "converter", "trader"],
+                "description": "Economic role in game economy"
+              },
+              "semanticTags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Semantic tags for AI coherence"
+              }
+            },
+            "required": ["id", "name", "primaryType", "economicRole"]
+          }
+        },
+        "semanticRelationships": {
+          "type": "array",
+          "description": "Semantic relationships between game elements",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "description": "Source element ID"
+              },
+              "to": {
+                "type": "string",
+                "description": "Target element ID"
+              },
+              "relationship": {
+                "type": "string",
+                "description": "Type of relationship"
+              },
+              "strength": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Relationship strength for AI reasoning"
+              }
+            },
+            "required": ["from", "to", "relationship"]
+          }
+        }
+      }
+    },
+    "tradingSystem": {
+      "type": "object",
+      "description": "Trading and exchange system",
+      "properties": {
+        "bankTrades": {
+          "type": "object",
+          "description": "Bank trading configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "defaultRate": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 6,
+              "default": 4,
+              "description": "Default resources given to receive 1"
+            },
+            "portTrades": {
+              "type": "array",
+              "description": "Special port trading rates",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "resource": {
+                    "type": "string",
+                    "description": "Resource type for this port"
+                  },
+                  "giveAmount": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "maximum": 4,
+                    "default": 2,
+                    "description": "Resources to give"
+                  },
+                  "getAmount": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2,
+                    "default": 1,
+                    "description": "Resources to receive"
+                  }
+                },
+                "required": ["resource", "giveAmount", "getAmount"]
+              }
+            }
+          }
+        },
+        "playerTrades": {
+          "type": "object",
+          "description": "Player-to-player trading",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "tradeValidation": {
+              "type": "string",
+              "enum": ["mutual_consent", "automatic", "moderated"],
+              "default": "mutual_consent",
+              "description": "Trade validation method"
+            }
+          }
+        }
+      }
+    },
+    "simulationHooks": {
+      "type": "object",
+      "description": "Monte Carlo simulation hooks for AI testing based on NotebookLM research",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "simulationConfig": {
+          "type": "object",
+          "description": "Simulation configuration",
+          "properties": {
+            "maxSimulations": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 100000,
+              "default": 10000,
+              "description": "Maximum simulations per evaluation"
+            },
+            "timeBudget": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 1000,
+              "default": 100,
+              "description": "Time budget in milliseconds"
+            },
+            "depthLimit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 10,
+              "description": "Maximum simulation depth"
+            }
+          }
+        },
+        "evaluationHooks": {
+          "type": "array",
+          "description": "Hooks for AI evaluation",
+          "items": {
+            "type": "object",
+            "properties": {
+              "eventType": {
+                "type": "string",
+                "description": "Event type for this hook"
+              },
+              "luaFunction": {
+                "type": "string",
+                "description": "Lua function to call for evaluation"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Hook priority"
+              }
+            },
+            "required": ["eventType", "luaFunction"]
+          }
+        }
+      }
+    },
+    "luaScripting": {
+      "type": "object",
+      "description": "Lua scripting configuration for custom rules",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "sandbox": {
+          "type": "object",
+          "description": "Lua sandbox configuration",
+          "properties": {
+            "memoryLimit": {
+              "type": "integer",
+              "minimum": 1024,
+              "maximum": 102400,
+              "default": 8192,
+              "description": "Memory limit per script in KB"
+            },
+            "executionTimeLimit": {
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 5000,
+              "default": 100,
+              "description": "Execution time limit in milliseconds"
+            },
+            "allowedLibraries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Allowed Lua libraries"
+            }
+          }
+        },
+        "customRules": {
+          "type": "array",
+          "description": "Custom Lua rules",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Rule identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name"
+              },
+              "description": {
+                "type": "string",
+                "description": "Rule description"
+              },
+              "timingWindow": {
+                "type": "string",
+                "description": "When this rule executes"
+              },
+              "condition": {
+                "type": "string",
+                "description": "Lua condition script"
+              },
+              "action": {
+                "type": "string",
+                "description": "Lua action script"
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Rule priority"
+              },
+              "enabled": {
+                "type": "boolean",
+                "default": true
+              }
+            },
+            "required": ["id", "name", "timingWindow", "condition", "action"]
+          }
+        }
+      }
+    },
+    "debugging": {
+      "type": "object",
+      "description": "Debugging and tracing configuration",
+      "properties": {
+        "ruleTracing": {
+          "type": "object",
+          "description": "Rule execution tracing",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "logLevel": {
+              "type": "string",
+              "enum": ["trace", "debug", "info", "warning", "error"],
+              "default": "info"
+            },
+            "maxTraceEntries": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 10000,
+              "default": 1000,
+              "description": "Maximum trace entries to keep"
+            }
+          }
+        },
+        "performanceProfiling": {
+          "type": "object",
+          "description": "Performance profiling for rules",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "sampleRate": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 1.0,
+              "default": 0.1,
+              "description": "Sampling rate for profiling"
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["version", "gameMetadata", "resourceSystem", "buildingSystem", "productionSystem"],
+  "additionalProperties": false
+}
