@@ -5,7 +5,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [Unreleased] — v0.3.0 Senior Code Review Uplift
+## [Unreleased] — v0.4.0
+
+### Added
+- `RulesEngine.cs` — declarative rules engine with `LuaSandbox`, `RegisteredRule`, `RuleExecutionContext` (Lua execution stub — wired in v0.5.0)
+- `RuleConflictResolver.cs` — specific-beats-general override system with `RuleScope` and `RuleBehavior` enums
+- `RuleTimingSystem.cs` — time-based rule activation and expiration
+- `GameOntology.cs` — game concept taxonomy and entity relationship model
+- `EconomicBalancer.cs` — resource balance analysis and rebalancing recommendations
+- `HeadlessGameState.cs` — pure C# Monte Carlo simulation framework (6 action types: PlaceSettlement, PlaceRoad, PlaceCity, RollDice, TradeResources, EndTurn)
+- `IGameAction.cs` — Command pattern interface for game actions; all actions implement it
+- `ISpawner` interface — common contract for all spawners; `GameSpawner` iterates via `IEnumerable<ISpawner>`
+- `HexFactory.cs` — hex prefab instantiation service (extracted from `HexSpawner`)
+- `HexRegistry.cs` — live hex reference tracking with O(1) lookup by `(col, row)`
+- `SelectionManager.cs` — hex selection/deselection service (extracted from `HexSpawner`)
+- `SaveLoadService.cs` — centralized persistence service; `GameSpawner` delegates to it
+- `TurnManager.cs` — player rotation and phase tracking (Roll → Build → Trade → End)
+- `DiceRoller.cs` — two-dice mechanic seeded from `Rng`; statistical distribution verified
+- `ResourceManager.cs` — per-player resource tracking; produces on dice roll
+- `ProductionEngine.cs` — resolves which hexes produce on a given roll
+- `PlacementValidator.cs` — settlement, road, and city placement rules (adjacency, ownership, cost)
+- `VictoryChecker.cs` — win detection at 10 VP; counts settlements, cities, longest road, largest army
+- `BoardHasher.cs` — deterministic board state hash for reproducibility tests
+- Tests: `DiceRollerTests`, `HexFactoryTests`, `HexRegistryTests`, `ISpawnerTests`, `ResourceManagerTests`, `RuleConflictResolverTests`, `RulesEngineTests`, `SaveLoadServiceTests`, `SelectionManagerTests`, `TurnManagerTests`
+
+### Changed
+- `GameSpawner` — all `GameObject.Find` calls replaced with `[SerializeField]` inspector references; `AllSpawners` exposed as `IEnumerable<ISpawner>`
+- `EdgeSpawner.BuildMe(bool isRefresh)` — fully implemented with Clear/Refresh logic
+- `CornerSpawner.BuildMe(bool isRefresh)` — fully implemented with Clear/Refresh logic
+- `GameConstants.GAMESERVERREMOTEADDRESS` — hardcoded IP replaced with `"127.0.0.1"`; marked `[Obsolete]` pointing to `ServerConfig.Load()`
+
+---
+
+## [v0.3.0] — 2026-02-13 — Senior Code Review Uplift
 
 ### Added
 - `BACKLOG.md` — structured product roadmap with Epics, Features, Stories (now 7 Epics)

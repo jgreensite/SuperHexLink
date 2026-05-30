@@ -3,11 +3,26 @@
 > **For the full product roadmap** (Epics, Features, Stories), see [`BACKLOG.md`](../BACKLOG.md).
 > This file tracks immediate tactical work items and known technical debt.
 
-**Last Updated**: February 2026
+**Last Updated**: May 2026
 
 ---
 
-## Recently Completed (v0.3.0 Uplift)
+## Recently Completed (v0.4.0 Gameplay MVP)
+
+- [x] `EdgeSpawner.BuildMe` — implemented with Clear/Refresh logic (`E1-F2-S1`)
+- [x] `CornerSpawner.BuildMe` — implemented with Clear/Refresh logic (`E1-F2-S2`)
+- [x] `BoardHasher` — deterministic board state hash utility (`E1-F3-S1`)
+- [x] `GameSpawner` — replaced all `GameObject.Find` with `[SerializeField]` (`E3-F1-S1`)
+- [x] `ISpawner` interface + all spawners implement it; `AllSpawners` as `IEnumerable<ISpawner>` (`E3-F1-S2`)
+- [x] `HexFactory`, `HexRegistry`, `SelectionManager` — extracted from `HexSpawner` (`E3-F2`)
+- [x] `SaveLoadService` — centralized persistence service (`E3-F3-S1`)
+- [x] `TurnManager`, `DiceRoller` — turn management and dice mechanic (`E4-F1`)
+- [x] `ResourceManager`, `ProductionEngine` — resource production on dice roll (`E4-F2`)
+- [x] `PlacementValidator` — settlement, road, city placement rules (`E4-F3`)
+- [x] `VictoryChecker` — 10 VP win detection (`E4-F4`)
+- [x] `RulesEngine`, `RuleConflictResolver`, `RuleTimingSystem`, `GameOntology`, `EconomicBalancer` (`E8-F1`)
+- [x] `HeadlessGameState`, `IGameAction` — Monte Carlo simulation framework (`E9-F1`)
+- [x] Tests: `DiceRollerTests`, `HexFactoryTests`, `HexRegistryTests`, `ISpawnerTests`, `ResourceManagerTests`, `RuleConflictResolverTests`, `RulesEngineTests`, `SaveLoadServiceTests`, `SelectionManagerTests`, `TurnManagerTests`
 
 - [x] `GameConstants` — `static` → `const`, `materialMap` → `MaterialMap`, removed empty `Start()`
 - [x] `SpawnerBase` — promoted `IsConfiguredEmpty` to base, removed unused imports
@@ -42,26 +57,27 @@
 
 ## Immediate Next Steps
 
-See `BACKLOG.md` for the detailed breakdown. Summary:
+See `BACKLOG.md` and `ROADMAP.md` for the full breakdown. Summary of what's actually missing:
 
 | Priority | Item | Backlog ID |
 |----------|------|------------|
-| **High** | Implement EdgeSpawner.BuildMe from saved state | `E1-F2-S1` |
-| **High** | Implement CornerSpawner.BuildMe from saved state | `E1-F2-S2` |
-| **High** | End-to-end save/load round-trip test | `E1-F2-S3` |
-| **High** | Activate Unity license on CI runner | `E2-F1-S5` |
-| **Medium** | Replace `GameObject.Find` in GameSpawner | `E3-F1-S1` |
-| **Medium** | Add code coverage reporting | `E2-F1-S6` |
+| **Critical** | Add MoonSharp NuGet + wire real Lua in `RulesEngine.ExecuteScriptInternal` | `E8-F2-S1` |
+| **Critical** | Create `UnityGameStateBridge` (`ExtractFromScene` / `ApplyToScene`) | `E9-F2-S1` |
+| **High** | Add 5 missing test files: `RuleTimingSystemTests`, `GameOntologyTests`, `EconomicBalancerTests`, `HeadlessGameStateTests`, `IGameActionTests` | `E9-F3` |
+| **High** | Activate Unity Personal license (`.ulf`) and add to GitHub secrets for GameCI | `E2-F1-S5` |
+| **Medium** | Add code coverage reporting for CoreLogic (coverlet + ReportGenerator) | `E2-F1-S6` |
+| **Low** | Async save with progress callback | `E3-F3-S2` |
 
 ## Known Technical Debt
 
 | Severity | Issue | Backlog Ref |
 |----------|-------|-------------|
-| High | `GameObject.Find` coupling in `GameSpawner` | `E3-F1-S1` |
-| High | Mixed responsibilities in `HexSpawner` (factory + registry + selection) | `E3-F2` |
+| High | `RulesEngine.ExecuteScriptInternal` is a stub — MoonSharp not yet wired | `E8-F2-S1` |
+| High | `UnityGameStateBridge` not yet created — Unity scene ↔ HeadlessGameState roundtrip missing | `E9-F2-S1` |
+| High | 5 test files missing: `RuleTimingSystem`, `GameOntology`, `EconomicBalancer`, `HeadlessGameState`, `IGameAction` | `E9-F3` |
+| High | Unity EditMode CI not running — no `.ulf` license secret in GitHub | `E2-F1-S5` |
 | Medium | No object pooling — `Instantiate`/`Destroy` causes GC pressure | `E6-F1-S1` |
 | Medium | Synchronous JSON save on main thread | `E3-F3-S2` |
-| Medium | Hardcoded server address/port in `GameConstants` (WARNING comment added, needs runtime config) | `E3-F3` |
 | Low | `GameUIManager` should use UQuery for element selection | — |
 | Low | `HexLandModel` contains leftover old hex model code | — |
 
@@ -69,14 +85,16 @@ See `BACKLOG.md` for the detailed breakdown. Summary:
 
 | Area | What's Missing | Backlog Ref |
 |------|----------------|-------------|
-| CoreLogic | ~~Distance calculations~~ (done), ~~boundary tests~~ (done) | — |
-| Unity | EdgeSpawner/CornerSpawner state reconstruction | `E1-F2` |
-| Unity | Deterministic board recreation (hash comparison) | `E1-F3` |
-| E2E | Generate → Save → Clear → Load → Verify identical | `E1-F2-S3` |
-| Perf | Load 1000+ hex board benchmark | — |
+| Rules | `RuleTimingSystemTests.cs` | `E9-F3-S1` |
+| Rules | `GameOntologyTests.cs` | `E9-F3-S2` |
+| Rules | `EconomicBalancerTests.cs` | `E9-F3-S3` |
+| Simulation | `HeadlessGameStateTests.cs` | `E9-F3-S4` |
+| Simulation | `IGameActionTests.cs` | `E9-F3-S5` |
+| Rules (integration) | `RulesEngineIntegrationTests.cs` — real Lua execution via MoonSharp | `E8-F2-S1` |
+| Integration | `UnityIntegrationTests.cs` — round-trip via `UnityGameStateBridge` | `E9-F2-S1` |
 
 ---
 
-**Next review**: After Edge & Corner reconstruction is complete (v0.4.0).
+**Next review**: After MoonSharp + UnityGameStateBridge complete (v0.5.0).
 
-> **v0.3.0 Senior Uplift is complete.** See `BACKLOG.md` Epic 7 for the full list of security, performance, and onboarding work delivered.
+> **v0.4.0 Gameplay MVP is complete.** See `BACKLOG.md` Epics 1–4, 8-F1, 9-F1 for the full list of delivered work.
