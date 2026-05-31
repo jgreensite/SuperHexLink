@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
-using SuperHexLink.CoreLogic;
 using SuperHexLink.Logging;
 
 namespace SuperHexLink.Rules

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SuperHexLink.CoreLogic;
 using SuperHexLink.Logging;
 using SuperHexLink.Rules;
 
