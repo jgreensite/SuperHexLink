@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -72,7 +72,6 @@ namespace SuperHexLink.Performance
         void Start()
         {
             _logSettings = new ActionLogSettings();
-            _logSettings.EnableCategory(ActionLogCategory.Performance, true);
             
             // Initialize performance monitoring
             PerformanceMetrics.Initialize(_logSettings);
@@ -87,7 +86,7 @@ namespace SuperHexLink.Performance
             }
             
             // Log dashboard initialization
-            ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                 "Performance dashboard initialized");
         }
 
@@ -170,7 +169,7 @@ namespace SuperHexLink.Performance
                 _isVisible = true;
                 UpdateDashboard();
                 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                     "Performance dashboard shown");
             }
         }
@@ -185,7 +184,7 @@ namespace SuperHexLink.Performance
                 dashboardPanel.SetActive(false);
                 _isVisible = false;
                 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                     "Performance dashboard hidden");
             }
         }
@@ -221,7 +220,7 @@ namespace SuperHexLink.Performance
             }
             catch (Exception ex)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Error, 
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error, 
                     $"Error updating dashboard: {ex.Message}");
             }
         }
@@ -274,17 +273,17 @@ namespace SuperHexLink.Performance
                     double trend = metric.value - display.lastValue;
                     if (Math.Abs(trend) < 0.01)
                     {
-                        display.trendText.text = "→";
+                        display.trendText.text = "â†’";
                         display.trendText.color = Color.gray;
                     }
                     else if (trend > 0)
                     {
-                        display.trendText.text = "↑";
+                        display.trendText.text = "â†‘";
                         display.trendText.color = Color.red;
                     }
                     else
                     {
-                        display.trendText.text = "↓";
+                        display.trendText.text = "â†“";
                         display.trendText.color = Color.green;
                     }
                     
@@ -478,7 +477,7 @@ namespace SuperHexLink.Performance
                 display.lastValue = 0;
             }
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                 "Performance metrics reset from dashboard");
         }
 
@@ -493,7 +492,7 @@ namespace SuperHexLink.Performance
                 Destroy(child.gameObject);
             }
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                 "Performance alerts cleared from dashboard");
         }
 

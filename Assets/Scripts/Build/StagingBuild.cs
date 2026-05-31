@@ -64,7 +64,7 @@ namespace SuperHexLink.Build
                 // Log any errors
                 foreach (var step in buildReport.steps)
                 {
-                    if (step.messages.Count > 0)
+                    if (step.messages.Length > 0)
                     {
                         Debug.LogError($"Build step '{step.name}' errors:");
                         foreach (var message in step.messages)
@@ -100,8 +100,8 @@ namespace SuperHexLink.Build
             PlayerSettings.bundleVersion = GetStagingVersion();
             
             // Ensure development build is enabled for debugging
-            PlayerSettings.development = true;
-            PlayerSettings.scriptDebuggingEnabled = true;
+            EditorUserBuildSettings.development = true;
+            EditorUserBuildSettings.allowDebugging = true;
             
             // Configure quality settings for staging
             QualitySettings.SetQualityLevel(2, true); // Good quality for testing
@@ -189,15 +189,15 @@ namespace SuperHexLink.Build
                 unityVersion = Application.unityVersion,
                 targetPlatform = buildReport.summary.platform.ToString(),
                 buildSize = buildReport.summary.totalSize,
-                buildTime = buildReport.summary.totalTime.ToString(),
+                buildDuration = buildReport.summary.totalTime.ToString(),
                 commitHash = Environment.GetEnvironmentVariable("GITHUB_SHA") ?? "local",
                 branch = Environment.GetEnvironmentVariable("GITHUB_REF_NAME") ?? "local",
                 environment = "staging",
                 scenes = GetScenes(),
                 buildOptions = new
                 {
-                    development = PlayerSettings.development,
-                    scriptDebugging = PlayerSettings.scriptDebuggingEnabled,
+                    development = EditorUserBuildSettings.development,
+                    scriptDebugging = EditorUserBuildSettings.allowDebugging,
                     compression = "LZ4"
                 }
             };
@@ -220,7 +220,7 @@ namespace SuperHexLink.Build
             bool isValid = true;
             
             // Check if Unity license is available
-            if (!Application.HasUserAuthorization(UserAuthorization.MotionTracking))
+            if (!Application.HasUserAuthorization(UserAuthorization.WebCam))
             {
                 Debug.LogWarning("⚠️ Unity license may not be properly configured");
             }

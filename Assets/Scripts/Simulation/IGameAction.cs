@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SuperHexLink.Simulation
 {
@@ -87,8 +88,10 @@ namespace SuperHexLink.Simulation
             var dice2 = random.Next(1, 7);
             var roll = dice1 + dice2;
 
-            state.CurrentTurn.DiceRoll = roll;
-            state.CurrentTurn.Phase = TurnPhase.Build;
+            var turn = state.CurrentTurn;
+            turn.DiceRoll = roll;
+            turn.Phase = TurnPhase.Build;
+            state.CurrentTurn = turn;
 
             // Calculate production based on roll
             CalculateProduction(ref state, roll);
@@ -136,7 +139,9 @@ namespace SuperHexLink.Simulation
                     if (playerResources.ContainsKey(result.ResourceType))
                     {
                         playerResources[result.ResourceType] += result.Amount;
-                        state.EconomicState.TotalResourcesProduced += result.Amount;
+                        var eco0 = state.EconomicState;
+                        eco0.TotalResourcesProduced += result.Amount;
+                        state.EconomicState = eco0;
                     }
                 }
             }
@@ -222,7 +227,9 @@ namespace SuperHexLink.Simulation
 
             // Update victory points
             playerState.VictoryPoints += 1;
-            state.EconomicState.TotalBuildingsConstructed += 1;
+            var eco1 = state.EconomicState;
+            eco1.TotalBuildingsConstructed += 1;
+            state.EconomicState = eco1;
         }
 
         public bool IsValid(HeadlessGameState state)
@@ -324,7 +331,9 @@ namespace SuperHexLink.Simulation
                 edge.OwnerId = PlayerId;
             }
 
-            state.EconomicState.TotalBuildingsConstructed += 1;
+            var eco2 = state.EconomicState;
+            eco2.TotalBuildingsConstructed += 1;
+            state.EconomicState = eco2;
         }
 
         public bool IsValid(HeadlessGameState state)
@@ -579,10 +588,12 @@ namespace SuperHexLink.Simulation
         {
             // Move to next player
             var nextPlayerId = (PlayerId + 1) % state.Players.Count;
-            state.CurrentTurn.CurrentPlayerId = nextPlayerId;
-            state.CurrentTurn.TurnNumber++;
-            state.CurrentTurn.Phase = TurnPhase.Roll;
-            state.CurrentTurn.DiceRoll = 0;
+            var endTurn = state.CurrentTurn;
+            endTurn.CurrentPlayerId = nextPlayerId;
+            endTurn.TurnNumber++;
+            endTurn.Phase = TurnPhase.Roll;
+            endTurn.DiceRoll = 0;
+            state.CurrentTurn = endTurn;
 
             // Update game phase based on turn number
             if (state.CurrentTurn.TurnNumber <= 4)
@@ -592,7 +603,9 @@ namespace SuperHexLink.Simulation
             else
                 state.GamePhase = GamePhase.LateGame;
 
-            state.EconomicState.EconomicCycles++;
+            var eco3 = state.EconomicState;
+            eco3.EconomicCycles++;
+            state.EconomicState = eco3;
         }
 
         public bool IsValid(HeadlessGameState state)

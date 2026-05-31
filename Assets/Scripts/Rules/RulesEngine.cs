@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoonSharp.Interpreter;
@@ -143,7 +143,7 @@ namespace SuperHexLink.Rules
 
                     result.ExecutionTime = DateTime.UtcNow - startTime;
 
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Debug,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                         "Lua script executed in {0}ms", result.ExecutionTime.TotalMilliseconds);
                 }
                 catch (Exception ex)
@@ -152,7 +152,7 @@ namespace SuperHexLink.Rules
                     result.ErrorMessage = ex.Message;
                     result.ExecutionTime = DateTime.UtcNow - startTime;
 
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                         "Lua script execution failed: {0}", ex.Message);
                 }
 
@@ -227,7 +227,7 @@ namespace SuperHexLink.Rules
 
                 // Wire print() to the action logger
                 luaScript.Globals["print"] = (Action<object>)(
-                    val => ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+                    val => ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "Lua print: {0}", val?.ToString() ?? "nil"));
 
                 DynValue returnValue = luaScript.DoString(script);
@@ -243,7 +243,7 @@ namespace SuperHexLink.Rules
             // Safe Lua library implementations
             private void SafePrint(object value)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Lua print: {0}", value?.ToString() ?? "nil");
             }
 
@@ -387,14 +387,14 @@ namespace SuperHexLink.Rules
                 // Store rule
                 _registeredRules[rule.Id] = rule;
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Registered rule {0}: {1}", rule.Id, rule.Name);
 
                 return true;
             }
             catch (Exception ex)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Failed to register rule {0}: {1}", rule.Id, ex.Message);
                 return false;
             }
@@ -407,21 +407,21 @@ namespace SuperHexLink.Rules
         {
             if (string.IsNullOrWhiteSpace(rule.Id))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule validation failed: ID is required");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(rule.ConditionScript))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule validation failed: Condition script is required");
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(rule.ActionScript))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule validation failed: Action script is required");
                 return false;
             }
@@ -430,7 +430,7 @@ namespace SuperHexLink.Rules
             var conditionValidation = _luaSandbox.ExecuteScript($"return {rule.ConditionScript}", new Dictionary<string, object>());
             if (!conditionValidation.Success)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule validation failed: Condition script error - {0}", conditionValidation.ErrorMessage);
                 return false;
             }
@@ -438,7 +438,7 @@ namespace SuperHexLink.Rules
             var actionValidation = _luaSandbox.ExecuteScript(rule.ActionScript, new Dictionary<string, object>());
             if (!actionValidation.Success)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule validation failed: Action script error - {0}", actionValidation.ErrorMessage);
                 return false;
             }
@@ -485,12 +485,12 @@ namespace SuperHexLink.Rules
                     }
                 }
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Executed {0} rules for event {1}", results.Count, eventType);
             }
             catch (Exception ex)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule execution failed for event {0}: {1}", eventType, ex.Message);
                 
                 results.Add(new RuleExecutionResult
@@ -559,7 +559,7 @@ namespace SuperHexLink.Rules
                     result.ReturnValue = executionResult.ReturnValue;
                     result.ExecutionTime = DateTime.UtcNow - startTime;
 
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Debug,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                         "Rule {0} executed successfully in {1}ms", rule.Id, result.ExecutionTime.TotalMilliseconds);
                 }
                 else
@@ -568,7 +568,7 @@ namespace SuperHexLink.Rules
                     result.ErrorMessage = executionResult.ErrorMessage;
                     result.ExecutionTime = DateTime.UtcNow - startTime;
 
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                         "Rule {0} execution failed: {1}", rule.Id, result.ErrorMessage);
                 }
             }
@@ -578,7 +578,7 @@ namespace SuperHexLink.Rules
                 result.ErrorMessage = ex.Message;
                 result.ExecutionTime = DateTime.UtcNow - startTime;
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule {0} execution exception: {1}", rule.Id, ex.Message);
             }
 
@@ -621,14 +621,14 @@ namespace SuperHexLink.Rules
         {
             if (!_registeredRules.TryGetValue(ruleId, out var rule))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Rule {0} not found", ruleId);
                 return false;
             }
 
             rule.Enabled = enabled;
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Rule {0} {1}", ruleId, enabled ? "enabled" : "disabled");
 
             return true;
@@ -657,12 +657,12 @@ namespace SuperHexLink.Rules
         {
             if (!_registeredRules.Remove(ruleId))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Rule {0} not found for unregistration", ruleId);
                 return false;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Unregistered rule {0}", ruleId);
 
             return true;

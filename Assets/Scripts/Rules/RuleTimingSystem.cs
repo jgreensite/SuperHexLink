@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.Logging;
@@ -56,7 +56,7 @@ namespace SuperHexLink.Rules
                 _timingWindows[window] = new List<TimedRule>();
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Initialized {0} timing windows", timingWindows.Length);
         }
 
@@ -67,7 +67,7 @@ namespace SuperHexLink.Rules
         {
             if (!_timingWindows.ContainsKey(rule.TimingWindow))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Unknown timing window: {0}", rule.TimingWindow);
                 return;
             }
@@ -78,7 +78,7 @@ namespace SuperHexLink.Rules
             // Sort the timing window by priority (higher priority first)
             _timingWindows[rule.TimingWindow].Sort((a, b) => b.PriorityLayer.CompareTo(a.PriorityLayer));
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Registered rule {0} in timing window {1} with priority {2} (behavior: {3})",
                 rule.RuleId, rule.TimingWindow, rule.PriorityLayer, rule.StackBehavior);
         }
@@ -96,13 +96,13 @@ namespace SuperHexLink.Rules
                     timingWindow.Remove(rule);
                     _rulePriorities.Remove(ruleId);
                     
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "Unregistered rule {0}", ruleId);
                     return;
                 }
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                 "Rule {0} not found for unregistration", ruleId);
         }
 
@@ -119,7 +119,7 @@ namespace SuperHexLink.Rules
 
             if (!_timingWindows.ContainsKey(timingWindow))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Unknown timing window: {0}", timingWindow);
                 return results;
             }
@@ -127,12 +127,12 @@ namespace SuperHexLink.Rules
             var rules = _timingWindows[timingWindow];
             if (!rules.Any())
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "No rules registered for timing window: {0}", timingWindow);
                 return results;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Executing {0} rules in timing window: {1}", rules.Count, timingWindow);
 
             switch (GetStackBehavior(rules))
@@ -259,7 +259,7 @@ namespace SuperHexLink.Rules
                         ExecutionTime = DateTime.UtcNow - execution.StartTime
                     };
 
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "Rule {0} skipped: condition not met", rule.RuleId);
                     return execution.Result;
                 }
@@ -280,7 +280,7 @@ namespace SuperHexLink.Rules
                 // Add to execution stack for tracking
                 _executionStack.Push(execution);
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Rule {0} executed: {1} (took {2}ms)", 
                     rule.RuleId, execution.Result.Success ? "Success" : "Failed", 
                     execution.Result.ExecutionTime.TotalMilliseconds);
@@ -297,7 +297,7 @@ namespace SuperHexLink.Rules
                     ExecutionTime = DateTime.UtcNow - execution.StartTime
                 };
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Rule {0} failed with exception: {1}", rule.RuleId, ex.Message);
 
                 return execution.Result;
@@ -465,7 +465,7 @@ namespace SuperHexLink.Rules
                 _executionStack.Pop();
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Cleared execution history");
         }
 

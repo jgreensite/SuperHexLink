@@ -38,7 +38,8 @@ namespace SuperHexLink.Services
 
             // Calculate position and instantiate
             Vector3 position = CalculateHexPosition(col, row, gridConfig);
-            Hex newHex = Object.Instantiate(hexPrefab, position, Quaternion.identity, parent);
+            GameObject hexObj = Object.Instantiate(hexPrefab, position, Quaternion.identity, parent);
+            Hex newHex = hexObj.GetComponent<Hex>();
 
             // Configure scale
             Vector3 scale = new Vector3(
@@ -75,7 +76,8 @@ namespace SuperHexLink.Services
                 return null;
             }
 
-            TextMeshPro hexText = Object.Instantiate(hexTextPrefab, parent);
+            GameObject hexTextObj = Object.Instantiate(hexTextPrefab, parent);
+            TextMeshPro hexText = hexTextObj.GetComponent<TextMeshPro>();
             hexText.name = "hexText";
 
             ActionLogger.Log(_logSettings, ActionLogCategory.HexLifecycle, ActionLogSeverity.Debug,

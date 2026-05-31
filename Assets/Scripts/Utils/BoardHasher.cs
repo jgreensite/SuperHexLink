@@ -220,6 +220,8 @@ namespace SuperHexLink.Utils
 
             // Sort hexes by coordinates for deterministic ordering
             var sortedHexes = hexSpawner.State.hexes
+                .Where(row => row != null)
+                .SelectMany(row => row)
                 .Where(h => h != null)
                 .OrderBy(h => h.Col)
                 .ThenBy(h => h.Row)

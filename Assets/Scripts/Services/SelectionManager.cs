@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace SuperHexLink.Services
         private readonly GameConstants _gameConstants;
         private readonly ActionLogSettings _logSettings;
         private readonly Dictionary<string, int> _selectionAttempts;
-        private readonly System.Random _random;
+        private System.Random _random;
 
         public SelectionManager(GameConstants gameConstants, ActionLogSettings logSettings = null)
         {
@@ -36,14 +36,14 @@ namespace SuperHexLink.Services
         {
             if (hex == null)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "SelectionManager: Cannot select type for null hex");
                 return new SelectionResult(GameConstants.CAR_TYPE_WORD_NULL, null, false, false, 0);
             }
 
             if (candidates == null || candidates.Count == 0)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     $"SelectionManager: No candidates available for hex at ({hex.hexState?.Col ?? -1}, {hex.hexState?.Row ?? -1})");
                 return new SelectionResult(GameConstants.CAR_TYPE_WORD_NULL, null, false, false, 0);
             }
@@ -61,7 +61,7 @@ namespace SuperHexLink.Services
                 var rule = _gameConstants?.GetPlacementRule(candidate);
                 if (rule == null)
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Debug,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                         $"SelectionManager: No placement rule for '{candidate}', using as candidate");
                     return new SelectionResult(candidate, null, true, false, iteration);
                 }
@@ -77,7 +77,7 @@ namespace SuperHexLink.Services
                 // Check if placement is allowed
                 if (AllowsPlacement(rule, hex))
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Debug,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                         $"SelectionManager: Selected '{candidate}' for hex at ({hex.hexState.Col}, {hex.hexState.Row}) after {attemptCount} attempts");
                     return new SelectionResult(candidate, rule, true, false, attemptCount);
                 }
@@ -86,7 +86,7 @@ namespace SuperHexLink.Services
                 if (attemptCount >= Math.Max(rule.maxAttemptsBeforeFallback, 1))
                 {
                     string fallback = string.IsNullOrEmpty(rule.fallbackHexType) ? GameConstants.CAR_TYPE_SEA : rule.fallbackHexType;
-                    ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         $"SelectionManager: Using fallback '{fallback}' for hex at ({hex.hexState.Col}, {hex.hexState.Row}) after {attemptCount} attempts with rule '{rule.ruleName}'");
                     return new SelectionResult(fallback, rule, false, true, attemptCount);
                 }
@@ -96,7 +96,7 @@ namespace SuperHexLink.Services
             string fallbackType = candidates[iteration % candidates.Count];
             var fallbackRule = _gameConstants?.GetPlacementRule(fallbackType);
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Warning,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                 $"SelectionManager: Exhausted {maxIterations} iterations, falling back to '{fallbackType}' for hex at ({hex.hexState.Col}, {hex.hexState.Row})");
             
             return new SelectionResult(fallbackType, fallbackRule, true, false, iteration);
@@ -117,7 +117,7 @@ namespace SuperHexLink.Services
         public void ClearStatistics()
         {
             _selectionAttempts.Clear();
-            ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Debug,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                 "SelectionManager: Cleared selection statistics");
         }
 
@@ -167,7 +167,7 @@ namespace SuperHexLink.Services
                 }
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Debug,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                 $"SelectionManager: Found {validCandidates.Count} valid candidates out of {allCandidates.Count} for hex at ({hex.hexState.Col}, {hex.hexState.Row})");
 
             return validCandidates;
@@ -211,7 +211,7 @@ namespace SuperHexLink.Services
         public void SetRandomSeed(int seed)
         {
             _random = new System.Random(seed);
-            ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Debug,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                 $"SelectionManager: Set random seed to {seed}");
         }
 
@@ -252,7 +252,7 @@ namespace SuperHexLink.Services
             var filtered = candidates.Where(candidate => 
                 !excludeTypes.Contains(candidate, StringComparer.OrdinalIgnoreCase)).ToList();
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.HexSelection, ActionLogSeverity.Debug,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                 $"SelectionManager: Filtered {candidates.Count} candidates to {filtered.Count} after excluding {excludeTypes.Count} types");
 
             return filtered;

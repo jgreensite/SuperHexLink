@@ -220,7 +220,7 @@ namespace SuperHexLink.Simulation
             // Bank trades (4:1)
             foreach (var resource in playerState.Resources.Where(r => r.Value >= 4))
             {
-                foreach (var targetResource in Enum.GetValues<ResourceType>())
+                foreach (var targetResource in (ResourceType[])Enum.GetValues(typeof(ResourceType)))
                 {
                     if (targetResource != resource.Key)
                     {
@@ -549,10 +549,11 @@ namespace SuperHexLink.Simulation
 
         public bool Equals(HeadlessGameState other)
         {
+            var players = Players;
             return HexGrid.Equals(other.HexGrid) &&
-                   Players.Count == other.Players.Count &&
-                   Players.All(kvp => other.Players.ContainsKey(kvp.Key) && 
-                                     Players[kvp.Key].Equals(other.Players[kvp.Key])) &&
+                   players.Count == other.Players.Count &&
+                   players.All(kvp => other.Players.ContainsKey(kvp.Key) && 
+                                     players[kvp.Key].Equals(other.Players[kvp.Key])) &&
                    CurrentTurn.Equals(other.CurrentTurn) &&
                    GamePhase == other.GamePhase;
         }
@@ -592,7 +593,7 @@ namespace SuperHexLink.Simulation
 
             // Generate hex grid
             var random = new Random();
-            var resourceTypes = Enum.GetValues<ResourceType>();
+            var resourceTypes = (ResourceType[])Enum.GetValues(typeof(ResourceType));
             
             for (int q = 0; q < width; q++)
             {
@@ -642,9 +643,10 @@ namespace SuperHexLink.Simulation
 
         public bool Equals(HexGridData other)
         {
-            return Hexes.Count == other.Hexes.Count &&
-                   Hexes.All(kvp => other.Hexes.ContainsKey(kvp.Key) && 
-                                    Hexes[kvp.Key].Equals(other.Hexes[kvp.Key]));
+            var hexes = Hexes;
+            return hexes.Count == other.Hexes.Count &&
+                   hexes.All(kvp => other.Hexes.ContainsKey(kvp.Key) && 
+                                    hexes[kvp.Key].Equals(other.Hexes[kvp.Key]));
         }
 
         public override int GetHashCode()

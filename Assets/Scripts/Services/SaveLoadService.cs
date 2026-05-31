@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using Sirenix.Serialization;
 using SuperHexLink.Logging;
 
 namespace SuperHexLink.Services
@@ -50,8 +49,7 @@ namespace SuperHexLink.Services
                 Directory.CreateDirectory(directory);
 
                 // Serialize the game state
-                byte[] serializedData = SirenixSerializationUtility.SerializeUnityObject(gameState, DataFormat.JSON);
-                string jsonContent = System.Text.Encoding.UTF8.GetString(serializedData);
+                string jsonContent = JsonUtility.ToJson(gameState);
 
                 // Write to file
                 File.WriteAllText(targetPath, jsonContent);
@@ -141,12 +139,11 @@ namespace SuperHexLink.Services
                         return new LoadResult(false, error, null, targetPath);
                     }
 
-                    jsonContent = conversionResult.ConvertedJson;
+                    jsonContent = JsonUtility.ToJson(conversionResult.ConvertedState);
                 }
 
                 // Deserialize game state
-                byte[] serializedData = System.Text.Encoding.UTF8.GetBytes(jsonContent);
-                GameSpawner.GameSpawnerState gameState = SirenixSerializationUtility.DeserializeUnityObject<GameSpawner.GameSpawnerState>(serializedData, DataFormat.JSON);
+                GameSpawner.GameSpawnerState gameState = JsonUtility.FromJson<GameSpawner.GameSpawnerState>(jsonContent);
 
                 if (gameState == null)
                 {
@@ -206,8 +203,7 @@ namespace SuperHexLink.Services
                     progressCallback?.Report(0.4f);
 
                     // Serialize the game state
-                    byte[] serializedData = SirenixSerializationUtility.SerializeUnityObject(gameState, DataFormat.JSON);
-                    string jsonContent = System.Text.Encoding.UTF8.GetString(serializedData);
+                    string jsonContent = JsonUtility.ToJson(gameState);
 
                     progressCallback?.Report(0.7f);
 
@@ -319,14 +315,13 @@ namespace SuperHexLink.Services
                             return new LoadResult(false, error, null, targetPath);
                         }
 
-                        jsonContent = conversionResult.ConvertedJson;
+                        jsonContent = JsonUtility.ToJson(conversionResult.ConvertedState);
                     }
 
                     progressCallback?.Report(0.8f);
 
                     // Deserialize game state
-                    byte[] serializedData = System.Text.Encoding.UTF8.GetBytes(jsonContent);
-                    GameSpawner.GameSpawnerState gameState = SirenixSerializationUtility.DeserializeUnityObject<GameSpawner.GameSpawnerState>(serializedData, DataFormat.JSON);
+                    GameSpawner.GameSpawnerState gameState = JsonUtility.FromJson<GameSpawner.GameSpawnerState>(jsonContent);
 
                     if (gameState == null)
                     {

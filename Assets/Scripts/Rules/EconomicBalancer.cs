@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.Logging;
@@ -50,18 +50,18 @@ namespace SuperHexLink.Rules
                     if (remainingPenalty <= 0) break;
 
                     var toRemove = Math.Min(resource.Value, remainingPenalty);
-                    resource.Value -= toRemove;
+                    playerResources.Resources[resource.Key] -= toRemove;
                     remainingPenalty -= toRemove;
                     resourcesLost[resource.Key] = toRemove;
                 }
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Applied hoarding penalty to player {0}: lost {1} total resources", 
                     playerId, penaltyAmount);
 
                 foreach (var lost in resourcesLost)
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "  - Lost {0} {1}", lost.Value, lost.Key);
                 }
             }
@@ -106,13 +106,13 @@ namespace SuperHexLink.Rules
 
             if (maintenancePaid < totalMaintenance)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Player {0} could not pay full maintenance: paid {1}/{2}", 
                     playerId, maintenancePaid, totalMaintenance);
                 return false;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Player {0} paid maintenance: {2} resources for {1} buildings", 
                 playerId, buildingCount, maintenancePaid);
 
@@ -131,7 +131,7 @@ namespace SuperHexLink.Rules
             var reductionAmount = (int)(baseProduction * reductionPercentage);
             var exhaustedProduction = Math.Max(1, baseProduction - reductionAmount);  // Minimum 1 resource
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Production exhausted: {0} -> {1} (exhaustion level: {2})", 
                 baseProduction, exhaustedProduction, hexExhaustionLevel);
 
@@ -155,7 +155,7 @@ namespace SuperHexLink.Rules
                 .OrderByDescending(kvp => kvp.Value)
                 .FirstOrDefault();
 
-            if (leaderMostAbundant.Key != null)
+            if (leaderMostAbundant.Value > 0)
             {
                 var stealAmount = Math.Min(1, leaderMostAbundant.Value);  // Steal 1 resource
                 
@@ -163,7 +163,7 @@ namespace SuperHexLink.Rules
                 {
                     resourceManager.AddResources(targetPlayerId, leaderMostAbundant.Key, stealAmount);
                     
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "Targeted debilitation: Player {0} stole {1} {2} from leader {3}", 
                         targetPlayerId, stealAmount, leaderMostAbundant.Key, leaderPlayerId);
                 }
@@ -192,7 +192,7 @@ namespace SuperHexLink.Rules
                 // Apply increasing difficulty for expansion
                 var expansionDifficulty = (int)(saturationRatio * 10);  // Higher cost when more saturated
                 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Player {0} territory expansion difficulty: {1} (saturation: {2:P})", 
                     playerId, expansionDifficulty, saturationRatio);
                 
@@ -282,7 +282,7 @@ namespace SuperHexLink.Rules
             {
                 if (metrics.TotalResources < 10)
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "Early game boost for player {0}: low resources, encouraging growth", metrics.PlayerId);
                     // Could implement small resource bonuses for struggling players
                 }
@@ -297,7 +297,7 @@ namespace SuperHexLink.Rules
             {
                 if (ShouldBalancePlayer(metrics.PlayerId, metrics, totalPlayers))
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         "Mid game balancing triggered for player {0}: potential runaway leader", metrics.PlayerId);
                 }
             }
@@ -309,7 +309,7 @@ namespace SuperHexLink.Rules
             var leaderMetrics = allMetrics.Values.OrderByDescending(m => m.TotalResources).FirstOrDefault();
             if (leaderMetrics != null)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Late game: player {0} is dominant, applying aggressive balancing", leaderMetrics.PlayerId);
                 // Could implement stronger penalties or mechanics to help trailing players
             }
@@ -321,8 +321,8 @@ namespace SuperHexLink.Rules
     /// </summary>
     public class EconomicBalanceConfig
     {
-        public int HoardingThreshold { get; set; } = HOARDING_THRESHOLD;
-        public int MaintenancePerBuilding { get; set; } = MAINTENANCE_PER_BUILDING;
+        public int HoardingThreshold { get; set; } = 7;
+        public int MaintenancePerBuilding { get; set; } = 1;
         public float ExhaustionRate { get; set; } = 0.1f;  // 10% reduction per exhaustion level
         public float SaturationThreshold { get; set; } = 0.7f;  // 70% territory saturation
     }

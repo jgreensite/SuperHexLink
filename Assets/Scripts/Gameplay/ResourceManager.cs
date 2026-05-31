@@ -41,7 +41,7 @@ namespace SuperHexLink.Gameplay
         {
             if (_playerResources.ContainsKey(playerId))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Player {0} already has resources initialized", playerId);
                 return;
             }
@@ -60,7 +60,7 @@ namespace SuperHexLink.Gameplay
                 }
             };
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Initialized resources for player {0}", playerId);
         }
 
@@ -71,14 +71,14 @@ namespace SuperHexLink.Gameplay
         {
             if (!_playerResources.ContainsKey(playerId))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Cannot add resources to non-existent player {0}", playerId);
                 return false;
             }
 
             if (amount <= 0)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Cannot add non-positive amount {0} of resources", amount);
                 return false;
             }
@@ -89,7 +89,7 @@ namespace SuperHexLink.Gameplay
             // Apply economic feedback control if available
             _economicBalancer?.ApplyHoardingPenalty(playerId, playerResources);
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Added {0} {1} to player {2} (new total: {3})", 
                 amount, resourceType, playerId, playerResources.Resources[resourceType]);
 
@@ -103,14 +103,14 @@ namespace SuperHexLink.Gameplay
         {
             if (!_playerResources.ContainsKey(playerId))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Cannot remove resources from non-existent player {0}", playerId);
                 return false;
             }
 
             if (amount <= 0)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Cannot remove non-positive amount {0} of resources", amount);
                 return false;
             }
@@ -119,7 +119,7 @@ namespace SuperHexLink.Gameplay
             
             if (playerResources.Resources[resourceType] < amount)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Player {0} insufficient {1} (has {2}, needs {3})", 
                     playerId, resourceType, playerResources.Resources[resourceType], amount);
                 return false;
@@ -127,7 +127,7 @@ namespace SuperHexLink.Gameplay
 
             playerResources.Resources[resourceType] -= amount;
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Removed {0} {1} from player {2} (new total: {3})", 
                 amount, resourceType, playerId, playerResources.Resources[resourceType]);
 
@@ -194,7 +194,7 @@ namespace SuperHexLink.Gameplay
                 return false;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Transaction completed: {0}", transaction);
 
             return true;

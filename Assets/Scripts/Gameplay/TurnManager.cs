@@ -17,8 +17,8 @@ namespace SuperHexLink.Gameplay
         private int _currentPlayerIndex;
         private TurnPhase _currentPhase;
         private int _turnNumber;
-        private readonly Dictionary<TurnPhase, Action<TurnPhase>> _phaseEnterActions;
-        private readonly Dictionary<TurnPhase, Action<TurnPhase>> _phaseExitActions;
+        private Dictionary<TurnPhase, Action<TurnPhase>> _phaseEnterActions;
+        private Dictionary<TurnPhase, Action<TurnPhase>> _phaseExitActions;
 
         /// <summary>
         /// Gets the current player whose turn it is.

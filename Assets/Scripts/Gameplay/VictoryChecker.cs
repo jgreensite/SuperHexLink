@@ -51,13 +51,13 @@ namespace SuperHexLink.Gameplay
             // Calculate total
             victoryPoints.TotalPoints = victoryPoints.SettlementPoints + 
                                        victoryPoints.CityPoints + 
-                                       victoryPoints.LongestRoadPoints + 
-                                       victoryPoints.LargestArmyPoints;
+                                       (victoryPoints.LongestRoadPoints ?? 0) + 
+                                       (victoryPoints.LargestArmyPoints ?? 0);
 
             // Store for tracking
             _playerVictoryPoints[playerId] = victoryPoints;
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Victory points for player {0}: {1} total (Settlements: {2}, Cities: {3}, Longest Road: {4}, Largest Army: {5})",
                 playerId, victoryPoints.TotalPoints, victoryPoints.SettlementPoints, 
                 victoryPoints.CityPoints, victoryPoints.LongestRoadPoints, victoryPoints.LargestArmyPoints);
@@ -227,7 +227,7 @@ namespace SuperHexLink.Gameplay
                     break;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Updated special achievement for player {0}: {1} = {2}", 
                 playerId, type, hasAchievement);
         }
@@ -257,7 +257,7 @@ namespace SuperHexLink.Gameplay
                 {
                     winners.Add(playerId);
                     
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                         "Player {0} has reached victory with {1} points!", playerId, victoryPoints.TotalPoints);
                 }
             }
@@ -271,7 +271,7 @@ namespace SuperHexLink.Gameplay
 
             if (result.HasWinner)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Game victory detected! Winners: {0}", string.Join(", ", result.Winners));
             }
 

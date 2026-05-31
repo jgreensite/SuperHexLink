@@ -213,7 +213,7 @@ public class EdgeSpawner : SpawnerBase
         switch (edgeType?.ToLower())
         {
             case "road":
-                return new Material(Shader.Find("Standard")) { color = Color.brown };
+                return new Material(Shader.Find("Standard")) { color = new Color(0.6f, 0.3f, 0f) };
             case "bridge":
                 return new Material(Shader.Find("Standard")) { color = Color.gray };
             default:

@@ -68,7 +68,7 @@ namespace SuperHexLink.Gameplay
 
             var result = new DiceRollResult(die1, die2, total, TotalRolls);
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 $"DiceRoller: Rolled {die1} + {die2} = {total} (Roll #{TotalRolls})");
 
             DiceRolled?.Invoke(result);
@@ -84,14 +84,14 @@ namespace SuperHexLink.Gameplay
         {
             if (count <= 0)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     $"DiceRoller: Invalid roll count {count}");
                 return new List<DiceRollResult>();
             }
 
             if (count > 1000)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     $"DiceRoller: Large roll count {count} may impact performance");
             }
 
@@ -102,7 +102,7 @@ namespace SuperHexLink.Gameplay
                 results.Add(Roll());
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 $"DiceRoller: Completed {count} rolls");
 
             return results;
@@ -143,7 +143,7 @@ namespace SuperHexLink.Gameplay
         {
             if (TotalRolls < 100)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "DiceRoller: Insufficient rolls for statistical validation");
                 return true; // Not enough data to validate
             }
@@ -158,7 +158,7 @@ namespace SuperHexLink.Gameplay
 
                 if (deviation > tolerancePercent)
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         $"DiceRoller: Distribution anomaly for total {total}: expected {expectedCount:F1}, got {actualCount} ({deviation:P1} deviation)");
 
                     isValid = false;
@@ -167,7 +167,7 @@ namespace SuperHexLink.Gameplay
 
             if (isValid)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     $"DiceRoller: Roll distribution is within {tolerancePercent:P0} tolerance");
             }
 
@@ -212,7 +212,7 @@ namespace SuperHexLink.Gameplay
                 _rollHistory[i] = 0;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "DiceRoller: Roll history reset");
         }
 
@@ -226,7 +226,7 @@ namespace SuperHexLink.Gameplay
             var oldRandom = _random;
             _random.GetHashCode(); // Force usage to avoid compiler warning
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 $"DiceRoller: Seed set to {seed}");
         }
 

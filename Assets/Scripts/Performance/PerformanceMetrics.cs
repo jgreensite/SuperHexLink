@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -138,7 +138,6 @@ namespace SuperHexLink.Performance
                 if (_isInitialized) return;
 
                 _logSettings = logSettings ?? new ActionLogSettings();
-                _logSettings.EnableCategory(ActionLogCategory.Performance, true);
 
                 // Set up default thresholds
                 SetupDefaultThresholds();
@@ -148,7 +147,7 @@ namespace SuperHexLink.Performance
 
                 _isInitialized = true;
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                     "Performance monitoring system initialized");
             }
         }
@@ -215,7 +214,7 @@ namespace SuperHexLink.Performance
             var threshold = new AlertThreshold(metricName, warningThreshold, criticalThreshold, comparisonOperator);
             _thresholds.AddOrUpdate(metricName, threshold, (key, existing) => threshold);
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                 $"Alert threshold set for {metricName}: Warning={warningThreshold}, Critical={criticalThreshold}");
         }
 
@@ -279,7 +278,7 @@ namespace SuperHexLink.Performance
             _metrics.Clear();
             _eventHistory.Clear();
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                 "All performance metrics reset");
         }
 
@@ -297,7 +296,7 @@ namespace SuperHexLink.Performance
 
                 _isInitialized = false;
 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                     "Performance monitoring system shutdown");
             }
         }
@@ -317,7 +316,7 @@ namespace SuperHexLink.Performance
                 if (DateTime.UtcNow.Second % 30 == 0)
                 {
                     var summary = GetSummary();
-                    ActionLogger.LogStructured(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Info, 
+                    ActionLogger.LogStructured(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info, 
                         "Performance summary", new Dictionary<string, object>
                         {
                             ["totalMetrics"] = summary.totalMetrics,
@@ -329,7 +328,7 @@ namespace SuperHexLink.Performance
             }
             catch (Exception ex)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Performance, ActionLogSeverity.Error, 
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error, 
                     $"Error collecting metrics: {ex.Message}");
             }
         }

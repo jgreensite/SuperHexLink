@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.Logging;
@@ -43,7 +43,7 @@ namespace SuperHexLink.Rules
             // Semantic Relationships
             RegisterSemanticRelationships();
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Initialized core game ontology with {0} entries", _ontologyEntries.Count);
         }
 
@@ -250,7 +250,7 @@ namespace SuperHexLink.Rules
         {
             _ontologyEntries[entryId] = entry;
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Registered ontology entry: {0} ({1})", entryId, entry.Name);
         }
 
@@ -267,7 +267,7 @@ namespace SuperHexLink.Rules
             var relationship = $"{relationshipType}:{toEntry}";
             _semanticRelationships[fromEntry].Add(relationship);
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Debug,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                 "Added semantic relationship: {0} -> {1} ({2})", fromEntry, toEntry, relationshipType);
         }
 
@@ -364,7 +364,7 @@ namespace SuperHexLink.Rules
                 result.Warnings.Add("MDA categories may be inconsistent for this rule");
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Rule coherence validation: {0} - {1}", result.IsValid ? "Valid" : "Invalid", 
                 string.Join("; ", result.Reasons.Concat(result.Warnings)));
 

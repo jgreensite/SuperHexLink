@@ -30,7 +30,7 @@ namespace SuperHexLink.Gameplay
         {
             _hexProductionMap[hexId] = productionData;
             
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Registered hex {0} for production: {1} on roll {2}", 
                 hexId, productionData.ResourceType, productionData.ProductionNumber);
         }
@@ -49,12 +49,12 @@ namespace SuperHexLink.Gameplay
 
             if (!producingHexes.Any())
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "No hexes produce on roll {0}", diceRoll);
                 return results;
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Roll {0}: {1} hexes producing", diceRoll, producingHexes.Count);
 
             foreach (var hexKvp in producingHexes)
@@ -64,7 +64,7 @@ namespace SuperHexLink.Gameplay
 
                 if (!buildingData.ContainsKey(hexId))
                 {
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         "No building data for hex {0}", hexId);
                     continue;
                 }
@@ -145,7 +145,7 @@ namespace SuperHexLink.Gameplay
         {
             if (!_hexProductionMap.ContainsKey(hexId))
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Cannot apply exhaustion to non-existent hex {0}", hexId);
                 return;
             }
@@ -153,7 +153,7 @@ namespace SuperHexLink.Gameplay
             var hexData = _hexProductionMap[hexId];
             hexData.ExhaustionLevel += exhaustionAmount;
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Applied exhaustion to hex {0}: new level {1}", hexId, hexData.ExhaustionLevel);
         }
 
@@ -165,7 +165,7 @@ namespace SuperHexLink.Gameplay
             if (_hexProductionMap.ContainsKey(hexId))
             {
                 _hexProductionMap[hexId].ExhaustionLevel = 0;
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Reset exhaustion for hex {0}", hexId);
             }
         }
@@ -348,6 +348,7 @@ namespace SuperHexLink.Gameplay
 
     public enum BuildingType
     {
+        None = 0,
         Settlement,
         City,
         Road

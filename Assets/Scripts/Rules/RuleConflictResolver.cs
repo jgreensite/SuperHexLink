@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.Logging;
@@ -134,7 +134,7 @@ namespace SuperHexLink.Rules
             _ruleBehaviors[ruleId] = behavior;
             _rulePriorities[ruleId] = priority;
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Registered rule {0} with scope {1}, behavior {2}, priority {3}", 
                 ruleId, scope, behavior, priority);
         }
@@ -147,7 +147,7 @@ namespace SuperHexLink.Rules
             var resolution = new ConflictResolution();
             var ruleList = ruleIds.ToList();
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Detecting conflicts for {0} rules", ruleList.Count);
 
             // Check for conflicts between each pair of rules
@@ -220,7 +220,7 @@ namespace SuperHexLink.Rules
         /// </summary>
         private ConflictResolution ResolveConflicts(ConflictResolution resolution)
         {
-            ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Resolving {0} rule conflicts", resolution.Conflicts.Count);
 
             resolution.ResolutionStrategy = "specific-beats-general";
@@ -400,19 +400,19 @@ namespace SuperHexLink.Rules
         /// </summary>
         private void LogResolutionResults(ConflictResolution resolution)
         {
-            ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Conflict resolution complete: {0} resolved, {1} superseded",
                 resolution.ResolvedRules.Count, resolution.SupersededRules.Count);
 
             if (resolution.ResolvedRules.Count > 0)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Debug,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                     "Resolved rules: {0}", string.Join(", ", resolution.ResolvedRules));
             }
 
             if (resolution.SupersededRules.Count > 0)
             {
-                ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Debug,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Debug,
                     "Superseded rules: {0}", string.Join(", ", resolution.SupersededRules));
             }
         }

@@ -38,7 +38,7 @@ namespace SuperHexLink.Gameplay
             {
                 result.IsValid = false;
                 result.Reason = $"Corner {cornerId} does not exist";
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Settlement placement failed: {0}", result.Reason);
                 return result;
             }
@@ -50,7 +50,7 @@ namespace SuperHexLink.Gameplay
             {
                 result.IsValid = false;
                 result.Reason = $"Corner {cornerId} is already occupied by {corner.BuildingType}";
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Settlement placement failed: {0}", result.Reason);
                 return result;
             }
@@ -64,7 +64,7 @@ namespace SuperHexLink.Gameplay
                 {
                     result.IsValid = false;
                     result.Reason = distanceValidation.Reason;
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         "Settlement placement failed: {0}", result.Reason);
                     return result;
                 }
@@ -74,13 +74,13 @@ namespace SuperHexLink.Gameplay
                 {
                     result.IsValid = false;
                     result.Reason = $"Corner {cornerId} is not connected to player {playerId}'s road network";
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         "Settlement placement failed: {0}", result.Reason);
                     return result;
                 }
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Settlement placement validated for player {0} at corner {1}", playerId, cornerId);
 
             return result;
@@ -199,7 +199,7 @@ namespace SuperHexLink.Gameplay
             {
                 result.IsValid = false;
                 result.Reason = $"Edge {edgeId} does not exist";
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "Road placement failed: {0}", result.Reason);
                 return result;
             }
@@ -211,7 +211,7 @@ namespace SuperHexLink.Gameplay
             {
                 result.IsValid = false;
                 result.Reason = $"Edge {edgeId} already has a road";
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "Road placement failed: {0}", result.Reason);
                 return result;
             }
@@ -224,7 +224,7 @@ namespace SuperHexLink.Gameplay
                 {
                     result.IsValid = false;
                     result.Reason = $"Initial road must be placed adjacent to player's settlement";
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         "Road placement failed: {0}", result.Reason);
                     return result;
                 }
@@ -236,13 +236,13 @@ namespace SuperHexLink.Gameplay
                 {
                     result.IsValid = false;
                     result.Reason = $"Edge {edgeId} is not connected to player {playerId}'s road network or settlement";
-                    ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                    ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                         "Road placement failed: {0}", result.Reason);
                     return result;
                 }
             }
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "Road placement validated for player {0} at edge {1}", playerId, edgeId);
 
             return result;
@@ -337,7 +337,7 @@ namespace SuperHexLink.Gameplay
             {
                 result.IsValid = false;
                 result.Reason = $"Corner {cornerId} does not exist";
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Error,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Error,
                     "City upgrade failed: {0}", result.Reason);
                 return result;
             }
@@ -349,7 +349,7 @@ namespace SuperHexLink.Gameplay
             {
                 result.IsValid = false;
                 result.Reason = $"Corner {cornerId} does not have player {playerId}'s settlement (has {corner.BuildingType})";
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Warning,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Warning,
                     "City upgrade failed: {0}", result.Reason);
                 return result;
             }
@@ -357,7 +357,7 @@ namespace SuperHexLink.Gameplay
             // Check resource cost (this would be validated by ResourceManager)
             // For now, just validate the placement rules
 
-            ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+            ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                 "City upgrade validated for player {0} at corner {1}", playerId, cornerId);
 
             return result;
@@ -412,7 +412,7 @@ namespace SuperHexLink.Gameplay
                 _cornerData[cornerId].BuildingType = buildingType;
                 _cornerData[cornerId].PlayerId = playerId;
                 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Placed {0} for player {1} at corner {2}", buildingType, playerId, cornerId);
             }
         }
@@ -430,7 +430,7 @@ namespace SuperHexLink.Gameplay
                 // Update road network
                 UpdateRoadNetwork(edgeId, playerId);
                 
-                ActionLogger.Log(_logSettings, ActionLogCategory.Gameplay, ActionLogSeverity.Info,
+                ActionLogger.Log(_logSettings, ActionLogCategory.General, ActionLogSeverity.Info,
                     "Placed road for player {0} at edge {1}", playerId, edgeId);
             }
         }
