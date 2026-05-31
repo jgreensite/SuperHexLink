@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.CoreLogic;
 using SuperHexLink.Logging;
+using SuperHexLink.Rules;
 
 namespace SuperHexLink.Gameplay
 {
@@ -38,7 +39,7 @@ namespace SuperHexLink.Gameplay
         /// <summary>
         /// Calculate resource production for a dice roll.
         /// </summary>
-        public List<ProductionResult> CalculateProduction(int diceRoll, Dictionary<int, List<BuildingData>> buildingData)
+        public List<ProductionResult> CalculateProduction(int diceRoll, Dictionary<int, List<ProductionBuildingData>> buildingData)
         {
             var results = new List<ProductionResult>();
             
@@ -86,7 +87,7 @@ namespace SuperHexLink.Gameplay
         /// <summary>
         /// Calculate production from a specific hex-building combination.
         /// </summary>
-        private ProductionResult CalculateHexProduction(HexProductionData hexData, BuildingData building)
+        private ProductionResult CalculateHexProduction(HexProductionData hexData, ProductionBuildingData building)
         {
             var baseAmount = building.BuildingType switch
             {
@@ -284,9 +285,9 @@ namespace SuperHexLink.Gameplay
     }
 
     /// <summary>
-    /// Data for buildings on hexes.
+    /// Data for buildings on hexes, used by production calculations.
     /// </summary>
-    public class BuildingData
+    public class ProductionBuildingData
     {
         public int BuildingId { get; set; }
         public int PlayerId { get; set; }

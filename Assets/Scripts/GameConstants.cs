@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using SuperHexLink;
 
 /// <summary>
 /// Central configuration asset holding game constants, material mappings, and placement rules.
