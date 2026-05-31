@@ -16,7 +16,7 @@ public class HexReplacementPipeline
 {
     private readonly List<IHexReplacementRule> rules = new();
 
-    public HexReplacementPipeline(IEnumerable<IHexReplacementRule>? initialRules = null)
+    public HexReplacementPipeline(IEnumerable<IHexReplacementRule> initialRules = null)
     {
         if (initialRules != null)
         {
@@ -44,7 +44,7 @@ public class HexReplacementContext
 {
     private readonly Dictionary<(int Col, int Row), Hex> hexLookup;
 
-    public HexReplacementContext(HexSpawner hexSpawner, ActionLogSettings? logSettings)
+    public HexReplacementContext(HexSpawner hexSpawner, ActionLogSettings logSettings)
     {
         HexSpawner = hexSpawner ?? throw new ArgumentNullException(nameof(hexSpawner));
         ActionLogSettings = logSettings;
@@ -54,7 +54,7 @@ public class HexReplacementContext
     }
 
     public HexSpawner HexSpawner { get; }
-    public ActionLogSettings? ActionLogSettings { get; }
+    public ActionLogSettings ActionLogSettings { get; }
 
     public IEnumerable<Hex> Hexes => hexLookup.Values;
 
@@ -82,10 +82,10 @@ public readonly struct HexReplacementCandidate
 public class HarbourReplacementRule : IHexReplacementRule
 {
     private readonly GameConstants constants;
-    private readonly HexPlacementRuleConfig? ruleConfig;
+    private readonly HexPlacementRuleConfig ruleConfig;
     private readonly int targetCount;
 
-    public HarbourReplacementRule(GameConstants constants, HexPlacementRuleConfig? ruleConfig, int targetCount)
+    public HarbourReplacementRule(GameConstants constants, HexPlacementRuleConfig ruleConfig, int targetCount)
     {
         this.constants = constants ?? throw new ArgumentNullException(nameof(constants));
         this.ruleConfig = ruleConfig;
