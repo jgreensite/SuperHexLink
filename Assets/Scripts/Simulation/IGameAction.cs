@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SuperHexLink.Simulation
@@ -145,7 +145,7 @@ namespace SuperHexLink.Simulation
         public bool IsValid(HeadlessGameState state)
         {
             return state.CurrentTurn.Phase == TurnPhase.Roll && 
-                   state.CurrentTurn.PlayerId == PlayerId;
+                   state.CurrentTurn.CurrentPlayerId == PlayerId;
         }
 
         public string GetDescription()
@@ -170,6 +170,9 @@ namespace SuperHexLink.Simulation
     /// </summary>
     public class PlaceSettlementAction : IGameAction
     {
+        public PlaceSettlementAction() { }
+        public PlaceSettlementAction(int cornerId, int playerId) { CornerId = cornerId; PlayerId = playerId; }
+
         public string ActionId => "place_settlement";
         public int PlayerId { get; set; }
         public ActionType Type => ActionType.Build;
@@ -225,7 +228,7 @@ namespace SuperHexLink.Simulation
         public bool IsValid(HeadlessGameState state)
         {
             if (state.CurrentTurn.Phase != TurnPhase.Build || 
-                state.CurrentTurn.PlayerId != PlayerId)
+                state.CurrentTurn.CurrentPlayerId != PlayerId)
                 return false;
 
             if (!state.Players.ContainsKey(PlayerId))
@@ -275,6 +278,9 @@ namespace SuperHexLink.Simulation
     /// </summary>
     public class PlaceRoadAction : IGameAction
     {
+        public PlaceRoadAction() { }
+        public PlaceRoadAction(int edgeId, int playerId) { EdgeId = edgeId; PlayerId = playerId; }
+
         public string ActionId => "place_road";
         public int PlayerId { get; set; }
         public ActionType Type => ActionType.Build;
@@ -324,7 +330,7 @@ namespace SuperHexLink.Simulation
         public bool IsValid(HeadlessGameState state)
         {
             if (state.CurrentTurn.Phase != TurnPhase.Build || 
-                state.CurrentTurn.PlayerId != PlayerId)
+                state.CurrentTurn.CurrentPlayerId != PlayerId)
                 return false;
 
             if (!state.Players.ContainsKey(PlayerId))
@@ -374,6 +380,9 @@ namespace SuperHexLink.Simulation
     /// </summary>
     public class UpgradeToCityAction : IGameAction
     {
+        public UpgradeToCityAction() { }
+        public UpgradeToCityAction(int cornerId, int playerId) { CornerId = cornerId; PlayerId = playerId; }
+
         public string ActionId => "upgrade_to_city";
         public int PlayerId { get; set; }
         public ActionType Type => ActionType.Build;
@@ -424,7 +433,7 @@ namespace SuperHexLink.Simulation
         public bool IsValid(HeadlessGameState state)
         {
             if (state.CurrentTurn.Phase != TurnPhase.Build || 
-                state.CurrentTurn.PlayerId != PlayerId)
+                state.CurrentTurn.CurrentPlayerId != PlayerId)
                 return false;
 
             if (!state.Players.ContainsKey(PlayerId))
@@ -473,6 +482,16 @@ namespace SuperHexLink.Simulation
     /// </summary>
     public class BankTradeAction : IGameAction
     {
+        public BankTradeAction() { }
+        public BankTradeAction(int playerId, ResourceType fromResource, ResourceType toResource, int giveAmount, int getAmount)
+        {
+            PlayerId = playerId;
+            FromResource = fromResource;
+            ToResource = toResource;
+            GiveAmount = giveAmount;
+            GetAmount = getAmount;
+        }
+
         public string ActionId => "bank_trade";
         public int PlayerId { get; set; }
         public ActionType Type => ActionType.Trade;
@@ -509,7 +528,7 @@ namespace SuperHexLink.Simulation
         public bool IsValid(HeadlessGameState state)
         {
             if (state.CurrentTurn.Phase != TurnPhase.Trade || 
-                state.CurrentTurn.PlayerId != PlayerId)
+                state.CurrentTurn.CurrentPlayerId != PlayerId)
                 return false;
 
             if (!state.Players.ContainsKey(PlayerId))
@@ -578,7 +597,7 @@ namespace SuperHexLink.Simulation
 
         public bool IsValid(HeadlessGameState state)
         {
-            return state.CurrentTurn.PlayerId == PlayerId;
+            return state.CurrentTurn.CurrentPlayerId == PlayerId;
         }
 
         public string GetDescription()
@@ -626,3 +645,4 @@ namespace SuperHexLink.Simulation
 
     #endregion
 }
+
