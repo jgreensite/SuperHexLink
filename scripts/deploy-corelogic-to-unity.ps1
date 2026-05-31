@@ -101,6 +101,21 @@ if (Test-Path $newtonsoftPath) {
     Write-Host "  Run 'dotnet restore' on CoreLogic to download dependencies" -ForegroundColor Yellow
 }
 
+# Copy MoonSharp dependency (Lua interpreter for RulesEngine)
+$moonsharpVersion = "2.0.0"
+# MoonSharp 2.0.0 ships netstandard1.6 as its highest netstandard target (compatible with ns2.0)
+$moonsharpPath = Join-Path $env:USERPROFILE ".nuget\packages\moonsharp\$moonsharpVersion\lib\netstandard1.6\MoonSharp.Interpreter.dll"
+
+if (Test-Path $moonsharpPath) {
+    $destPath = Join-Path $unityPluginsDir "MoonSharp.Interpreter.dll"
+    Copy-Item $moonsharpPath -Destination $destPath -Force
+    Write-Host "  Copied: MoonSharp.Interpreter.dll" -ForegroundColor Green
+} else {
+    Write-Warning "MoonSharp not found in NuGet cache: $moonsharpPath"
+    Write-Warning "RulesEngine Lua support will not work in Unity without this dependency."
+    Write-Host "  Run 'dotnet restore' on CoreLogic to download dependencies" -ForegroundColor Yellow
+}
+
 # Summary
 Write-Host "`n=== Deployment Complete ===" -ForegroundColor Cyan
 Write-Host "CoreLogic deployed to: $unityPluginsDir" -ForegroundColor Green

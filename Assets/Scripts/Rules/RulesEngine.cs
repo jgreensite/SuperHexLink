@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MoonSharp.Interpreter;
 using SuperHexLink.CoreLogic;
 using SuperHexLink.Logging;
 
@@ -207,18 +208,34 @@ namespace SuperHexLink.Rules
 
             private LuaExecutionResult ExecuteScriptInternal(string script, Dictionary<string, object> environment)
             {
-                // This is a simplified implementation
-                // In a real implementation, you would use a Lua interpreter like MoonSharp
                 var result = new LuaExecutionResult { Success = true };
 
-                // Simulate script execution
-                if (script.Contains("return"))
+                var luaScript = new Script(CoreModules.Preset_HardSandbox);
+
+                // Expose allowed context variables as Lua globals
+                foreach (var kvp in environment)
                 {
-                    // Extract return value (simplified)
-                    result.ReturnValue = new Dictionary<string, object>
-                    {
-                        ["result"] = "simulated_result"
-                    };
+                    if (kvp.Value == null) continue;
+
+                    if (kvp.Value is int i)         luaScript.Globals[kvp.Key] = i;
+                    else if (kvp.Value is long l)   luaScript.Globals[kvp.Key] = l;
+                    else if (kvp.Value is float f)  luaScript.Globals[kvp.Key] = f;
+                    else if (kvp.Value is double d) luaScript.Globals[kvp.Key] = d;
+                    else if (kvp.Value is bool b)   luaScript.Globals[kvp.Key] = b;
+                    else if (kvp.Value is string s) luaScript.Globals[kvp.Key] = s;
+                    // Tables and complex objects are skipped; extend here as needed
+                }
+
+                // Wire print() to the action logger
+                luaScript.Globals["print"] = (Action<object>)(
+                    val => ActionLogger.Log(_logSettings, ActionLogCategory.Rules, ActionLogSeverity.Info,
+                        "Lua print: {0}", val?.ToString() ?? "nil"));
+
+                DynValue returnValue = luaScript.DoString(script);
+
+                if (returnValue.Type != DataType.Void && returnValue.Type != DataType.Nil)
+                {
+                    result.ReturnValue = new Dictionary<string, object> { ["result"] = returnValue.ToObject() };
                 }
 
                 return result;
