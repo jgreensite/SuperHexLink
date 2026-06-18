@@ -91,13 +91,13 @@ jobs:
 
       - name: Upload changed-csprojs.txt for debugging
         if: steps.set_changed_projects.outputs.has_changes == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: changed-csprojs-${{ github.job }}
           path: changed-csprojs.txt
       - name: Upload changed-csprojs-dryrun.txt for debugging
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: changed-csprojs-dryrun-${{ github.job }}
           path: changed-csprojs-dryrun.txt
@@ -142,7 +142,7 @@ jobs:
           if (Test-Path changed-csprojs.txt) { Copy-Item -Path changed-csprojs.txt -Destination changed-csprojs-branch-harness.txt -Force }
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           # Include the job name to make artifact names unique across jobs
           name: changed-csprojs-branch-harness-${{ github.job }}
@@ -178,7 +178,7 @@ jobs:
 
       - name: Upload CoreLogic test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: corelogic-test-results
           path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
@@ -244,7 +244,7 @@ jobs:
           fi
       - name: Upload changed-csprojs-branch-harness.txt for debugging
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: changed-csprojs-branch-harness
           path: changed-csprojs-branch-harness.txt
@@ -265,7 +265,7 @@ jobs:
         run: dotnet test CoreLogic/tests/CoreLogic.Tests/CoreLogic.Tests.csproj --configuration Release --verbosity minimal --logger "trx;LogFileName=corelogic-results.trx"
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: corelogic-test-results-dedicated
           path: CoreLogic/tests/CoreLogic.Tests/TestResults/*.trx
@@ -321,7 +321,7 @@ jobs:
           Get-ChildItem -Path . -Force | Sort-Object Name | ForEach-Object { Write-Host $_.Name }
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pester-results-${{ matrix.platform }}-${{ matrix.shell }}
           path: |
