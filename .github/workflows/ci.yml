@@ -10,7 +10,7 @@ jobs:
   static-checks:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -38,7 +38,7 @@ jobs:
             shell: 'pwsh'
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Setup .NET
@@ -203,7 +203,7 @@ jobs:
             shell: 'pwsh'
     if: github.event_name == 'pull_request'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Setup .NET
@@ -254,7 +254,7 @@ jobs:
     name: CoreLogic Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -275,7 +275,7 @@ jobs:
     runs-on: windows-latest
     needs: [static-checks, corelogic-tests]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Unity Tests (disabled — requires license)
         run: echo "Unity EditMode tests require a licensed runner. See BACKLOG.md E2-F1-S5."
 
@@ -294,7 +294,7 @@ jobs:
             shell: 'pwsh'
     if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Setup PowerShell / .NET
