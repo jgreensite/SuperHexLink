@@ -10,7 +10,7 @@ jobs:
     runs-on: [self-hosted, windows, unity]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Repo csproj build guard
         shell: powershell
