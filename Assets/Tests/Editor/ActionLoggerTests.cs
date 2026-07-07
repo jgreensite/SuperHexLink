@@ -20,7 +20,6 @@ namespace Tests.Editor
         {
             // Create test settings
             _testSettings = new ActionLogSettings();
-            _testSettings.EnableAll();
             
             // Store original correlation ID
             _originalCorrelationId = ActionLogger.GetCorrelationId();
@@ -197,7 +196,7 @@ namespace Tests.Editor
         {
             // Arrange
             var disabledSettings = new ActionLogSettings();
-            disabledSettings.DisableCategory(ActionLogCategory.General);
+            disabledSettings.logGeneral = false;
             
             // Act & Assert
             // Should not log when category is disabled

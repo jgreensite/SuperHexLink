@@ -18,11 +18,7 @@ namespace SuperHexLink.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _logSettings = new ActionLogSettings
-            {
-                IsEnabled = (category, severity) => true,
-                LogLevel = ActionLogSeverity.Info
-            };
+            _logSettings = new ActionLogSettings();
             _rulesEngine = new RulesEngine(_logSettings);
         }
 
@@ -138,7 +134,7 @@ namespace SuperHexLink.Tests.Editor
             // Should not throw even if rule scripts reference context vars
             Assert.DoesNotThrow(() =>
             {
-                var result = _rulesEngine.ExecuteRule("default_production", context);
+                var result = _rulesEngine.ExecuteRules("default_production", context.GameState);
                 Assert.IsNotNull(result);
             });
         }

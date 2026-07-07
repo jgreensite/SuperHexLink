@@ -1,5 +1,7 @@
 using NUnit.Framework;
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.Utils;
 
@@ -52,19 +54,19 @@ namespace Tests.Editor
         public void TearDown()
         {
             // Clean up test GameObjects
-            Object.DestroyImmediate(_hexSpawnerGo1);
-            Object.DestroyImmediate(_hexSpawnerGo2);
-            Object.DestroyImmediate(_edgeSpawnerGo1);
-            Object.DestroyImmediate(_edgeSpawnerGo2);
-            Object.DestroyImmediate(_cornerSpawnerGo1);
-            Object.DestroyImmediate(_cornerSpawnerGo2);
+            UnityEngine.Object.DestroyImmediate(_hexSpawnerGo1);
+            UnityEngine.Object.DestroyImmediate(_hexSpawnerGo2);
+            UnityEngine.Object.DestroyImmediate(_edgeSpawnerGo1);
+            UnityEngine.Object.DestroyImmediate(_edgeSpawnerGo2);
+            UnityEngine.Object.DestroyImmediate(_cornerSpawnerGo1);
+            UnityEngine.Object.DestroyImmediate(_cornerSpawnerGo2);
 
             // Clean up any spawned objects
-            foreach (var go in Object.FindObjectsOfType<GameObject>())
+            foreach (var go in UnityEngine.Object.FindObjectsOfType<GameObject>())
             {
                 if (go.name.StartsWith("Hex_") || go.name.StartsWith("Edge_") || go.name.StartsWith("Corner_"))
                 {
-                    Object.DestroyImmediate(go);
+                    UnityEngine.Object.DestroyImmediate(go);
                 }
             }
         }
@@ -369,10 +371,10 @@ namespace Tests.Editor
         private void InitializeEmptySpawners()
         {
             _hexSpawner1.State = new HexSpawner.HexSpawnerState();
-            _hexSpawner1.State.hexes = new List<Hex.HexState>();
+            _hexSpawner1.State.hexes = new List<List<Hex.HexState>>();
             
             _hexSpawner2.State = new HexSpawner.HexSpawnerState();
-            _hexSpawner2.State.hexes = new List<Hex.HexState>();
+            _hexSpawner2.State.hexes = new List<List<Hex.HexState>>();
             
             _edgeSpawner1.State = new EdgeSpawner.EdgeSpawnerState();
             _edgeSpawner1.State.edges = new List<EdgeSpawner.EdgeState>();
@@ -411,8 +413,8 @@ namespace Tests.Editor
                         Selected = false
                     };
                     
-                    _hexSpawner1.State.hexes.Add(hexState);
-                    _hexSpawner2.State.hexes.Add(hexState);
+                    _hexSpawner1.State.hexes.Add(new List<Hex.HexState> { hexState });
+                    _hexSpawner2.State.hexes.Add(new List<Hex.HexState> { hexState });
                 }
             }
             
@@ -448,10 +450,10 @@ namespace Tests.Editor
         private void CreateBoardWithMultipleHexes(HexSpawner spawner)
         {
             spawner.State = new HexSpawner.HexSpawnerState();
-            spawner.State.hexes = new List<Hex.HexState>();
+            spawner.State.hexes = new List<List<Hex.HexState>>();
             
             // Create hexes in random order to test sorting
-            var hexes = new[]
+            var hexes = new Hex.HexState[]
             {
                 new Hex.HexState { Col = 2, Row = 1, HexType = "forest", HexSubType = "dense", Rotation = 90, HexNum = 5, GroupID = "group1", Selected = false },
                 new Hex.HexState { Col = 0, Row = 0, HexType = "grass", HexSubType = "plain", Rotation = 0, HexNum = 1, GroupID = "group0", Selected = false },
@@ -460,7 +462,7 @@ namespace Tests.Editor
                 new Hex.HexState { Col = 0, Row = 1, HexType = "desert", HexSubType = "dry", Rotation = 45, HexNum = 3, GroupID = "group1", Selected = false }
             };
             
-            spawner.State.hexes.AddRange(hexes);
+            spawner.State.hexes.Add(new List<Hex.HexState>(hexes));
         }
     }
 }

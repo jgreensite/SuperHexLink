@@ -19,11 +19,7 @@ namespace SuperHexLink.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _logSettings = new ActionLogSettings
-            {
-                IsEnabled = (category, severity) => true,
-                LogLevel = ActionLogSeverity.Info
-            };
+            _logSettings = new ActionLogSettings();
             _rulesEngine = new RulesEngine(_logSettings);
         }
 

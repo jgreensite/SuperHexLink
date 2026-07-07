@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using System.Linq;
 using SuperHexLink;
 
 namespace Tests.Editor

@@ -19,7 +19,6 @@ namespace Tests.Editor
         public void SetUp()
         {
             _testSettings = new ActionLogSettings();
-            _testSettings.EnableAll();
             
             // Ensure clean state
             PerformanceMetrics.ResetMetrics();

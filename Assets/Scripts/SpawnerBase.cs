@@ -7,7 +7,7 @@ using UnityEngine;
 /// Abstract base class for all spawners (Hex, Edge, Corner).
 /// Provides common references and lifecycle methods.
 /// </summary>
-public abstract class SpawnerBase : SerializedMonoBehaviour
+public abstract class SpawnerBase : SerializedMonoBehaviour, SuperHexLink.ISpawner
 {
     [Tooltip("Shared game constants asset — assign in the Inspector.")]
     public GameConstants CS;

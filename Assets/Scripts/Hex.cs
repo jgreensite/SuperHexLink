@@ -47,6 +47,16 @@ public class Hex : MonoBehaviour
 
         public HexState() { }
 
+        /// <summary>Returns cube coordinates (Vector3Int) for this hex. Satisfies x+y+z=0.</summary>
+        public Vector3Int CubeCoordinates
+        {
+            get
+            {
+                var cube = CRToHex(Col, Row);
+                return new Vector3Int(cube.q, cube.r, cube.s);
+            }
+        }
+
         /// <summary>Converts offset (col, row) to cube coordinates.</summary>
         public HexExtensions.HexExtensions.Hex CRToHex(int col, int row)
         {

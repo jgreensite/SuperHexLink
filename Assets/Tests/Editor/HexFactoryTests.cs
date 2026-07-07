@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using TMPro;
 using SuperHexLink.Services;
 using SuperHexLink.Logging;
 
@@ -41,11 +42,8 @@ namespace Tests.Editor
             {
                 cols = 3,
                 rows = 3,
-                radius = 1.0f,
-                height = 1.0f,
-                minHeight = 0.0f,
-                maxHeight = 2.0f,
-                Apothem = 0.866f // Standard hex apothem for radius 1
+                radius = 1,
+                height = 1.0f
             };
         }
 

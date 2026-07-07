@@ -75,7 +75,7 @@ namespace Tests.Editor
         {
             // Arrange
             var gameState = new GameSpawner.GameSpawnerState();
-            string invalidPath = "C:\invalid\path\that\doesnt\exist\file.json";
+            string invalidPath = @"C:\invalid\path\that\doesnt\exist\file.json";
 
             // Act
             SaveResult result = _saveLoadService.SaveGameState(gameState, invalidPath);
@@ -147,11 +147,8 @@ namespace Tests.Editor
             {
                 cols = 5,
                 rows = 7,
-                radius = 1.5f,
-                height = 2.0f,
-                minHeight = 0.5f,
-                maxHeight = 3.0f,
-                Apothem = 1.299f
+                radius = 1,
+                height = 2.0f
             };
 
             // Act

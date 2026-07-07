@@ -260,7 +260,7 @@ namespace Tests.Editor
             var bridgeEdge = edgeInstances.First(e => e.edgeState.edgeType == "bridge");
             var unknownEdge = edgeInstances.First(e => e.edgeState.edgeType == "unknown");
 
-            Assert.AreEqual(Color.brown, roadEdge.gameObject.GetComponent<MeshRenderer>().material.color);
+            Assert.AreEqual(new Color(0.6f, 0.3f, 0f), roadEdge.gameObject.GetComponent<MeshRenderer>().material.color);
             Assert.AreEqual(Color.gray, bridgeEdge.gameObject.GetComponent<MeshRenderer>().material.color);
             Assert.AreEqual(Color.white, unknownEdge.gameObject.GetComponent<MeshRenderer>().material.color);
         }

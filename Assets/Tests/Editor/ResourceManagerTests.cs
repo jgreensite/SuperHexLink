@@ -20,11 +20,7 @@ namespace SuperHexLink.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _logSettings = new ActionLogSettings
-            {
-                IsEnabled = (category, severity) => true,
-                LogLevel = ActionLogSeverity.Info
-            };
+            _logSettings = new ActionLogSettings();
             _economicBalancer = new EconomicBalancer(_logSettings);
             _resourceManager = new ResourceManager(_logSettings, _economicBalancer);
         }

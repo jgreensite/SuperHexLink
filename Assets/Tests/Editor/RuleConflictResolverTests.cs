@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SuperHexLink.Rules;
@@ -19,11 +20,7 @@ namespace SuperHexLink.Tests.Editor
         [SetUp]
         public void SetUp()
         {
-            _logSettings = new ActionLogSettings
-            {
-                IsEnabled = (category, severity) => true,
-                LogLevel = ActionLogSeverity.Info
-            };
+            _logSettings = new ActionLogSettings();
             _resolver = new RuleConflictResolver(_logSettings);
         }
 
