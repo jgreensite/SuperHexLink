@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
       - name: Repo csproj build guard
@@ -42,7 +42,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
       - name: Run changed-only csproj build guard (PR)
@@ -207,7 +207,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
       - name: Run branch harness (DryRun)
@@ -256,7 +256,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
       - name: Build CoreLogic
@@ -298,7 +298,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup PowerShell / .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
       - name: Install Pester
